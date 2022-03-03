@@ -53,14 +53,14 @@ SimpleTriangle::SimpleTriangle(int width, int height) : OpenGLDemo(width, height
     m_vao = new VertexArray();
     m_vao->bind();
 
-    m_vbo = new VertexBuffer(_vertices.data(), _vertices.size()*sizeof (GLfloat));
+    m_vbo = new VertexBuffer(_vertices.data(), _vertices.size()*sizeof(GLfloat));
     m_layout->push<float>(3);
     m_vao->addBuffer(m_vbo, m_layout);
 
-    m_ebo = new IndexBuffer(_indices.data(), _indices.size());
-
-    m_nbo = new VertexBuffer(_normals.data(), _normals.size()*sizeof (GLfloat));
+    m_nbo = new VertexBuffer(_normals.data(), _normals.size()*sizeof(GLfloat));
     m_vao->addBuffer(m_nbo, m_layout);
+
+    m_ebo = new IndexBuffer(_indices.data(), _indices.size());
 
     //6. Unbind the VAO
     m_vao->unbind();
@@ -141,6 +141,7 @@ SimpleTriangle::~SimpleTriangle() {
     delete m_vbo;
     delete m_nbo;
     delete m_ebo;
+    delete m_layout;
     delete m_vao;
 }
 

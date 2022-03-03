@@ -22,7 +22,7 @@ void VertexArray::addBuffer(VertexBuffer* vbo, VertexBufferLayout* layout)
         glAssert(glEnableVertexAttribArray(i));
         glAssert(glVertexAttribPointer(i, element.count, element.type, 
                                        element.normalized, layout->getStride(), 
-                                       (const GLvoid*)&offset));
+                                       reinterpret_cast<void*>(offset)));
         offset += element.count * VertexBufferElement::getSizeOfType(element.type);
     }
 }

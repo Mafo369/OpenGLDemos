@@ -31,6 +31,9 @@ class VertexBufferLayout
         template<typename T>
         void push(unsigned int count)
         {
+            std::cerr << 
+                "VertexBufferLayout: Unsupported type for count:" << count 
+            << std::endl;
             assert(false);
         }
 
