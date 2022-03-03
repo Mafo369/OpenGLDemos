@@ -1,6 +1,8 @@
 #ifndef SIMPLETRIANGLE_H
 #define SIMPLETRIANGLE_H
 
+#include "Buffer.h"
+#include "VertexArray.h"
 #include "opengldemo.h"
 
 /** Simple drawing demonstration
@@ -21,13 +23,14 @@ private:
 
     // OpenGL object for geometry
     // Vertex Array Buffer
-    GLuint _vao;
+    VertexArray* m_vao;
+    VertexBufferLayout* m_layout = new VertexBufferLayout();
     // Vertex Buffer Object
-    GLuint _vbo;
+    VertexBuffer* m_vbo;
     // Normal buffer
-    GLuint _nbo;
+    VertexBuffer* m_nbo;
     // Face buffer
-    GLuint _ebo;
+    IndexBuffer* m_ebo;
 
     // Shader program for rendering
     GLuint _program;

@@ -1,4 +1,5 @@
 #include "hellotriangles.h"
+#include "Buffer.h"
 #include <iostream>
 
 static const char* vertexshader_source ="#version 410 core\n\
@@ -42,36 +43,27 @@ SimpleTriangle::SimpleTriangle(int width, int height) : OpenGLDemo(width, height
         -0.577350269189626f, 0.577350269189626f, 0.577350269189626f
     };
     _indices = {
-        // Note that we start from 0!
         0, 1, 3,   // First Triangle
         1, 2, 3    // Second Triangle
     };
 
     // Initialize the geometry
     // 1. Generate geometry buffers
-    glGenBuffers(1, &_vbo) ;
-    glGenBuffers(1, &_nbo) ;
-    glGenBuffers(1, &_ebo) ;
-    glGenVertexArrays(1, &_vao) ;
-    // 2. Bind Vertex Array Object
-    glBindVertexArray(_vao);
-        // 3. Copy our vertices array in a buffer for OpenGL to use
-        glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-        glBufferData(GL_ARRAY_BUFFER, _vertices.size()*sizeof (GLfloat), _vertices.data(), GL_STATIC_DRAW);
-        // 4. Then set our vertex attributes pointers
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(0);
-        // 5. Copy our normals array in a buffer for OpenGL to use
-        glBindBuffer(GL_ARRAY_BUFFER, _nbo);
-        glBufferData(GL_ARRAY_BUFFER, _normals.size()*sizeof (GLfloat), _normals.data(), GL_STATIC_DRAW);
-        // 6. Copy our vertices array in a buffer for OpenGL to use
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-        glEnableVertexAttribArray(1);
-        // 7. Copy our index array in a element buffer for OpenGL to use
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size()*sizeof (GLfloat), _indices.data(), GL_STATIC_DRAW);
+    //glGenVertexArrays(1, &_vao) ;
+    m_vao = new VertexArray();
+    m_vao->bind();
+
+    m_vbo = new VertexBuffer(_vertices.data(), _vertices.size()*sizeof (GLfloat));
+    m_layout->push<float>(3);
+    m_vao->addBuffer(m_vbo, m_layout);
+
+    m_ebo = new IndexBuffer(_indices.data(), _indices.size());
+
+    m_nbo = new VertexBuffer(_normals.data(), _normals.size()*sizeof (GLfloat));
+    m_vao->addBuffer(m_nbo, m_layout);
+
     //6. Unbind the VAO
-    glBindVertexArray(0);
+    m_vao->unbind();
 
     // Initialize shaders
     GLint success;
@@ -146,19 +138,19 @@ SimpleTriangle::SimpleTriangle(int width, int height) : OpenGLDemo(width, height
 SimpleTriangle::~SimpleTriangle() {
     glDeleteProgram(_programcolor);
     glDeleteProgram(_programnormal);
-    glDeleteBuffers(1, &_vbo);
-    glDeleteBuffers(1, &_nbo);
-    glDeleteBuffers(1, &_ebo);
-    glDeleteVertexArrays(1, &_vao) ;
+    delete m_vbo;
+    delete m_nbo;
+    delete m_ebo;
+    delete m_vao;
 }
 
 void SimpleTriangle::draw() {
     OpenGLDemo::draw();
 
     glUseProgram(_program);
-    glBindVertexArray(_vao);
+    m_vao->bind();
     glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+    m_vao->unbind();
 }
 
 bool SimpleTriangle::keyboard(unsigned char k) {

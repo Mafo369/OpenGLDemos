@@ -4,8 +4,8 @@
 
 #include <vector>
 
+#include "error_handling.h"
 #include <QOpenGLFunctions_4_1_Core>
-#include "opengl_stuff.h"
 
 /** Simple class for managing an OpenGL demo
  */
