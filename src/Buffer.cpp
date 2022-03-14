@@ -27,7 +27,7 @@ IndexBuffer::IndexBuffer( const unsigned int* data, unsigned int count )
 {
    glAssert(glGenBuffers(1, &m_rendererId)); 
    glAssert(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererId));
-   glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(unsigned int), data, GL_STATIC_DRAW));
+   glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, GL_STATIC_DRAW));
 }
 
 IndexBuffer::~IndexBuffer()

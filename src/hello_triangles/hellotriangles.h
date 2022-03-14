@@ -3,6 +3,7 @@
 
 #include "Buffer.h"
 #include "VertexArray.h"
+#include "Shader.h"
 #include "opengldemo.h"
 
 /** Simple drawing demonstration
@@ -33,11 +34,11 @@ private:
     IndexBuffer* m_ebo;
 
     // Shader program for rendering
-    GLuint _program;
+    Shader* m_program;
 
     // Different availableprograms
-    GLuint _programcolor;
-    GLuint _programnormal;
+    Shader* m_programcolor;
+    Shader* m_programnormal;
 
 };
 
