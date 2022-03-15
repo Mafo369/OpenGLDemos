@@ -1,7 +1,7 @@
 #include "spheres.h"
 
 
-void UVSphere(uint32_t meridians, uint32_t parallels, Mesh &mesh)
+void UVSphere(uint32_t meridians, uint32_t parallels, MathiasMesh &mesh)
 {
     mesh.vertices.emplace_back(0.0f, 1.0f, 0.0f);
     for (uint32_t j = 0; j < parallels - 1; ++j)
@@ -51,7 +51,7 @@ void UVSphere(uint32_t meridians, uint32_t parallels, Mesh &mesh)
     }
 }
 
-void Icosahedron(Mesh &mesh)
+void Icosahedron(MathiasMesh &mesh)
 {
     const double t = (1.0 + std::sqrt(5.0)) / 2.0;
 
@@ -92,7 +92,7 @@ void Icosahedron(Mesh &mesh)
     mesh.addTriangle(9, 8, 1);
 }
 
-void SubdivideMesh(const Mesh &meshIn, Mesh &meshOut)
+void SubdivideMathiasMesh(const MathiasMesh &meshIn, MathiasMesh &meshOut)
 {
     meshOut.vertices = meshIn.vertices;
 

@@ -45,7 +45,7 @@ static const char* fragmentshader_source ="#version 410 core\n\
         }\n";
 
 
-void SimpleSpheres::Sphere::buildFrom(const Mesh &m) {
+void SimpleSpheres::Sphere::buildFrom(const MathiasMesh &m) {
   for(const auto& v : m.vertices) {
     _vertices.emplace_back(v.x);
     _vertices.emplace_back(v.y);
@@ -81,22 +81,22 @@ void SimpleSpheres::Sphere::draw() {
 }
 
 SimpleSpheres::SimpleSpheres(int width, int height) : OpenGLDemo(width, height), _camera(nullptr) {
-      Mesh m0;
-      Mesh m1;
-      Mesh m2;
-      Mesh m3;
-      Mesh m4;
+      MathiasMesh m0;
+      MathiasMesh m1;
+      MathiasMesh m2;
+      MathiasMesh m3;
+      MathiasMesh m4;
       UVSphere(18, 10, m4);
       _parametric.buildFrom(m4);
 
       Icosahedron(m1);        // 20 triangles
-      SubdivideMesh(m1, m2);  // 80 triangles
-      SubdivideMesh(m2, m3);  // 320 triangls
+      SubdivideMathiasMesh(m1, m2);  // 80 triangles
+      SubdivideMathiasMesh(m2, m3);  // 320 triangls
 
-      SubdivideMesh(m3, m0);
+      SubdivideMathiasMesh(m3, m0);
 /*
-      SubdivideMesh(m2, m3);
-      SubdivideMesh(m3, m2);
+      SubdivideMathiasMesh(m2, m3);
+      SubdivideMathiasMesh(m3, m2);
   */
     _geodesic.buildFrom( m0 );
 

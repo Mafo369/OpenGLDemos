@@ -1,10 +1,7 @@
 #ifndef SIMPLETRIANGLE_H
 #define SIMPLETRIANGLE_H
 
-#include "Buffer.h"
-#include "VertexArray.h"
-#include "Shader.h"
-#include "opengldemo.h"
+#include "Renderer.h"
 
 /** Simple drawing demonstration
  */
@@ -18,14 +15,11 @@ public:
     bool keyboard(unsigned char k) override;
 private:
     // A simple geometry
-    std::vector<GLfloat> _vertices;
-    std::vector<GLfloat> _normals;
-    std::vector<GLuint> _indices;
+    Mesh* m_mesh;
 
     // OpenGL object for geometry
     // Vertex Array Buffer
     VertexArray* m_vao;
-    VertexBufferLayout* m_layout = new VertexBufferLayout();
     // Vertex Buffer Object
     VertexBuffer* m_vbo;
     // Normal buffer
@@ -39,6 +33,8 @@ private:
     // Different availableprograms
     Shader* m_programcolor;
     Shader* m_programnormal;
+
+    Renderer* m_renderer;
 
 };
 

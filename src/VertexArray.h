@@ -1,6 +1,13 @@
 #pragma once
 
 #include "Buffer.h"
+#include <cassert>
+#include <iostream>
+
+// Hard coded to avoid cyclical includes
+#define GL_FLOAT				0x1406
+#define GL_UNSIGNED_INT				0x1405
+#define GL_UNSIGNED_BYTE			0x1401
 
 struct VertexBufferElement
 {

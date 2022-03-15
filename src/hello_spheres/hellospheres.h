@@ -7,7 +7,7 @@
 
 #include <memory>
 
-struct Mesh;
+struct MathiasMesh;
 /** Simple drawing demonstration
  */
 class SimpleSpheres : public OpenGLDemo {
@@ -40,7 +40,7 @@ private:
         GLuint _vbo;
         GLuint _ebo;
 
-        void buildFrom(const Mesh &m);
+        void buildFrom(const MathiasMesh &m);
         void draw();
     };
 

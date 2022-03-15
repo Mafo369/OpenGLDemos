@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Renderer.h"
-
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <glm/glm.hpp>
   
 struct ShaderProgramSource{
     std::string vertexSource;
@@ -26,6 +25,9 @@ public:
 
     // utility uniform functions
     void setUniform4f(const std::string& name, const glm::vec4& v);
+    void setUniform1f(const std::string& name, float value);
+
+    void setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection);
 private:
     std::stringstream readShader(const std::string& filepath);
     ShaderProgramSource parseShader(const std::string& vertexFilepath, const std::string& fragmentFilepath);

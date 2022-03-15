@@ -1,4 +1,5 @@
 #include "Buffer.h"
+#include "Renderer.h"
 
 VertexBuffer::VertexBuffer( const void* data, unsigned int size )
 {
@@ -22,8 +23,8 @@ void VertexBuffer::unbind() const
     glAssert(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-IndexBuffer::IndexBuffer( const unsigned int* data, unsigned int count )
-   : m_count( count )
+IndexBuffer::IndexBuffer( const unsigned int* data, unsigned int count, unsigned int mode )
+   : m_count( count ), m_mode(mode)
 {
    glAssert(glGenBuffers(1, &m_rendererId)); 
    glAssert(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_rendererId));

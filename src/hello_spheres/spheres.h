@@ -14,7 +14,7 @@
 
 #include <glm/glm.hpp>
 
-struct Mesh
+struct MathiasMesh
 {
     std::vector<glm::vec3> vertices;
     std::vector<uint32_t> triangles;
@@ -46,10 +46,10 @@ struct Mesh
 
 };
 
-void UVSphere(uint32_t meridians, uint32_t parallels, Mesh &mesh);
+void UVSphere(uint32_t meridians, uint32_t parallels, MathiasMesh &mesh);
 
-void Icosahedron(Mesh &mesh);
-void SubdivideMesh(const Mesh &meshIn, Mesh &meshOut);
+void Icosahedron(MathiasMesh &mesh);
+void SubdivideMathiasMesh(const MathiasMesh &meshIn, MathiasMesh &meshOut);
 
 
 #endif // SPHERES_H

@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include "Renderer.h"
 
 Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFilepath) 
 {
@@ -24,6 +25,18 @@ void Shader::unbind() const{
 
 void Shader::setUniform4f(const std::string& name, const glm::vec4& v){
     glAssert(glUniform4f(getUniformLocation(name), v.x, v.y, v.z, v.w));
+}
+
+void Shader::setUniform1f(const std::string& name, float value){
+    glAssert(glUniform1f(getUniformLocation(name), value));
+}
+    
+void Shader::setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection){
+    bind();
+    glUniformMatrix4fv( getUniformLocation("model"), 1, GL_FALSE, glm::value_ptr(_model));
+    glUniformMatrix4fv( getUniformLocation("view"), 1, GL_FALSE, glm::value_ptr(_view));
+    glUniformMatrix4fv( getUniformLocation("projection"), 1, GL_FALSE, glm::value_ptr(_projection));
+    unbind();
 }
 
 int Shader::getUniformLocation(const std::string& name){

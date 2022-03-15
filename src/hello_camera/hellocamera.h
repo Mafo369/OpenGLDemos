@@ -1,7 +1,7 @@
 #ifndef SIMPLECAMERA_H
 #define SIMPLECAMERA_H
 
-#include "opengldemo.h"
+#include "Renderer.h"
 
 #include "camera.h"
 
@@ -28,18 +28,12 @@ public:
 
 private:
     // A simple geometry
-    std::vector<GLfloat> _vertices;
-    std::vector<GLfloat> _normals;
-    std::vector<GLuint> _indices;
-
-    // OpenGL object for geometry
-    GLuint _vao;
-    GLuint _vbo;
-    GLuint _nbo;
-    GLuint _ebo;
+    Mesh* m_mesh;
 
     // Shader program for rendering
-    GLuint _program;
+    Shader* m_program;
+
+    Renderer* m_renderer;
 
     // for mouse management
     int _button; // 0 --> left. 1 --> right. 2 --> middle. 3 --> other
