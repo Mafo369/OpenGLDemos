@@ -1,5 +1,6 @@
 #include "hellocamera.h"
 #include <iostream>
+#include <math.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
@@ -13,18 +14,58 @@
 
 #define deg2rad(x) float(M_PI)*(x)/180.f
 
+void pascalCoeffs(int n, std::vector<std::vector<int>>& coeffs){
+    for(int line = 1; line <= n; line++){
+        int C = 1;
+        std::vector<int> coeffI;
+        for(int i = 1; i <= line; i++){
+            coeffI.push_back(C);
+            C = C * (line - i) / i;
+        }
+        coeffs.push_back(coeffI);
+    }
+}
+
 SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _activecamera(0), _camera(nullptr) {
     // Initialise geometric data
-    Vertex v0 = {glm::vec3(0.5f,  0.5f, 0.0f), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v1 = {glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v2 = {glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v3 = {glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    std::vector<Vertex> vertices = { v0, v1, v2, v3 };
-    std::vector<unsigned int> indices = {
-        0, 1, 3,   // First Triangle
-        1, 2, 3    // Second Triangle
-    };
+    std::vector<glm::vec3> points;
+    points.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
+    points.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
+    points.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
+    points.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
+    //Vertex v0 = {glm::vec3(0.5f,  0.5f, 0.0f), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    //Vertex v1 = {glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    //Vertex v2 = {glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    //Vertex v3 = {glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    //std::vector<Vertex> vertices = { v0, v1, v2, v3 };
+    //std::vector<unsigned int> indices = {
+    //    0, 1, 3,   // First Triangle
+    //    1, 2, 3    // Second Triangle
+    //};
     std::vector<Texture> textures;
+
+    int n = points.size();
+    std::vector<std::vector<int>> coeffs;
+    pascalCoeffs(n, coeffs);
+
+    int indice = 0;
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+    auto normal = glm::vec3(0.577350269189626f, 0.0, 0.0);
+    for(int j = 0; j <= 100; j++){
+        float u = float(j)/100.f;
+        glm::vec3 pu(0.0f);
+        for(int i = 0; i < n; i++){
+            float Bi = coeffs[n-1][i] * powf(u, i) * powf(1.0f-u, n-1-i);  
+            pu += Bi * points[i];
+        }
+        indices.push_back(indice);
+        indice++;
+        indices.push_back(indice);
+        Vertex v = { pu, normal, glm::vec2(0.f, 0.f) };
+        vertices.push_back(v);
+    }
+    indices.pop_back();
  
     m_renderer = new Renderer();
 

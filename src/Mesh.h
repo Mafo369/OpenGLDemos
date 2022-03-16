@@ -37,7 +37,6 @@ public:
 private:
     VertexArray* m_vao;
     VertexBuffer* m_vbo;
-    VertexBuffer* m_nbo;
     IndexBuffer* m_ebo;
 
     void setupMesh(unsigned int mode);

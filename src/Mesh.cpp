@@ -13,7 +13,6 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
 Mesh::~Mesh(){
     delete m_vao;
     delete m_ebo;
-    delete m_nbo;
     delete m_vbo;
 }
 
