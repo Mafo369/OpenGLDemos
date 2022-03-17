@@ -28,44 +28,86 @@ void pascalCoeffs(int n, std::vector<std::vector<int>>& coeffs){
 
 SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _activecamera(0), _camera(nullptr) {
     // Initialise geometric data
-    std::vector<glm::vec3> points;
-    points.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
-    points.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
-    points.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
-    points.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
-    //Vertex v0 = {glm::vec3(0.5f,  0.5f, 0.0f), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    //Vertex v1 = {glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    //Vertex v2 = {glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    //Vertex v3 = {glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    //std::vector<Vertex> vertices = { v0, v1, v2, v3 };
-    //std::vector<unsigned int> indices = {
-    //    0, 1, 3,   // First Triangle
-    //    1, 2, 3    // Second Triangle
-    //};
+    std::vector<std::vector<glm::vec3>> points;
+    std::vector<glm::vec3> points1;
+    std::vector<glm::vec3> points2;
+    points1.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
+    points1.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
+    points1.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
+    points1.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
+    points2.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
+    points2.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
+    points2.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
+    points2.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
+    points.push_back(points1);
+    points.push_back(points2);
+
+    //std::vector<glm::vec3> points;
+    //points.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
+    //points.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
+    //points.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
+    //points.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
+    Vertex v0 = {points1[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v1 = {points1[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v2 = {points1[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v3 = {points1[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    std::vector<Vertex> vertices = { v0, v1, v2, v3 };
+    std::vector<unsigned int> indices = {
+        0, 1, 1,   // First Triangle
+        2, 2, 3    // Second Triangle
+    };
     std::vector<Texture> textures;
 
     int n = points.size();
-    std::vector<std::vector<int>> coeffs;
-    pascalCoeffs(n, coeffs);
+    int m = points1.size();
+    std::vector<std::vector<int>> coeffsn;
+    std::vector<std::vector<int>> coeffsm;
+    pascalCoeffs(n, coeffsn);
+    pascalCoeffs(m, coeffsm);
 
-    int indice = 0;
-    std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
-    auto normal = glm::vec3(0.577350269189626f, 0.0, 0.0);
-    for(int j = 0; j <= 100; j++){
-        float u = float(j)/100.f;
-        glm::vec3 pu(0.0f);
-        for(int i = 0; i < n; i++){
-            float Bi = coeffs[n-1][i] * powf(u, i) * powf(1.0f-u, n-1-i);  
-            pu += Bi * points[i];
+    //std::vector<Vertex> vertices;
+    //std::vector<unsigned int> indices;
+    auto normal = glm::vec3(0.577350269189626f, 0.577350269189626f, 0.0);
+    for(int ui = 0; ui <= 10; ui++){
+        float u = float(ui)/10.f;
+        for(int uj = 0; uj <= 100; uj++){
+            float v = float(uj)/100.f;
+            glm::vec3 puv(0.0f);
+            for(int i = 0; i < n; i++){
+                for(int j = 0; j < m; j++){
+                    float Bi = coeffsn[n-1][i] * powf(u, i) * powf(1.0f-u, n-1-i);  
+                    float Bj = coeffsm[m-1][j] * powf(v, j) * powf(1.0f-v, m-1-j);  
+                    puv += Bi * Bj * points[i][j];
+                }
+            }
+            std::cout << puv.x << " " <<puv.y << " " <<puv.z << " " << std::endl;
+            Vertex vertex = { normalize(puv), normal, glm::vec2(0.f, 0.f) };
+            vertices.push_back(vertex);
         }
-        indices.push_back(indice);
-        indice++;
-        indices.push_back(indice);
-        Vertex v = { pu, normal, glm::vec2(0.f, 0.f) };
-        vertices.push_back(v);
     }
-    indices.pop_back();
+    for(int i = 4; i < 104; i++){
+        indices.push_back(10*i);
+        indices.push_back(10*(i+1));
+    }
+
+    //int indice = 4;
+    //std::vector<Vertex> vertices;
+    //std::vector<unsigned int> indices;
+    //auto normal = glm::vec3(0.577350269189626f, 0.0, 0.0);
+    //for(int j = 0; j <= 100; j++){
+    //    float u = float(j)/100.f;
+    //    glm::vec3 pu(0.0f);
+    //    for(int i = 0; i < n; i++){
+    //        float Bi = coeffs[n-1][i] * powf(u, i) * powf(1.0f-u, n-1-i);  
+    //        pu += Bi * points[i];
+    //    }
+    //    indices.push_back(indice);
+    //    indice++;
+    //    indices.push_back(indice);
+    //    Vertex v = { pu, normal, glm::vec2(0.f, 0.f) };
+    //    vertices.push_back(v);
+    //}
+    //indices.pop_back();
  
     m_renderer = new Renderer();
 

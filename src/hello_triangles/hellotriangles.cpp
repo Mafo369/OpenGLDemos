@@ -2,10 +2,10 @@
 
 SimpleTriangle::SimpleTriangle(int width, int height) : OpenGLDemo(width, height) {
     // Initialise geometric data
-    Vertex v0 = {glm::vec3(0.5f,  0.5f, 0.0f), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v1 = {glm::vec3(0.5f, -0.5f, 0.0f), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v2 = {glm::vec3(-0.5f, -0.5f, 0.0f), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v3 = {glm::vec3(-0.5f, 0.5f, 0.0f), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v0 = {normalize(glm::vec3(0.5f,  0.5f, 1.5f)), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v1 = {normalize(glm::vec3(0.5f, -0.5f, 0.0f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v2 = {normalize(glm::vec3(-0.5f, -0.5f, 0.0f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v3 = {normalize(glm::vec3(-0.5f, 0.5f, 1.5f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     std::vector<Vertex> vertices = { v0, v1, v2, v3 };
     std::vector<unsigned int> indices = {
         0, 1, 3,   // First Triangle
