@@ -1,6 +1,7 @@
 #include "hellocamera.h"
 #include <iostream>
 #include <math.h>
+#include <vector>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
@@ -26,81 +27,100 @@ void pascalCoeffs(int n, std::vector<std::vector<int>>& coeffs){
     }
 }
 
+glm::vec3 bezierValue(std::vector<glm::vec3>& p, float t, std::vector<std::vector<int>>& coeffs){
+    glm::vec3 pu(0.0f);
+    int n = p.size()-1;
+    for(int i = 0; i <= n; i++){
+        float Bi = coeffs[n][i] * powf(t, i) * powf(1.0f-t, n-i);  
+        pu += Bi * p[i];
+    }
+    return pu;
+}
+
 SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _activecamera(0), _camera(nullptr) {
     // Initialise geometric data
     std::vector<std::vector<glm::vec3>> points;
     std::vector<glm::vec3> points1;
     std::vector<glm::vec3> points2;
-    points1.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
-    points1.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
-    points1.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
-    points1.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
-    points2.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
-    points2.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
-    points2.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
-    points2.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
+    points1.push_back(glm::vec3(0.f,  -0.5f, 0.0f));
+    points1.push_back(glm::vec3(0.5f, 0.f, 0.0f));
+    points1.push_back(glm::vec3(1.f, 0.f, 0.0f));
+    points1.push_back(glm::vec3(1.5f, -0.5f, 0.0f));
+    points2.push_back(glm::vec3(0.f,  -0.5f, 0.5f));
+    points2.push_back(glm::vec3(0.5f, 0.f, 0.5f));
+    points2.push_back(glm::vec3(1.f, 0.5f, 0.5f));
+    points2.push_back(glm::vec3(1.5f, -0.5f, 0.5f));
     points.push_back(points1);
     points.push_back(points2);
-
-    //std::vector<glm::vec3> points;
-    //points.push_back(glm::vec3(0.5f,  0.5f, 0.0f));
-    //points.push_back(glm::vec3(0.5f, -0.5f, 0.0f));
-    //points.push_back(glm::vec3(-0.5f, -0.5f, 0.0f));
-    //points.push_back(glm::vec3(-0.5f, 0.5f, 0.0f));
     Vertex v0 = {points1[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v1 = {points1[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v2 = {points1[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v3 = {points1[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    std::vector<Vertex> vertices = { v0, v1, v2, v3 };
-    std::vector<unsigned int> indices = {
-        0, 1, 1,   // First Triangle
-        2, 2, 3    // Second Triangle
+    Vertex v4 = {points2[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v5 = {points2[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v6 = {points2[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v7 = {points2[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    std::vector<Vertex> vertices1 = { v0, v1, v2, v3, v4, v5, v6, v7 };
+    std::vector<unsigned int> indices1 = {
+        0, 1, 1,
+        2, 2, 3,
+        4, 5, 5,
+        6, 6, 7
     };
+
     std::vector<Texture> textures;
 
-    int n = points.size();
-    int m = points1.size();
-    std::vector<std::vector<int>> coeffsn;
-    std::vector<std::vector<int>> coeffsm;
-    pascalCoeffs(n, coeffsn);
-    pascalCoeffs(m, coeffsm);
+    // ===================== BEZIER SURFACE ===========================//
 
-    //std::vector<Vertex> vertices;
-    //std::vector<unsigned int> indices;
+    int lignes = points.size();
+    int cols = points[0].size();
+    std::vector<std::vector<int>> coeffsLignes;
+    std::vector<std::vector<int>> coeffsCols;
+    pascalCoeffs(lignes, coeffsLignes);
+    pascalCoeffs(cols, coeffsCols);
+
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
     auto normal = glm::vec3(0.577350269189626f, 0.577350269189626f, 0.0);
-    for(int ui = 0; ui <= 10; ui++){
-        float u = float(ui)/10.f;
-        for(int uj = 0; uj <= 100; uj++){
-            float v = float(uj)/100.f;
-            glm::vec3 puv(0.0f);
-            for(int i = 0; i < n; i++){
-                for(int j = 0; j < m; j++){
-                    float Bi = coeffsn[n-1][i] * powf(u, i) * powf(1.0f-u, n-1-i);  
-                    float Bj = coeffsm[m-1][j] * powf(v, j) * powf(1.0f-v, m-1-j);  
-                    puv += Bi * Bj * points[i][j];
-                }
+    int n = 100; // Nb segments en u
+    int m = 10; // Nb segments en v
+    int uf = n-1;
+    int vf = m-1;
+    for(int ui = 0; ui <= uf; ui++){
+        float u = float(ui)/uf;
+        for(int uj = 0; uj <= vf; uj++){
+            float v = float(uj)/vf;
+            std::vector<glm::vec3> uCurve;
+            for(int i = 0; i < lignes; i++){
+                uCurve.push_back(bezierValue(points[i], u, coeffsCols)); 
             }
-            std::cout << puv.x << " " <<puv.y << " " <<puv.z << " " << std::endl;
-            Vertex vertex = { normalize(puv), normal, glm::vec2(0.f, 0.f) };
+            glm::vec3 puv = bezierValue(uCurve, v, coeffsLignes);
+            Vertex vertex = { puv, normal, glm::vec2(0.f, 0.f) };
             vertices.push_back(vertex);
         }
     }
-    for(int i = 4; i < 104; i++){
-        indices.push_back(10*i);
-        indices.push_back(10*(i+1));
+    for(int i = 0; i < n-1; i++){
+        for(int j = 0; j < m-1; j++){
+            indices.push_back(i*m+j);
+            indices.push_back(i*m+j+1);
+            indices.push_back((i+1)*m+j+1);
+            indices.push_back(i*m+j);
+            indices.push_back((i+1)*m+j+1);
+            indices.push_back((i+1)*m+j);
+        }
     }
 
-    //int indice = 4;
+    // ===================== BEZIER CURVE ===========================//
+     
+    //int indice = 0;
     //std::vector<Vertex> vertices;
     //std::vector<unsigned int> indices;
     //auto normal = glm::vec3(0.577350269189626f, 0.0, 0.0);
-    //for(int j = 0; j <= 100; j++){
-    //    float u = float(j)/100.f;
-    //    glm::vec3 pu(0.0f);
-    //    for(int i = 0; i < n; i++){
-    //        float Bi = coeffs[n-1][i] * powf(u, i) * powf(1.0f-u, n-1-i);  
-    //        pu += Bi * points[i];
-    //    }
+    //int n = 100; // Nb de segments en u
+    //int uf = n-1;
+    //for(int j = 0; j <= uf; j++){
+    //    float u = float(j)/uf;
+    //    glm::vec3 pu = bezierValue(points1, u, coeffsCols);
     //    indices.push_back(indice);
     //    indice++;
     //    indices.push_back(indice);
@@ -111,7 +131,8 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
  
     m_renderer = new Renderer();
 
-    m_mesh = new Mesh(vertices, indices, textures, GL_LINES);
+    m_mesh = new Mesh(vertices, indices, textures, GL_TRIANGLES);
+    m_meshL = new Mesh(vertices1, indices1, textures, GL_LINES);
 
     m_program = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Camera.frag.glsl");
@@ -161,6 +182,7 @@ void SimpleCamera::draw() {
 
     m_program->setMVP(_model, _view, _projection);
     m_renderer->draw(m_mesh, m_program);
+    m_renderer->draw(m_meshL, m_program);
 }
 
 void SimpleCamera::mouseclick(int button, float xpos, float ypos) {

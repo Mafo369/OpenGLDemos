@@ -29,6 +29,7 @@ public:
 private:
     // A simple geometry
     Mesh* m_mesh;
+    Mesh* m_meshL;
 
     // Shader program for rendering
     Shader* m_program;
