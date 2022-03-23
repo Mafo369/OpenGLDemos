@@ -27,12 +27,13 @@ add_definitions(-DGL_SILENCE_DEPRECATION -DGLM_FORCE_SILENT_WARNINGS)
 FILE(GLOB_RECURSE
     folder_source
     ${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/Geometry/*.cpp
 )
 
 FILE(GLOB_RECURSE
     folder_header
     ${CMAKE_SOURCE_DIR}/src/*.h
-
+    ${CMAKE_SOURCE_DIR}/src/Geometry/*.h
 )
 
 FILE(GLOB_RECURSE

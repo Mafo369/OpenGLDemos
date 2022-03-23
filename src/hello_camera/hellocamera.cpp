@@ -42,6 +42,8 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
     std::vector<std::vector<glm::vec3>> points;
     std::vector<glm::vec3> points1;
     std::vector<glm::vec3> points2;
+    std::vector<glm::vec3> points3;
+    std::vector<glm::vec3> points4;
     points1.push_back(glm::vec3(0.f,  -0.5f, 0.0f));
     points1.push_back(glm::vec3(0.5f, 0.f, 0.0f));
     points1.push_back(glm::vec3(1.f, 0.f, 0.0f));
@@ -50,8 +52,18 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
     points2.push_back(glm::vec3(0.5f, 0.f, 0.5f));
     points2.push_back(glm::vec3(1.f, 0.5f, 0.5f));
     points2.push_back(glm::vec3(1.5f, -0.5f, 0.5f));
+    points3.push_back(glm::vec3(0.f,  -0.5f, 1.0f));
+    points3.push_back(glm::vec3(0.5f, 0.5f, 1.0f));
+    points3.push_back(glm::vec3(1.f, 1.0f, 1.0f));
+    points3.push_back(glm::vec3(1.5f, -0.3f, 1.0f));
+    points4.push_back(glm::vec3(0.f,  1.5f, 1.5f));
+    points4.push_back(glm::vec3(0.5f, 0.f, 1.5f));
+    points4.push_back(glm::vec3(1.f, -1.0f, 1.5f));
+    points4.push_back(glm::vec3(1.5f, 0.3f, 1.5f));
     points.push_back(points1);
     points.push_back(points2);
+    points.push_back(points3);
+    points.push_back(points4);
     Vertex v0 = {points1[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v1 = {points1[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v2 = {points1[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
@@ -60,12 +72,21 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
     Vertex v5 = {points2[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v6 = {points2[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v7 = {points2[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    std::vector<Vertex> vertices1 = { v0, v1, v2, v3, v4, v5, v6, v7 };
+    Vertex v8 = {points3[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v9 = {points3[1], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v10 = {points3[2], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v11 = {points3[3], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v12 = {points4[0], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v13 = {points4[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v14 = {points4[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v15 = {points4[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    std::vector<Vertex> vertices1 = { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
+                                      v10, v11, v12, v13, v14, v15 };
     std::vector<unsigned int> indices1 = {
-        0, 1, 1,
-        2, 2, 3,
-        4, 5, 5,
-        6, 6, 7
+        0, 1, 1, 2, 2, 3,
+        4, 5, 5, 6, 6, 7,
+        8, 9, 9, 10, 10, 11,
+        12, 13, 13, 14, 14, 15
     };
 
     std::vector<Texture> textures;
@@ -81,9 +102,10 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
 
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
-    auto normal = glm::vec3(0.577350269189626f, 0.577350269189626f, 0.0);
+    std::vector<std::vector<unsigned int>> vertexNormals;
+    auto normal = glm::vec3(0.f);
     int n = 100; // Nb segments en u
-    int m = 10; // Nb segments en v
+    int m = 100; // Nb segments en v
     int uf = n-1;
     int vf = m-1;
     for(int ui = 0; ui <= uf; ui++){
@@ -97,6 +119,8 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
             glm::vec3 puv = bezierValue(uCurve, v, coeffsLignes);
             Vertex vertex = { puv, normal, glm::vec2(0.f, 0.f) };
             vertices.push_back(vertex);
+            std::vector<unsigned int> vn;
+            vertexNormals.push_back(vn);
         }
     }
     for(int i = 0; i < n-1; i++){
@@ -108,6 +132,27 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
             indices.push_back((i+1)*m+j+1);
             indices.push_back((i+1)*m+j);
         }
+    }
+    std::vector<glm::vec3> faceNormals;
+    unsigned int faceId = 0;
+    for(unsigned int i = 0; i < indices.size(); i += 3){
+        unsigned int a = indices[i];
+        unsigned int b = indices[i+1];
+        unsigned int c = indices[i+2];
+        glm::vec3 normal = glm::cross(vertices[a].m_position,
+                                      vertices[b].m_position);
+        faceNormals.push_back(normal);
+        vertexNormals[a].push_back(faceId);
+        vertexNormals[b].push_back(faceId);
+        vertexNormals[c].push_back(faceId);
+        faceId++;
+    }
+    for(unsigned int i = 0; i < vertexNormals.size(); i++){
+        glm::vec3 sumN(0.f);
+        for(unsigned int j = 0; j < vertexNormals[i].size(); j++){
+            sumN += faceNormals[vertexNormals[i][j]];
+        }
+        vertices[i].m_normal = glm::normalize(sumN);
     }
 
     // ===================== BEZIER CURVE ===========================//
