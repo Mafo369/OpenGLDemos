@@ -80,7 +80,7 @@ void SimpleSpheres::Sphere::draw() {
   glBindVertexArray(0);
 }
 
-SimpleSpheres::SimpleSpheres(int width, int height) : OpenGLDemo(width, height), _camera(nullptr) {
+SimpleSpheres::SimpleSpheres(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _camera(nullptr) {
       MathiasMesh m0;
       MathiasMesh m1;
       MathiasMesh m2;

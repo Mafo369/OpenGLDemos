@@ -37,7 +37,7 @@ glm::vec3 bezierValue(std::vector<glm::vec3>& p, float t, std::vector<std::vecto
     return pu;
 }
 
-SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _activecamera(0), _camera(nullptr) {
+SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     // Initialise geometric data
     std::vector<std::vector<glm::vec3>> points;
     std::vector<glm::vec3> points1;
@@ -139,8 +139,9 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
         unsigned int a = indices[i];
         unsigned int b = indices[i+1];
         unsigned int c = indices[i+2];
-        glm::vec3 normal = glm::cross(vertices[a].m_position,
-                                      vertices[b].m_position);
+        glm::vec3 edge1 = vertices[b].m_position - vertices[a].m_position;
+        glm::vec3 edge2 = vertices[c].m_position - vertices[a].m_position;
+        glm::vec3 normal = glm::cross(edge1, edge2);
         faceNormals.push_back(normal);
         vertexNormals[a].push_back(faceId);
         vertexNormals[b].push_back(faceId);
@@ -193,7 +194,7 @@ SimpleCamera::SimpleCamera(int width, int height) : OpenGLDemo(width, height), _
 
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 
-    _model = glm::mat4(1.0);
+    _model = glm::translate(glm::mat4(1.0), m_translation);
 }
 
 SimpleCamera::~SimpleCamera() {
@@ -222,6 +223,7 @@ void printmatrix(T * ptr) {
 void SimpleCamera::draw() {
     OpenGLDemo::draw();
 
+    _model = glm::translate(glm::mat4(1.0), m_translation);
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 

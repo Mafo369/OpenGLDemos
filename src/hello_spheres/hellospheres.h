@@ -1,6 +1,7 @@
 #ifndef SIMPLESPHERES_H
 #define SIMPLESPHERES_H
 
+#include <imgui.h>
 #include "opengldemo.h"
 
 #include "../hello_camera/camera.h"
@@ -12,7 +13,7 @@ struct MathiasMesh;
  */
 class SimpleSpheres : public OpenGLDemo {
 public:
-    explicit SimpleSpheres(int width, int height);
+    explicit SimpleSpheres(int width, int height, ImVec4 clearColor);
     ~SimpleSpheres();
 
     void resize(int width, int height) override;

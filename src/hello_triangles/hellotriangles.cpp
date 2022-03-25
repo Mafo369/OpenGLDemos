@@ -1,6 +1,6 @@
 # include "hellotriangles.h"
 
-SimpleTriangle::SimpleTriangle(int width, int height) : OpenGLDemo(width, height) {
+SimpleTriangle::SimpleTriangle(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor) {
     // Initialise geometric data
     Vertex v0 = {normalize(glm::vec3(0.5f,  0.5f, 1.5f)), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v1 = {normalize(glm::vec3(0.5f, -0.5f, 0.0f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};

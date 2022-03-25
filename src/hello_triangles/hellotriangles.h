@@ -2,12 +2,13 @@
 #define SIMPLETRIANGLE_H
 
 #include "Renderer.h"
+#include "imgui.h"
 
 /** Simple drawing demonstration
  */
 class SimpleTriangle : public OpenGLDemo {
 public:
-    explicit SimpleTriangle(int width, int height);
+    explicit SimpleTriangle(int width, int height, ImVec4 clearColor);
     ~SimpleTriangle() override;
 
     void draw() override;

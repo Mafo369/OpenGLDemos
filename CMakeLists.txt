@@ -69,4 +69,6 @@ add_executable(helloopenGL
 
 set(EXT_LIBS Qt5::OpenGL ${OPENGL_LIBRARIES})
 
-target_link_libraries(helloopenGL ${EXT_LIBS} )
+add_subdirectory(libs/qtimgui)
+
+target_link_libraries(helloopenGL ${EXT_LIBS} qt_imgui_widgets implot  )

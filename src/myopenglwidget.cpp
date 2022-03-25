@@ -7,23 +7,28 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <QtImGui.h>
+#include <implot.h>
+#include <imgui.h>
+#include <QTimer>
+
 #include "hello_triangles/hellotriangles.h"
 #include "hello_camera/hellocamera.h"
 #include "hello_spheres/hellospheres.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Hello clear ..." << std::endl; return new OpenGLDemo(width, height);
+    _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
+        std::cout << "Hello clear ..." << std::endl; return new OpenGLDemo(width, height, clearColor);
         } );
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Hello triangles ..." << std::endl; return new SimpleTriangle(width, height);
+    _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
+        std::cout << "Hello triangles ..." << std::endl; return new SimpleTriangle(width, height, clearColor);
         } );
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Hello camera ..." << std::endl; return new SimpleCamera(width, height);
+    _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
+        std::cout << "Hello camera ..." << std::endl; return new SimpleCamera(width, height, clearColor);
         } );
-    _democonstructors.push_back( [](int width, int height)->OpenGLDemo*{
-        std::cout << "Hello spheres ..." << std::endl; return new SimpleSpheres(width, height);
+    _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
+        std::cout << "Hello spheres ..." << std::endl; return new SimpleSpheres(width, height, clearColor);
         } );
 }
 
@@ -48,20 +53,37 @@ void MyOpenGLWidget::cleanup() {
 void MyOpenGLWidget::initializeGL() {
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &MyOpenGLWidget::cleanup);
 
+    QObject::connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    m_timer.start(16);
+
     if (!initializeOpenGLFunctions()) {
         QMessageBox::critical(this, "OpenGL initialization error", "MyOpenGLWidget::initializeGL() : Unable to initialize OpenGL functions");
         exit(1);
     }
     // Initialize OpenGL and all OpenGL dependent stuff below
-    _openglDemo.reset(_democonstructors[0](width(), height()));
+    QtImGui::initialize(this);
+    _openglDemo.reset(_democonstructors[0](width(), height(), m_clear_color));
 }
 
 void MyOpenGLWidget::paintGL() {
+    QtImGui::newFrame();
+    {
+        ImGui::Text("Hello, world!");
+        ImGui::ColorEdit3("clear color", (float*)&m_clear_color);
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), 0.f, 1.0);
+    }
+
     std::int64_t starttime = QDateTime::currentMSecsSinceEpoch();
+    _openglDemo->setClearColor(m_clear_color);
+    _openglDemo->setTranslation(m_translation);
     _openglDemo->draw();
     glFinish();
     std::int64_t endtime = QDateTime::currentMSecsSinceEpoch();
     _lastime = endtime-starttime;
+
+    ImGui::Render();
+    QtImGui::render();
 }
 
 void MyOpenGLWidget::resizeGL(int width, int height) {
@@ -88,13 +110,17 @@ void MyOpenGLWidget::mousePressEvent(QMouseEvent *event) {
 }
 
 void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event) {
-    _openglDemo->mousemove(event->x(), event->y());
-    update();
+    if(!ImGui::GetIO().WantCaptureMouse){
+        _openglDemo->mousemove(event->x(), event->y());
+        update();
+    }
 }
 
 void MyOpenGLWidget::wheelEvent( QWheelEvent* event ) {
-    _openglDemo->mousewheel( event->angleDelta().y() * 0.01f + event->angleDelta().x() * 0.01f );
-    update();
+    if(!ImGui::GetIO().WantCaptureMouse){
+        _openglDemo->mousewheel( event->angleDelta().y() * 0.01f + event->angleDelta().x() * 0.01f );
+        update();
+    }
 }
 
 void MyOpenGLWidget::keyPressEvent(QKeyEvent *event) {
@@ -117,18 +143,24 @@ void MyOpenGLWidget::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Up:
         case Qt::Key_Right:
         case Qt::Key_Down:
-            _openglDemo->keyboardmove(event->key()-Qt::Key_Left, 1./100/*double(_lastime)/10.*/);
-            update();
+            if(!ImGui::GetIO().WantCaptureMouse){
+                _openglDemo->keyboardmove(event->key()-Qt::Key_Left, 1./100/*double(_lastime)/10.*/);
+                update();
+            }
         break;
         // Wireframe key
         case Qt::Key_W:
-            _openglDemo->toggledrawmode();
-            update();
+            if(!ImGui::GetIO().WantCaptureMouse){
+                _openglDemo->toggledrawmode();
+                update();
+            }
         break;
         // Other keys are transmitted to the scene
         default :
-            if (_openglDemo->keyboard(event->text().toStdString()[0]))
-                update();
+            if(!ImGui::GetIO().WantCaptureMouse){
+                if (_openglDemo->keyboard(event->text().toStdString()[0]))
+                    update();
+            }
         break;
     }
 }
@@ -137,7 +169,7 @@ void MyOpenGLWidget::activatedemo(unsigned int numdemo) {
     if (numdemo < _democonstructors.size()) {
         std::cout << "Activating demo " << numdemo << " : ";
         makeCurrent();
-        _openglDemo.reset(_democonstructors[numdemo](width(), height()));
+        _openglDemo.reset(_democonstructors[numdemo](width(), height(), m_clear_color));
         doneCurrent();
         update();
     }

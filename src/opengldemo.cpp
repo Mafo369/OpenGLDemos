@@ -1,8 +1,12 @@
 #include "opengldemo.h"
 #include <iostream>
 
+#include <QtImGui.h>
+#include <implot.h>
 
-OpenGLDemo::OpenGLDemo(int width, int height) :  _width(width), _height(height), _drawfill(true) {
+
+OpenGLDemo::OpenGLDemo(int width, int height, ImVec4 clearColor) :  _width(width),
+                       _height(height), m_clearColor(clearColor), _drawfill(true) {
     initializeOpenGLFunctions();
     glEnable(GL_DEPTH_TEST);
     glViewport(0, 0, width, height);
@@ -18,7 +22,7 @@ void OpenGLDemo::resize(int width, int height) {
 }
 
 void OpenGLDemo::draw() {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (_drawfill)

@@ -7,13 +7,14 @@
 
 #include <memory>
 #include <functional>
+#include <imgui.h>
 
 
 /** Simple drawing demonstration
  */
 class SimpleCamera : public OpenGLDemo {
 public:
-    explicit SimpleCamera(int width, int height);
+    explicit SimpleCamera(int width, int height, ImVec4 clearColor);
     ~SimpleCamera() override;
 
     void resize(int width, int height) override;
