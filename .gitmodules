@@ -1,0 +1,3 @@
+[submodule "libs/qtimgui"]
+	path = libs/qtimgui
+	url = git@github.com:Mafo369/qtimgui.git
