@@ -28,6 +28,7 @@ public:
     std::vector<unsigned int> m_indices;
     std::vector<Texture> m_textures;
 
+    Mesh() {}
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures, unsigned int mode);
     ~Mesh();
 
@@ -39,5 +40,6 @@ private:
     VertexBuffer* m_vbo;
     IndexBuffer* m_ebo;
 
+protected:
     void setupMesh(unsigned int mode);
 };
