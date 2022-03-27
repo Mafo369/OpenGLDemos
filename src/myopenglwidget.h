@@ -53,10 +53,10 @@ private :
     // for event management
     std::int64_t _lastime;
 
-    bool m_show_imgui_demo_window = true;
-    bool m_show_implot_demo_window = false;
     ImVec4 m_clear_color = ImColor(114, 144, 154);
     glm::vec3 m_translation = glm::vec3(0.f);
+    bool m_displayCtrlPts = false;
+
 
     QTimer m_timer;
 };

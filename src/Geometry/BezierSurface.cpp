@@ -7,9 +7,16 @@ BezierSurface::BezierSurface(std::vector<std::vector<glm::vec3>> controlPoints, 
     m_controlPoints = controlPoints;
     m_nbSegmentsU = nbSegmentsU;
     m_nbSegmentsV = nbSegmentsV;
-    pascalCoeffs(controlPoints.size(), m_coeffsLignes);
-    pascalCoeffs(controlPoints[0].size(), m_coeffsCols);
-    computeVertices(controlPoints.size(), color);
+    unsigned int lignes = controlPoints.size();
+    pascalCoeffs(lignes, m_coeffsLignes);
+    unsigned int maxSize = 0;
+    for(unsigned int i = 0; i < lignes; i++){
+        unsigned int col = controlPoints[i].size();
+        if(col > maxSize)
+            maxSize = col;
+    }
+    pascalCoeffs(maxSize, m_coeffsCols);
+    computeVertices(lignes, color);
     computeIndices();
     computeNormals();
     setupMesh(GL_TRIANGLES);

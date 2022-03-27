@@ -13,6 +13,7 @@ public:
     void addRenderObject(RenderObject* ro);
     void setMaterial(Material* material);
     void setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+    void setLight(Light light);
     void clearRenderObjects() { m_roList.clear(); }
     Material* getCurrentMaterial() { return m_roList[0]->getMaterial(); }
 

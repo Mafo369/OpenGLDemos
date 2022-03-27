@@ -21,6 +21,8 @@ struct Light
   Attenuation attenuation;
 };
 
+uniform Light light;
+
 float lambert(vec3 N, vec3 L)
 {
   vec3 nrmN = normalize(N);
@@ -38,15 +40,14 @@ vec3 lightContributionFrom(Light light, vec3 position){
 
 void main()
 {
-  // Temporary light, exam one will be a uniform input
-  Light light;
-  light.position = vec3(2,1,4);
-  light.color = vec3(1.0);
-  Attenuation attenuation;
-  attenuation.constant = 1;
-  attenuation.linear = 0;
-  attenuation.quadratic = 0;
-  light.attenuation = attenuation;
+  //Light light;
+  //light.position = vec3(2,1,4);
+  //light.color = vec3(1.0);
+  //Attenuation attenuation;
+  //attenuation.constant = 1;
+  //attenuation.linear = 0;
+  //attenuation.quadratic = 0;
+  //light.attenuation = attenuation;
 
   vec3 I = lightContributionFrom(light, in_position.xyz);
 

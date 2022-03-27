@@ -33,6 +33,7 @@ public:
 
     void compute() override;
     glm::vec4& getColor() override { return m_color; }
+    void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
 
 private:
     // Shader program for rendering
@@ -43,6 +44,7 @@ private:
     Renderer* m_renderer;
 
     bool m_first = true;
+    bool m_displayCtrlPts = false;
 
     std::vector<std::vector<glm::vec3>> m_controlPoints;
 
@@ -62,6 +64,8 @@ private:
     glm::mat4 _model;
     glm::mat4 _view;
     glm::mat4 _projection;
+
+    Light m_light;
 
     glm::vec4 m_color;
 };

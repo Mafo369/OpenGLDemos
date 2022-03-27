@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <glm/glm.hpp>
+#include "Light.h"
   
 struct ShaderProgramSource{
     std::string vertexSource;
@@ -25,9 +26,11 @@ public:
 
     // utility uniform functions
     void setUniform4f(const std::string& name, const glm::vec4& v);
+    void setUniform3f(const std::string& name, const glm::vec3& v);
     void setUniform1f(const std::string& name, float value);
 
     void setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection);
+    void setLight(Light light);
 private:
     std::stringstream readShader(const std::string& filepath);
     ShaderProgramSource parseShader(const std::string& vertexFilepath, const std::string& fragmentFilepath);

@@ -33,6 +33,8 @@ public:
 
     void toggledrawmode();
 
+    virtual void toggleCtrlPts() {}
+
 protected:
     // Width and heigth of the viewport
     int _width;

@@ -82,9 +82,13 @@ void MyOpenGLWidget::paintGL() {
             }
             ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
             ImGui::Text("Control points:");
+            if(ImGui::Checkbox("Display control points: ", &m_displayCtrlPts)){
+                _openglDemo->toggleCtrlPts();
+                _openglDemo->compute();
+            }
             auto& ctrlPts = _openglDemo->getControlsPoints();
             for(unsigned int i = 0; i < ctrlPts.size(); i++){
-                for(unsigned int j = 0; j < ctrlPts[0].size(); j++){
+                for(unsigned int j = 0; j < ctrlPts[i].size(); j++){
                     std::string name = "ControlPoint " + std::to_string(i) + " " + std::to_string(j);
                     if(ImGui::SliderFloat3(name.c_str(), glm::value_ptr(ctrlPts[i][j]), -5.f, 5.0)){
                         _openglDemo->compute();

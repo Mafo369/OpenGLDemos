@@ -49,3 +49,9 @@ void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
         ro->getMaterial()->getShader()->setMVP(model, view, projection);
     }
 }
+
+void Renderer::setLight(Light light){
+    for(auto& ro: m_roList){
+        ro->getMaterial()->getShader()->setLight(light);
+    }
+}
