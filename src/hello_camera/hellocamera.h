@@ -32,12 +32,13 @@ public:
     std::vector<std::vector<glm::vec3>>& getControlsPoints() override { return m_controlPoints; }
 
     void compute() override;
+    glm::vec4& getColor() override { return m_color; }
 
 private:
     // Shader program for rendering
-    Shader* m_program;
-    Shader* m_programNormal;
-    Shader* m_programParametric;
+    Material* m_material;
+    Material* m_materialNormal;
+    Material* m_materialParametric;
 
     Renderer* m_renderer;
 
@@ -61,6 +62,8 @@ private:
     glm::mat4 _model;
     glm::mat4 _view;
     glm::mat4 _projection;
+
+    glm::vec4 m_color;
 };
 
 /*------------------------------------------------------------------------------------------------------------------------*/

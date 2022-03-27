@@ -3,11 +3,11 @@
 class BezierSurface : public Mesh{
 public:
     BezierSurface(std::vector<std::vector<glm::vec3>> controlPoints, unsigned int nbSegmentsU,
-                  unsigned int nbSegmentsV);
+                  unsigned int nbSegmentsV, glm::vec4 color);
     ~BezierSurface();
 
 private:
-    void computeVertices(unsigned int lignes); // Indices will be computed along
+    void computeVertices(unsigned int lignes, glm::vec4 color); // Indices will be computed along
     void computeIndices();
     void computeNormals();
 

@@ -30,7 +30,7 @@ void Renderer::draw(Mesh* mesh, Shader* shader){
 void Renderer::draw() {
     for(auto& ro : m_roList) {
         Mesh* mesh = ro->getMesh();
-        draw(mesh->m_vao, mesh->m_ebo, ro->getShader());
+        draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
     }
 }
 
@@ -38,14 +38,14 @@ void Renderer::addRenderObject(RenderObject* ro){
     m_roList.push_back(ro);
 }
 
-void Renderer::setShader(Shader *shader){
+void Renderer::setMaterial(Material* material){
     for(auto& ro: m_roList){
-        ro->setShader(shader);
+        ro->setMaterial(material);
     }
 }
 
 void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
     for(auto& ro: m_roList){
-        ro->getShader()->setMVP(model, view, projection);
+        ro->getMaterial()->getShader()->setMVP(model, view, projection);
     }
 }

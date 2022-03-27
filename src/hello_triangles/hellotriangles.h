@@ -17,11 +17,13 @@ public:
 
     void compute() override {}
     std::vector<std::vector<glm::vec3>>& getControlsPoints() override { return m_controlPoints; }
+    glm::vec4& getColor() override { return m_color; }
 private:
     // A simple geometry
     Mesh* m_mesh;
     std::vector<std::vector<glm::vec3>> m_controlPoints;
 
+    glm::vec4 m_color;
     // OpenGL object for geometry
     // Vertex Array Buffer
     VertexArray* m_vao;

@@ -26,6 +26,7 @@ void Mesh::setupMesh(unsigned int mode){
     layout.push<float>(3);
     layout.push<float>(3);
     layout.push<float>(2);
+    layout.push<float>(4);
     m_vao->addBuffer(m_vbo, &layout);
  
     m_ebo = new IndexBuffer(m_indices.data(), m_indices.size(), mode);

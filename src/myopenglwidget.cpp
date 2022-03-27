@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <string>
 
+#include "gtc/type_ptr.hpp"
 #include "hello_triangles/hellotriangles.h"
 #include "hello_camera/hellocamera.h"
 #include "hello_spheres/hellospheres.h"
@@ -70,10 +71,16 @@ void MyOpenGLWidget::paintGL() {
     QtImGui::newFrame();
     {
         ImGui::Text("Hello, world!");
-        ImGui::ColorEdit3("clear color", (float*)&m_clear_color);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
+        ImGui::Text("Background");
+        ImGui::ColorEdit3("clear color", (float*)&m_clear_color);
         if(!_openglDemo->getControlsPoints().empty()){
+            ImGui::Text("Surface:");
+            auto& color = _openglDemo->getColor();
+            if(ImGui::ColorEdit3("surface color", (float*)glm::value_ptr(color))){
+                _openglDemo->compute();
+            }
+            ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
             ImGui::Text("Control points:");
             auto& ctrlPts = _openglDemo->getControlsPoints();
             for(unsigned int i = 0; i < ctrlPts.size(); i++){

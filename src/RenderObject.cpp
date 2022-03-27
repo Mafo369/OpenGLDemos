@@ -1,12 +1,12 @@
 #include "RenderObject.h"
 
-RenderObject::RenderObject(Mesh* mesh, Shader* shader) {
+RenderObject::RenderObject(Mesh* mesh, Material* material) {
     m_mesh = mesh;
-    m_shader = shader;
+    m_material = material;
 }
 
 RenderObject::~RenderObject(){
     delete m_mesh;
-    delete m_shader;
+    delete m_material;
 }
 

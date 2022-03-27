@@ -28,6 +28,8 @@ public:
     void compute() override {}
     std::vector<std::vector<glm::vec3>>& getControlsPoints() override { return m_controlPoints; }
 
+    glm::vec4& getColor() override { return m_color; }
+
 private:
 
     struct Sphere : public QOpenGLFunctions_4_1_Core {
@@ -67,6 +69,8 @@ private:
     glm::mat4 _model;
     glm::mat4 _view;
     glm::mat4 _projection;
+
+    glm::vec4 m_color;
 };
 
 /*------------------------------------------------------------------------------------------------------------------------*/

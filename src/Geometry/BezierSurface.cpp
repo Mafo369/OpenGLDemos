@@ -3,13 +3,13 @@
 #include "Renderer.h"
 
 BezierSurface::BezierSurface(std::vector<std::vector<glm::vec3>> controlPoints, unsigned int nbSegmentsU, 
-                             unsigned int nbSegmentsV) : Mesh() {
+                             unsigned int nbSegmentsV, glm::vec4 color) : Mesh() {
     m_controlPoints = controlPoints;
     m_nbSegmentsU = nbSegmentsU;
     m_nbSegmentsV = nbSegmentsV;
     pascalCoeffs(controlPoints.size(), m_coeffsLignes);
     pascalCoeffs(controlPoints[0].size(), m_coeffsCols);
-    computeVertices(controlPoints.size());
+    computeVertices(controlPoints.size(), color);
     computeIndices();
     computeNormals();
     setupMesh(GL_TRIANGLES);
@@ -19,7 +19,7 @@ BezierSurface::~BezierSurface(){
 
 }
 
-void BezierSurface::computeVertices(unsigned int lignes){
+void BezierSurface::computeVertices(unsigned int lignes, glm::vec4 color){
     auto normal = glm::vec3(0.f);
     int uf = m_nbSegmentsU-1;
     int vf = m_nbSegmentsV-1;
@@ -32,7 +32,7 @@ void BezierSurface::computeVertices(unsigned int lignes){
                 uCurve.push_back(bezierValue(m_controlPoints[i], u, m_coeffsCols)); 
             }
             glm::vec3 puv = bezierValue(uCurve, v, m_coeffsLignes);
-            Vertex vertex = { puv, normal, glm::vec2(u, v) };
+            Vertex vertex = { puv, normal, glm::vec2(u, v), color };
             m_vertices.push_back(vertex);
             std::vector<unsigned int> vn;
             m_vertexNormals.push_back(vn);

@@ -46,6 +46,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     std::vector<glm::vec3> points2;
     std::vector<glm::vec3> points3;
     std::vector<glm::vec3> points4;
+    m_color = glm::vec4(1.0f, 0.5f, 0.2f, 1.f);
     points1.push_back(glm::vec3(0.f,  -0.5f, 0.0f));
     points1.push_back(glm::vec3(0.5f, 0.f, 0.0f));
     points1.push_back(glm::vec3(1.f, 0.f, 0.0f));
@@ -66,22 +67,22 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_controlPoints.push_back(points2);
     m_controlPoints.push_back(points3);
     m_controlPoints.push_back(points4);
-    Vertex v0 = {points1[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v1 = {points1[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v2 = {points1[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v3 = {points1[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v4 = {points2[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v5 = {points2[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v6 = {points2[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v7 = {points2[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v8 = {points3[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v9 = {points3[1], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v10 = {points3[2], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v11 = {points3[3], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v12 = {points4[0], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v13 = {points4[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v14 = {points4[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
-    Vertex v15 = {points4[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
+    Vertex v0 = {points1[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v1 = {points1[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v2 = {points1[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v3 = {points1[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v4 = {points2[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v5 = {points2[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v6 = {points2[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v7 = {points2[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v8 = {points3[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v9 = {points3[1], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v10 = {points3[2], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v11 = {points3[3], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v12 = {points4[0], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v13 = {points4[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v14 = {points4[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v15 = {points4[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
     std::vector<Vertex> vertices1 = { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
                                       v10, v11, v12, v13, v14, v15 };
     std::vector<unsigned int> indices1 = {
@@ -97,12 +98,16 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
 
     //m_mesh = new BezierCurve(points1, 100);
 
-    m_program = 
-        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Basic.frag.glsl");
-    m_programNormal = 
+    Shader* program = 
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Lambert.frag.glsl");
+    Shader* programNormal = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Camera.frag.glsl");
-    m_programParametric = 
+    Shader* programParametric = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Parametric.frag.glsl");
+
+    m_material = new Material(program);
+    m_materialNormal = new Material(programNormal);
+    m_materialParametric = new Material(programParametric);
     
     compute();
     m_first = false;
@@ -122,16 +127,19 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
 
 SimpleCamera::~SimpleCamera() {
     delete m_renderer;
-    delete m_program;
-    delete m_programNormal;
+    delete m_material;
+    delete m_materialNormal;
+    delete m_materialParametric;
 }
 void SimpleCamera::compute() {
-    Mesh* mesh = new BezierSurface(m_controlPoints, 100, 100);
+    Mesh* mesh = new BezierSurface(m_controlPoints, 100, 100, m_color);
     RenderObject* ro;
-    if(!m_first)
-        ro = new RenderObject(mesh, m_renderer->getCurrentShader());
-    else
-        ro = new RenderObject(mesh, m_program);
+    if(!m_first){
+        ro = new RenderObject(mesh, m_renderer->getCurrentMaterial());
+    }
+    else{
+        ro = new RenderObject(mesh, m_material);
+    }
     m_renderer->clearRenderObjects();
     m_renderer->addRenderObject(ro);
 }
@@ -192,13 +200,13 @@ bool SimpleCamera::keyboard(unsigned char k) {
             _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
             return true;
         case 'c' :
-            m_renderer->setShader(m_program);
+            m_renderer->setMaterial(m_material);
             return true;
         case 'n' :
-            m_renderer->setShader(m_programNormal);
+            m_renderer->setMaterial(m_materialNormal);
             return true;
         case 't' :
-            m_renderer->setShader(m_programParametric);
+            m_renderer->setMaterial(m_materialParametric);
             return true;
         default:
             return false;

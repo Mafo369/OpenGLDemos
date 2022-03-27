@@ -1,16 +1,16 @@
 #pragma once
-#include "Shader.h"
+#include "Material.h"
 #include "Geometry/Mesh.h"
 
 class RenderObject {
 public:
-    RenderObject(Mesh* mesh, Shader* shader);
+    RenderObject(Mesh* mesh, Material* material);
     ~RenderObject();
 
-    void setShader(Shader* shader) { m_shader = shader; }
+    void setMaterial(Material* material) { m_material = material; }
     Mesh* getMesh() { return m_mesh; }
-    Shader* getShader() { return m_shader; }
+    Material* getMaterial() { return m_material; }
 private:
     Mesh* m_mesh;
-    Shader* m_shader;
+    Material* m_material;
 };
