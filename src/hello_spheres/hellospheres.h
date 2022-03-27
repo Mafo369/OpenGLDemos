@@ -25,6 +25,8 @@ public:
 
     void keyboardmove(int key, double time) override;
     bool keyboard(unsigned char k) override;
+    void compute() override {}
+    std::vector<std::vector<glm::vec3>>& getControlsPoints() override { return m_controlPoints; }
 
 private:
 
@@ -44,7 +46,7 @@ private:
         void buildFrom(const MathiasMesh &m);
         void draw();
     };
-
+    std::vector<std::vector<glm::vec3>> m_controlPoints;
     Sphere _parametric;
     Sphere _geodesic;
 

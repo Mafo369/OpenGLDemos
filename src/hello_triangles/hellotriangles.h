@@ -14,9 +14,13 @@ public:
     void draw() override;
 
     bool keyboard(unsigned char k) override;
+
+    void compute() override {}
+    std::vector<std::vector<glm::vec3>>& getControlsPoints() override { return m_controlPoints; }
 private:
     // A simple geometry
     Mesh* m_mesh;
+    std::vector<std::vector<glm::vec3>> m_controlPoints;
 
     // OpenGL object for geometry
     // Vertex Array Buffer

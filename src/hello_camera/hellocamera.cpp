@@ -4,6 +4,7 @@
 #include <vector>
 #include "Geometry/BezierCurve.h"
 #include "Geometry/BezierSurface.h"
+#include "RenderObject.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
@@ -41,7 +42,6 @@
 
 SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     // Initialise geometric data
-    std::vector<std::vector<glm::vec3>> points;
     std::vector<glm::vec3> points1;
     std::vector<glm::vec3> points2;
     std::vector<glm::vec3> points3;
@@ -62,10 +62,10 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     points4.push_back(glm::vec3(0.5f, 0.f, 1.5f));
     points4.push_back(glm::vec3(1.f, -1.0f, 1.5f));
     points4.push_back(glm::vec3(1.5f, 0.3f, 1.5f));
-    points.push_back(points1);
-    points.push_back(points2);
-    points.push_back(points3);
-    points.push_back(points4);
+    m_controlPoints.push_back(points1);
+    m_controlPoints.push_back(points2);
+    m_controlPoints.push_back(points3);
+    m_controlPoints.push_back(points4);
     Vertex v0 = {points1[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v1 = {points1[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
     Vertex v2 = {points1[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f)};
@@ -92,101 +92,20 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     };
 
     std::vector<Texture> textures;
-
-    // ===================== BEZIER SURFACE ===========================//
-
-    //int lignes = points.size();
-    //int cols = points[0].size();
-    //std::vector<std::vector<int>> coeffsLignes;
-    //std::vector<std::vector<int>> coeffsCols;
-    //pascalCoeffs(lignes, coeffsLignes);
-    //pascalCoeffs(cols, coeffsCols);
-
-    //std::vector<Vertex> vertices;
-    //std::vector<unsigned int> indices;
-    //std::vector<std::vector<unsigned int>> vertexNormals;
-    //auto normal = glm::vec3(0.f);
-    //int n = 100; // Nb segments en u
-    //int m = 100; // Nb segments en v
-    //int uf = n-1;
-    //int vf = m-1;
-    //for(int ui = 0; ui <= uf; ui++){
-    //    float u = float(ui)/uf;
-    //    for(int uj = 0; uj <= vf; uj++){
-    //        float v = float(uj)/vf;
-    //        std::vector<glm::vec3> uCurve;
-    //        for(int i = 0; i < lignes; i++){
-    //            uCurve.push_back(bezierValue(points[i], u, coeffsCols)); 
-    //        }
-    //        glm::vec3 puv = bezierValue(uCurve, v, coeffsLignes);
-    //        Vertex vertex = { puv, normal, glm::vec2(0.f, 0.f) };
-    //        vertices.push_back(vertex);
-    //        std::vector<unsigned int> vn;
-    //        vertexNormals.push_back(vn);
-    //    }
-    //}
-    //for(int i = 0; i < n-1; i++){
-    //    for(int j = 0; j < m-1; j++){
-    //        indices.push_back(i*m+j);
-    //        indices.push_back(i*m+j+1);
-    //        indices.push_back((i+1)*m+j+1);
-    //        indices.push_back(i*m+j);
-    //        indices.push_back((i+1)*m+j+1);
-    //        indices.push_back((i+1)*m+j);
-    //    }
-    //}
-    //std::vector<glm::vec3> faceNormals;
-    //unsigned int faceId = 0;
-    //for(unsigned int i = 0; i < indices.size(); i += 3){
-    //    unsigned int a = indices[i];
-    //    unsigned int b = indices[i+1];
-    //    unsigned int c = indices[i+2];
-    //    glm::vec3 edge1 = vertices[b].m_position - vertices[a].m_position;
-    //    glm::vec3 edge2 = vertices[c].m_position - vertices[a].m_position;
-    //    glm::vec3 normal = glm::cross(edge1, edge2);
-    //    faceNormals.push_back(normal);
-    //    vertexNormals[a].push_back(faceId);
-    //    vertexNormals[b].push_back(faceId);
-    //    vertexNormals[c].push_back(faceId);
-    //    faceId++;
-    //}
-    //for(unsigned int i = 0; i < vertexNormals.size(); i++){
-    //    glm::vec3 sumN(0.f);
-    //    for(unsigned int j = 0; j < vertexNormals[i].size(); j++){
-    //        sumN += faceNormals[vertexNormals[i][j]];
-    //    }
-    //    vertices[i].m_normal = glm::normalize(sumN);
-    //}
-
-    // ===================== BEZIER CURVE ===========================//
-     
-    //int indice = 0;
-    //std::vector<Vertex> vertices;
-    //std::vector<unsigned int> indices;
-    //auto normal = glm::vec3(0.577350269189626f, 0.0, 0.0);
-    //int n = 100; // Nb de segments en u
-    //int uf = n-1;
-    //for(int j = 0; j <= uf; j++){
-    //    float u = float(j)/uf;
-    //    glm::vec3 pu = bezierValue(points1, u, coeffsCols);
-    //    indices.push_back(indice);
-    //    indice++;
-    //    indices.push_back(indice);
-    //    Vertex v = { pu, normal, glm::vec2(0.f, 0.f) };
-    //    vertices.push_back(v);
-    //}
-    //indices.pop_back();
  
     m_renderer = new Renderer();
 
     //m_mesh = new BezierCurve(points1, 100);
-    m_mesh = new BezierSurface(points, 100, 100);
-    //m_mesh = new Mesh(vertices, indices, textures, GL_TRIANGLES);
-    //m_meshL = new Mesh(vertices1, indices1, textures, GL_LINES);
 
     m_program = 
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Basic.frag.glsl");
+    m_programNormal = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Camera.frag.glsl");
-
+    m_programParametric = 
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Parametric.frag.glsl");
+    
+    compute();
+    m_first = false;
 
     _cameraselector.push_back( []()->Camera*{return new EulerCamera(glm::vec3(0.f, 0.f, 3.f));} );
     _cameraselector.push_back( []()->Camera*{return new TrackballCamera(glm::vec3(0.f, 0.f, 3.f));} );
@@ -202,8 +121,19 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
 }
 
 SimpleCamera::~SimpleCamera() {
-    delete m_mesh;
     delete m_renderer;
+    delete m_program;
+    delete m_programNormal;
+}
+void SimpleCamera::compute() {
+    Mesh* mesh = new BezierSurface(m_controlPoints, 100, 100);
+    RenderObject* ro;
+    if(!m_first)
+        ro = new RenderObject(mesh, m_renderer->getCurrentShader());
+    else
+        ro = new RenderObject(mesh, m_program);
+    m_renderer->clearRenderObjects();
+    m_renderer->addRenderObject(ro);
 }
 
 void SimpleCamera::resize(int width, int height){
@@ -231,9 +161,8 @@ void SimpleCamera::draw() {
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 
-    m_program->setMVP(_model, _view, _projection);
-    m_renderer->draw(m_mesh, m_program);
-    //m_renderer->draw(m_meshL, m_program);
+    m_renderer->setMVP(_model, _view, _projection);
+    m_renderer->draw();
 }
 
 void SimpleCamera::mouseclick(int button, float xpos, float ypos) {
@@ -261,6 +190,15 @@ bool SimpleCamera::keyboard(unsigned char k) {
             _activecamera = (_activecamera+1)%2;
             _camera.reset(_cameraselector[_activecamera]());
             _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
+            return true;
+        case 'c' :
+            m_renderer->setShader(m_program);
+            return true;
+        case 'n' :
+            m_renderer->setShader(m_programNormal);
+            return true;
+        case 't' :
+            m_renderer->setShader(m_programParametric);
             return true;
         default:
             return false;

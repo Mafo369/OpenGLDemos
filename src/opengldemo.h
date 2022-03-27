@@ -27,6 +27,8 @@ public:
 
     void setClearColor(ImVec4 clearColor) { m_clearColor = clearColor; }
     void setTranslation(glm::vec3 translation) { m_translation = translation; }
+    virtual std::vector<std::vector<glm::vec3>>& getControlsPoints() { return m_controlPoints; }
+    virtual void compute(){};
 
     void toggledrawmode();
 
@@ -36,6 +38,7 @@ protected:
     int _height;
     ImVec4 m_clearColor;
     glm::vec3 m_translation = glm::vec3(0.f);
+    std::vector<std::vector<glm::vec3>> m_controlPoints;
 
 private:
     // Rendering mode (true is filled, false is wireframed

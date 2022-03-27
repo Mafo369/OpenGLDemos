@@ -4,10 +4,12 @@
 #include "Renderer.h"
 
 #include "camera.h"
+#include "fwd.hpp"
 
 #include <memory>
 #include <functional>
 #include <imgui.h>
+#include <vector>
 
 
 /** Simple drawing demonstration
@@ -27,15 +29,21 @@ public:
     void keyboardmove(int key, double time) override;
     bool keyboard(unsigned char k) override;
 
-private:
-    // A simple geometry
-    Mesh* m_mesh;
-    Mesh* m_meshL;
+    std::vector<std::vector<glm::vec3>>& getControlsPoints() override { return m_controlPoints; }
 
+    void compute() override;
+
+private:
     // Shader program for rendering
     Shader* m_program;
+    Shader* m_programNormal;
+    Shader* m_programParametric;
 
     Renderer* m_renderer;
+
+    bool m_first = true;
+
+    std::vector<std::vector<glm::vec3>> m_controlPoints;
 
     // for mouse management
     int _button; // 0 --> left. 1 --> right. 2 --> middle. 3 --> other

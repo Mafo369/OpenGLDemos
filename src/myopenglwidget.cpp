@@ -11,6 +11,7 @@
 #include <implot.h>
 #include <imgui.h>
 #include <QTimer>
+#include <string>
 
 #include "hello_triangles/hellotriangles.h"
 #include "hello_camera/hellocamera.h"
@@ -71,7 +72,27 @@ void MyOpenGLWidget::paintGL() {
         ImGui::Text("Hello, world!");
         ImGui::ColorEdit3("clear color", (float*)&m_clear_color);
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), 0.f, 1.0);
+        ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
+        if(!_openglDemo->getControlsPoints().empty()){
+            ImGui::Text("Control points:");
+            auto& ctrlPts = _openglDemo->getControlsPoints();
+            for(unsigned int i = 0; i < ctrlPts.size(); i++){
+                for(unsigned int j = 0; j < ctrlPts[0].size(); j++){
+                    std::string name = "ControlPoint " + std::to_string(i) + " " + std::to_string(j);
+                    if(ImGui::SliderFloat3(name.c_str(), glm::value_ptr(ctrlPts[i][j]), -5.f, 5.0)){
+                        _openglDemo->compute();
+                    }
+                }
+            }
+            //auto ctrlPts = _openglDemo->getControlsPoints();
+            //for(unsigned int i = 0; ctrlPts.size(); i++){
+            //    for(unsigned int j = 0; ctrlPts[i].size(); j++){
+            //        std::string name = "ControlPoint " + std::to_string(i);
+            //        ImGui::SliderFloat3(name.c_str(), glm::value_ptr(ctrlPts[i][j]), -5.f, 5.0);
+            //    }
+            //    //_openglDemo->compute(); 
+            //}
+        }
     }
 
     std::int64_t starttime = QDateTime::currentMSecsSinceEpoch();
