@@ -55,3 +55,9 @@ void Renderer::setLight(Light light){
         ro->getMaterial()->getShader()->setLight(light);
     }
 }
+
+void Renderer::setCameraPosition(glm::vec3 position){
+    for(auto& ro: m_roList){
+        ro->getMaterial()->getShader()->setCameraPosition(position);
+    }
+}

@@ -31,6 +31,7 @@ public:
 
     void setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection);
     void setLight(Light light);
+    void setCameraPosition(glm::vec3 position);
 private:
     std::stringstream readShader(const std::string& filepath);
     ShaderProgramSource parseShader(const std::string& vertexFilepath, const std::string& fragmentFilepath);

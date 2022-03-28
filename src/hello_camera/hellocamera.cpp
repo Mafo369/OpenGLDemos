@@ -47,40 +47,13 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_controlPoints.push_back(points2);
     m_controlPoints.push_back(points3);
     m_controlPoints.push_back(points4);
-    //Vertex v0 = {points1[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v1 = {points1[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v2 = {points1[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v3 = {points1[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v4 = {points2[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v5 = {points2[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v6 = {points2[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v7 = {points2[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v8 = {points3[0], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v9 = {points3[1], glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v10 = {points3[2], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v11 = {points3[3], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v12 = {points4[0], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v13 = {points4[1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v14 = {points4[2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v15 = {points4[3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //Vertex v16 = {points4[4], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    //std::vector<Vertex> vertices1 = { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
-    //                                  v10, v11, v12, v13, v14, v15, v16 };
-    //std::vector<unsigned int> indices1 = {
-    //    0, 1, 1, 2, 2, 3,
-    //    4, 5, 5, 6, 6, 7,
-    //    8, 9, 9, 10, 10, 11,
-    //    12, 13, 13, 14, 14, 15, 16
-    //};
 
-    //std::vector<Texture> textures;
- 
     m_renderer = new Renderer();
     m_light.position = glm::vec3(2.f,1.f,4.f);
     m_light.color = glm::vec3(1.0f);
 
     Shader* program = 
-        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Lambert.frag.glsl");
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Microfacet.frag.glsl");
     Shader* programNormal = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Camera.frag.glsl");
     Shader* programParametric = 
@@ -104,7 +77,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 
     _model = glm::translate(glm::mat4(1.0), m_translation);
-    m_renderer->setLight(m_light);
+    //m_renderer->setLight(m_light);
 }
 
 SimpleCamera::~SimpleCamera() {
@@ -190,6 +163,7 @@ void SimpleCamera::draw() {
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 
+    m_renderer->setCameraPosition(_camera->position());
     m_renderer->setMVP(_model, _view, _projection);
     m_renderer->draw();
 }

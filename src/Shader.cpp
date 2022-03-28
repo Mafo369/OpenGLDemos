@@ -53,6 +53,12 @@ void Shader::setLight(Light light){
     unbind();
 }
 
+void Shader::setCameraPosition(glm::vec3 position){
+    bind();
+    setUniform3f("u_eye", position);
+    unbind();
+}
+
 int Shader::getUniformLocation(const std::string& name){
     glAssert(int location = glGetUniformLocation(m_rendererId, name.c_str()));
     if(location == -1)

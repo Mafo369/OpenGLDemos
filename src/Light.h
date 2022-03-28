@@ -13,3 +13,4 @@ typedef struct s_Light
     glm::vec3 color; // Colour
     Attenuation attenuation;
 }Light;
+
