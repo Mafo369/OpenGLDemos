@@ -40,18 +40,9 @@ vec3 lightContributionFrom(Light light, vec3 position){
 
 void main()
 {
-  //Light light;
-  //light.position = vec3(2,1,4);
-  //light.color = vec3(1.0);
-  //Attenuation attenuation;
-  //attenuation.constant = 1;
-  //attenuation.linear = 0;
-  //attenuation.quadratic = 0;
-  //light.attenuation = attenuation;
-
   vec3 I = lightContributionFrom(light, in_position.xyz);
-
-  vec4 result = in_color * lambert(in_normal, light.position) * vec4(I, 1.0);
+  vec3 n = gl_FrontFacing ? in_normal : -in_normal;
+  vec4 result = in_color * lambert(n, light.position) * vec4(I, 1.0);
 
   color = result.rgba;
 }

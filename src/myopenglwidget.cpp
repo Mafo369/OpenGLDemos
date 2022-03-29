@@ -72,15 +72,17 @@ void MyOpenGLWidget::paintGL() {
     {
         ImGui::Text("Hello, world!");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-        ImGui::Text("Background");
+        ImGui::Text("Scene:");
         ImGui::ColorEdit3("clear color", (float*)&m_clear_color);
         if(!_openglDemo->getControlsPoints().empty()){
+            ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
+            ImGui::Text("Light:");
+            ImGui::SliderFloat3("light position", glm::value_ptr(_openglDemo->getLightPosition()), -5.f, 5.0);
             ImGui::Text("Surface:");
             auto& color = _openglDemo->getColor();
             if(ImGui::ColorEdit3("surface color", (float*)glm::value_ptr(color))){
                 _openglDemo->compute();
             }
-            ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
             ImGui::Text("Control points:");
             if(ImGui::Checkbox("Display control points: ", &m_displayCtrlPts)){
                 _openglDemo->toggleCtrlPts();
@@ -95,14 +97,6 @@ void MyOpenGLWidget::paintGL() {
                     }
                 }
             }
-            //auto ctrlPts = _openglDemo->getControlsPoints();
-            //for(unsigned int i = 0; ctrlPts.size(); i++){
-            //    for(unsigned int j = 0; ctrlPts[i].size(); j++){
-            //        std::string name = "ControlPoint " + std::to_string(i);
-            //        ImGui::SliderFloat3(name.c_str(), glm::value_ptr(ctrlPts[i][j]), -5.f, 5.0);
-            //    }
-            //    //_openglDemo->compute(); 
-            //}
         }
     }
 

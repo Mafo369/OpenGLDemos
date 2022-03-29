@@ -32,10 +32,18 @@ void Renderer::draw() {
         Mesh* mesh = ro->getMesh();
         draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
     }
+    for(auto& ro : m_roLights) {
+        Mesh* mesh = ro->getMesh();
+        draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
+    }
 }
 
 void Renderer::addRenderObject(RenderObject* ro){
     m_roList.push_back(ro);
+}
+
+void Renderer::addLightRo(RenderObject* ro){
+    m_roLights.push_back(ro);
 }
 
 void Renderer::setMaterial(Material* material){
@@ -44,20 +52,23 @@ void Renderer::setMaterial(Material* material){
     }
 }
 
-void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
-    for(auto& ro: m_roList){
+void Renderer::setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
+    for(auto& ro: m_roLights){
         ro->getMaterial()->getShader()->setMVP(model, view, projection);
     }
 }
 
-void Renderer::setLight(Light light){
+void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
     for(auto& ro: m_roList){
-        ro->getMaterial()->getShader()->setLight(light);
+        ro->getMaterial()->getShader()->setMVP(model, view, projection);
+    }
+    for(auto& ro: m_roLights){
+        ro->getMaterial()->getShader()->setMVP(model, view, projection);
     }
 }
 
-void Renderer::setCameraPosition(glm::vec3 position){
+void Renderer::setLight(Light* light){
     for(auto& ro: m_roList){
-        ro->getMaterial()->getShader()->setCameraPosition(position);
+        ro->getMaterial()->getShader()->setLight(light);
     }
 }

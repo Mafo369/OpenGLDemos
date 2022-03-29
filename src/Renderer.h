@@ -11,10 +11,11 @@ class Renderer
 {
 public:
     void addRenderObject(RenderObject* ro);
+    void addLightRo(RenderObject* ro);
     void setMaterial(Material* material);
+    void setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
     void setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
-    void setLight(Light light);
-    void setCameraPosition(glm::vec3 position);
+    void setLight(Light* light);
     void clearRenderObjects() { m_roList.clear(); }
     Material* getCurrentMaterial() { return m_roList[0]->getMaterial(); }
 
@@ -25,4 +26,5 @@ public:
 
 private:
     std::vector<RenderObject*> m_roList;
+    std::vector<RenderObject*> m_roLights;
 };

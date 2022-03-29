@@ -7,6 +7,7 @@
 #include "error_handling.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <imgui.h>
+#include "Light.h"
 
 /** Simple class for managing an OpenGL demo
  */
@@ -30,6 +31,7 @@ public:
     virtual std::vector<std::vector<glm::vec3>>& getControlsPoints() { return m_controlPoints; }
     virtual void compute() {}
     virtual glm::vec4& getColor() { return m_color; }
+    glm::vec3& getLightPosition() { return m_light->position; }
 
     void toggledrawmode();
 
@@ -43,6 +45,7 @@ protected:
     glm::vec3 m_translation = glm::vec3(0.f);
     glm::vec4 m_color;
     std::vector<std::vector<glm::vec3>> m_controlPoints;
+    Light* m_light;
 
 private:
     // Rendering mode (true is filled, false is wireframed

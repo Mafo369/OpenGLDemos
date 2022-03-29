@@ -1,3 +1,6 @@
+#ifndef LIGHT_H
+#define LIGHT_H
+
 #include <glm/glm.hpp>
 
 typedef struct s_Attenuation
@@ -14,3 +17,4 @@ typedef struct s_Light
     Attenuation attenuation;
 }Light;
 
+#endif

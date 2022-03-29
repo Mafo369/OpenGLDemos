@@ -38,8 +38,11 @@ public:
 private:
     // Shader program for rendering
     Material* m_material;
+    Material* m_materialLambert;
     Material* m_materialNormal;
     Material* m_materialParametric;
+
+    Material* m_lightMaterial;
 
     Renderer* m_renderer;
 
@@ -62,10 +65,9 @@ private:
 
     // matrices
     glm::mat4 _model;
+    glm::mat4 _lightmodel;
     glm::mat4 _view;
     glm::mat4 _projection;
-
-    Light m_light;
 
     glm::vec4 m_color;
 };

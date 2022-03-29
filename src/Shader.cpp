@@ -1,5 +1,6 @@
 #include "Shader.h"
 #include "Renderer.h"
+#include "Light.h"
 
 Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFilepath) 
 {
@@ -43,19 +44,13 @@ void Shader::setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection){
     unbind();
 }
 
-void Shader::setLight(Light light){
+void Shader::setLight(Light* light){
     bind();
-    setUniform3f( "light.position", light.position);
-    setUniform3f( "light.color", light.color);
-    setUniform1f("light.attenuation.constant", light.attenuation.constant);
-    setUniform1f("light.attenuation.linear", light.attenuation.linear);
-    setUniform1f("light.attenuation.quadratic", light.attenuation.quadratic);
-    unbind();
-}
-
-void Shader::setCameraPosition(glm::vec3 position){
-    bind();
-    setUniform3f("u_eye", position);
+    setUniform3f( "light.position", light->position);
+    setUniform3f( "light.color", light->color);
+    setUniform1f("light.attenuation.constant", light->attenuation.constant);
+    setUniform1f("light.attenuation.linear", light->attenuation.linear);
+    setUniform1f("light.attenuation.quadratic", light->attenuation.quadratic);
     unbind();
 }
 
