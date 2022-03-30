@@ -31,7 +31,7 @@ public:
     virtual std::vector<std::vector<glm::vec3>>& getControlsPoints() { return m_controlPoints; }
     virtual void compute() {}
     virtual glm::vec4& getColor() { return m_color; }
-    glm::vec3& getLightPosition() { return m_light->position; }
+    std::vector<Light*>& getLights() { return m_lights; }
 
     void toggledrawmode();
 
@@ -45,7 +45,7 @@ protected:
     glm::vec3 m_translation = glm::vec3(0.f);
     glm::vec4 m_color;
     std::vector<std::vector<glm::vec3>> m_controlPoints;
-    Light* m_light;
+    std::vector<Light*> m_lights;
 
 private:
     // Rendering mode (true is filled, false is wireframed

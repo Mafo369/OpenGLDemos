@@ -1,3 +1,5 @@
+#ifndef RENDERER_H
+#define RENDERER_H
 #pragma once
 
 #include "Geometry/Mesh.h"
@@ -13,9 +15,9 @@ public:
     void addRenderObject(RenderObject* ro);
     void addLightRo(RenderObject* ro);
     void setMaterial(Material* material);
-    void setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
+    void setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection, unsigned int id);
     void setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
-    void setLight(Light* light);
+    void setLight(Light* light, unsigned int id);
     void clearRenderObjects() { m_roList.clear(); }
     Material* getCurrentMaterial() { return m_roList[0]->getMaterial(); }
 
@@ -28,3 +30,5 @@ private:
     std::vector<RenderObject*> m_roList;
     std::vector<RenderObject*> m_roLights;
 };
+
+#endif

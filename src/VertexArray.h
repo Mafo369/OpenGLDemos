@@ -1,3 +1,5 @@
+#ifndef VERTEXARRAY_H
+#define VERTEXARRAY_H
 #pragma once
 
 #include "Buffer.h"
@@ -62,3 +64,5 @@ class VertexArray
         void bind() const;
         void unbind() const;
 };
+
+#endif

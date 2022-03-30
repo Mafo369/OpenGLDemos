@@ -44,13 +44,15 @@ void Shader::setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection){
     unbind();
 }
 
-void Shader::setLight(Light* light){
+void Shader::setLight(Light* light, unsigned int id){
     bind();
-    setUniform3f( "light.position", light->position);
-    setUniform3f( "light.color", light->color);
-    setUniform1f("light.attenuation.constant", light->attenuation.constant);
-    setUniform1f("light.attenuation.linear", light->attenuation.linear);
-    setUniform1f("light.attenuation.quadratic", light->attenuation.quadratic);
+    LightParams lightParams = light->getParams();
+    std::string lightname = "light[" + std::to_string(id) + "]";
+    setUniform3f( lightname + ".position", lightParams.position);
+    setUniform3f( lightname + ".color", lightParams.color);
+    setUniform1f( lightname + ".attenuation.constant", lightParams.attenuation.constant);
+    setUniform1f( lightname + ".attenuation.linear", lightParams.attenuation.linear);
+    setUniform1f( lightname + ".attenuation.quadratic", lightParams.attenuation.quadratic);
     unbind();
 }
 

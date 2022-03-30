@@ -1,3 +1,5 @@
+#ifndef MESH_H
+#define MESH_H
 #pragma once
 
 #include <glm/glm.hpp>
@@ -44,3 +46,5 @@ private:
 protected:
     void setupMesh(unsigned int mode);
 };
+
+#endif

@@ -1,6 +1,8 @@
+#ifndef MATERIAL_H
+#define MATERIAL_H
 #pragma once
 
-#include "Shader.h"
+class Shader;
 
 class Material {
 public:
@@ -11,3 +13,5 @@ public:
 private:
     Shader* m_shader;
 };
+
+#endif

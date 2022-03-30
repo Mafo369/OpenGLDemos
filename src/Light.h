@@ -1,7 +1,7 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include <glm/glm.hpp>
+#include "RenderObject.h"
 
 typedef struct s_Attenuation
 {
@@ -10,11 +10,25 @@ typedef struct s_Attenuation
     float quadratic = 0;
 }Attenuation;
 
-typedef struct s_Light
+typedef struct s_LightParams
 {
     glm::vec3 position;
     glm::vec3 color; // Colour
     Attenuation attenuation;
-}Light;
+}LightParams;
+
+class Light : public RenderObject{
+public:
+    Light(LightParams lightParams);
+    ~Light();
+
+    void update(glm::vec3 translation);
+    glm::mat4 getModel() { return m_lightmodel; }
+    LightParams& getParams() { return m_lightParams; }
+    glm::vec3& getLightPosition() { return m_lightParams.position; }
+private:
+    LightParams m_lightParams;
+    glm::mat4 m_lightmodel;
+};
 
 #endif

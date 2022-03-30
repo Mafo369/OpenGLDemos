@@ -21,7 +21,7 @@ struct Light
   Attenuation attenuation;
 };
 
-uniform Light light;
+uniform Light light[3];
 
 float lambert(vec3 N, vec3 L)
 {
@@ -40,9 +40,14 @@ vec3 lightContributionFrom(Light light, vec3 position){
 
 void main()
 {
-  vec3 I = lightContributionFrom(light, in_position.xyz);
-  vec3 n = gl_FrontFacing ? in_normal : -in_normal;
-  vec4 result = in_color * lambert(n, light.position) * vec4(I, 1.0);
+  vec4 result = vec4(0.0);
+  for(int i =0; i < 3; i++){
+    vec3 I = lightContributionFrom(light[i], in_position.xyz);
+    vec3 n = gl_FrontFacing ? in_normal : -in_normal;
+    result += in_color * lambert(n, light[i].position) * vec4(I, 1.0);
+  }
+
+  result = clamp(result, 0.0, 1.0);
 
   color = result.rgba;
 }

@@ -52,10 +52,8 @@ void Renderer::setMaterial(Material* material){
     }
 }
 
-void Renderer::setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
-    for(auto& ro: m_roLights){
-        ro->getMaterial()->getShader()->setMVP(model, view, projection);
-    }
+void Renderer::setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection, unsigned int id){
+    m_roLights[id]->getMaterial()->getShader()->setMVP(model, view, projection);
 }
 
 void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
@@ -67,8 +65,8 @@ void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
     }
 }
 
-void Renderer::setLight(Light* light){
+void Renderer::setLight(Light* light, unsigned int id){
     for(auto& ro: m_roList){
-        ro->getMaterial()->getShader()->setLight(light);
+        ro->getMaterial()->getShader()->setLight(light, id);
     }
 }

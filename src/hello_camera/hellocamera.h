@@ -38,11 +38,10 @@ public:
 private:
     // Shader program for rendering
     Material* m_material;
+    Material* m_materialModified;
     Material* m_materialLambert;
     Material* m_materialNormal;
     Material* m_materialParametric;
-
-    Material* m_lightMaterial;
 
     Renderer* m_renderer;
 

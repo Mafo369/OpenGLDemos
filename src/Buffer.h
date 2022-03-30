@@ -1,3 +1,5 @@
+#ifndef BUFFER_H
+#define BUFFER_H
 #pragma once
 
 #include <vector>
@@ -34,3 +36,4 @@ class IndexBuffer
         inline unsigned int getCount() const { return m_count; }
         inline unsigned int getMode() const { return m_mode; }
 };
+#endif

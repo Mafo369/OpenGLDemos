@@ -4,7 +4,7 @@
 #include <vector>
 #include "Geometry/BezierCurve.h"
 #include "Geometry/BezierSurface.h"
-#include "Geometry/LightCube.h"
+#include "Geometry/Cube.h"
 #include "Geometry/Mesh.h"
 #include "RenderObject.h"
 
@@ -50,12 +50,11 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_controlPoints.push_back(points4);
 
     m_renderer = new Renderer();
-    m_light = new Light();
-    m_light->position = glm::vec3(2.f,1.f,4.f);
-    m_light->color = glm::vec3(1.0f);
 
     Shader* program = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Microfacet.frag.glsl");
+    Shader* programModified = 
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetModified.frag.glsl");
     Shader* programLambert = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Lambert.frag.glsl");
     Shader* programNormal = 
@@ -64,6 +63,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Parametric.frag.glsl");
 
     m_material = new Material(program);
+    m_materialModified = new Material(programModified);
     m_materialLambert = new Material(programLambert);
     m_materialNormal = new Material(programNormal);
     m_materialParametric = new Material(programParametric);
@@ -83,12 +83,23 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
 
     _model = glm::translate(glm::mat4(1.0), m_translation);
 
-    Shader* programLight = 
-        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Light.frag.glsl");
-    m_lightMaterial = new Material(programLight);
-    Mesh* lightCubeMesh = new LightCube(m_light->position);
-    RenderObject* lightRo = new RenderObject(lightCubeMesh, m_lightMaterial);
-    m_renderer->addLightRo(lightRo);
+    LightParams lightParams;
+    lightParams.position = glm::vec3(2.f,1.f,4.f);
+    lightParams.color = glm::vec3(1.0f);
+    Light* light = new Light(lightParams);
+    
+    lightParams.position = glm::vec3(2.f, 1.f, -4.f);
+    Light* light1 = new Light(lightParams);
+
+    lightParams.position = glm::vec3(-2.f, 0.3, 0.0f);
+    Light* light2 = new Light(lightParams);
+
+    m_renderer->addLightRo(light);
+    m_renderer->addLightRo(light1);
+    m_renderer->addLightRo(light2);
+    m_lights.push_back(light);
+    m_lights.push_back(light1);
+    m_lights.push_back(light2);
 }
 
 SimpleCamera::~SimpleCamera() {
@@ -175,13 +186,14 @@ void SimpleCamera::draw() {
     _model = glm::translate(glm::mat4(1.0), m_translation);
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
-    _lightmodel = glm::translate(glm::mat4(1.0), m_translation);
-    _lightmodel = glm::translate(_lightmodel, m_light->position);
-    _lightmodel = glm::scale(_lightmodel, glm::vec3(0.2f));
-
     m_renderer->setMVP(_model, _view, _projection);
-    m_renderer->setLightMVP(_lightmodel, _view, _projection);
-    m_renderer->setLight(m_light);
+    for(unsigned int i = 0; i < m_lights.size(); i++){
+        auto& l = m_lights[i];
+        l->update(m_translation);
+        m_renderer->setLightMVP(l->getModel(), _view, _projection , i);
+        m_renderer->setLight(l, i);
+    }
+
     m_renderer->draw();
 }
 
@@ -213,6 +225,9 @@ bool SimpleCamera::keyboard(unsigned char k) {
             return true;
         case 'c' :
             m_renderer->setMaterial(m_material);
+            return true;
+        case 'm' :
+            m_renderer->setMaterial(m_materialModified);
             return true;
         case 'n' :
             m_renderer->setMaterial(m_materialNormal);

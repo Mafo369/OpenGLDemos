@@ -1,8 +1,8 @@
-#include "LightCube.h"
+#include "Cube.h"
 #include <GL/gl.h>
 
-LightCube::LightCube(glm::vec3 lightPosition) : Mesh() {
-    m_lightPosition = lightPosition;
+Cube::Cube(glm::vec3 position) : Mesh() {
+    m_position = position;
     m_color = glm::vec4(1.0f);
     m_vertices.push_back({glm::vec3(0.5, 0, 0.5 ), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color});
     m_vertices.push_back({glm::vec3(0.5, 0, -0.5), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color});
@@ -23,6 +23,6 @@ LightCube::LightCube(glm::vec3 lightPosition) : Mesh() {
     setupMesh(GL_TRIANGLES);
 }
 
-LightCube::~LightCube(){
+Cube::~Cube(){
 
 }

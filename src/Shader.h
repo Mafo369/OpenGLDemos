@@ -1,3 +1,5 @@
+#ifndef SHADER_H
+#define SHADER_H
 #pragma once
 
 #include <string>
@@ -5,7 +7,8 @@
 #include <sstream>
 #include <iostream>
 #include <glm/glm.hpp>
-#include "Light.h"
+
+class Light;
   
 struct ShaderProgramSource{
     std::string vertexSource;
@@ -30,7 +33,7 @@ public:
     void setUniform1f(const std::string& name, float value);
 
     void setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection);
-    void setLight(Light* light);
+    void setLight(Light* light, unsigned int id);
 private:
     std::stringstream readShader(const std::string& filepath);
     ShaderProgramSource parseShader(const std::string& vertexFilepath, const std::string& fragmentFilepath);
@@ -38,4 +41,5 @@ private:
     unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader);
     int getUniformLocation(const std::string& name);
 };
-  
+
+#endif
