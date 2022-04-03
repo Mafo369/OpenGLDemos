@@ -24,7 +24,14 @@ struct Light
   Attenuation attenuation;
 };
 
+struct Material{
+  float metallic;
+  float roughness;
+};
+
 uniform Light light[3];
+
+uniform Material material;
 
 float chiplus(float c) { return (c > 0.f) ? 1.f : 0.f; }
 
@@ -48,8 +55,8 @@ void main(){
   float ior = 0.04;
   vec3 iorV = vec3(ior);
   vec3 baseColor = in_color.rgb;
-  float metallic = 0.01;
-  float roughness = 0.6;
+  float metallic = material.metallic;
+  float roughness = material.roughness;
   vec3 n = gl_FrontFacing ? in_normal : -in_normal;
 
   vec3 v = normalize(eyePos - in_position.xyz);

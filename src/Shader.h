@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iostream>
 #include <glm/glm.hpp>
+#include "Material.h"
 
 class Light;
   
@@ -31,9 +32,11 @@ public:
     void setUniform4f(const std::string& name, const glm::vec4& v);
     void setUniform3f(const std::string& name, const glm::vec3& v);
     void setUniform1f(const std::string& name, float value);
+    void setUniform1i(const std::string& name, int value);
 
     void setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection);
     void setLight(Light* light, unsigned int id);
+    void setMaterialParams(MaterialParams params);
 private:
     std::stringstream readShader(const std::string& filepath);
     ShaderProgramSource parseShader(const std::string& vertexFilepath, const std::string& fragmentFilepath);

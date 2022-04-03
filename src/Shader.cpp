@@ -35,6 +35,10 @@ void Shader::setUniform3f(const std::string& name, const glm::vec3& v){
 void Shader::setUniform1f(const std::string& name, float value){
     glAssert(glUniform1f(getUniformLocation(name), value));
 }
+
+void Shader::setUniform1i(const std::string& name, int value){
+    glAssert(glUniform1i(getUniformLocation(name), value));
+}
     
 void Shader::setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection){
     bind();
@@ -53,6 +57,14 @@ void Shader::setLight(Light* light, unsigned int id){
     setUniform1f( lightname + ".attenuation.constant", lightParams.attenuation.constant);
     setUniform1f( lightname + ".attenuation.linear", lightParams.attenuation.linear);
     setUniform1f( lightname + ".attenuation.quadratic", lightParams.attenuation.quadratic);
+    unbind();
+}
+
+void Shader::setMaterialParams(MaterialParams params){
+    bind();
+    setUniform1i("material.texDiffuse", params.texDiffuse);
+    setUniform1f("material.metallic", params.metallic);
+    setUniform1f("material.roughness", params.roughness);
     unbind();
 }
 

@@ -52,6 +52,23 @@ void Renderer::setMaterial(Material* material){
     }
 }
 
+void Renderer::setMaterialParams(){
+    for(auto& ro : m_roList){
+        auto material = ro->getMaterial();
+        if(material->hasParams()){
+            auto materialParams = material->getParams();
+            if(material->hasTexture()){
+                auto texture = material->getTexture();
+                texture->bind();
+                material->getShader()->setMaterialParams(materialParams);
+            }
+            else
+                material->getShader()->setMaterialParams(materialParams);
+        }
+
+    }
+}
+
 void Renderer::setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection, unsigned int id){
     m_roLights[id]->getMaterial()->getShader()->setMVP(model, view, projection);
 }

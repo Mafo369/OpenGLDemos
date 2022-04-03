@@ -2,10 +2,9 @@
 #include "Renderer.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, 
-           std::vector<Texture> textures, unsigned int mode){
+           unsigned int mode){
     setVertices(vertices);
     setIndices(indices);
-    setTextures(textures);
 
     setupMesh(mode);
 }

@@ -3,6 +3,7 @@
 
 #include "Renderer.h"
 
+#include "Texture.h"
 #include "camera.h"
 #include "fwd.hpp"
 
@@ -44,7 +45,7 @@ private:
     Material* m_materialParametric;
 
     Renderer* m_renderer;
-
+    Texture* m_texture;
     bool m_first = true;
     bool m_displayCtrlPts = false;
 

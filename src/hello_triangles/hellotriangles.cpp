@@ -12,11 +12,10 @@ SimpleTriangle::SimpleTriangle(int width, int height, ImVec4 clearColor) : OpenG
         0, 1, 3,   // First Triangle
         1, 2, 3    // Second Triangle
     };
-    std::vector<Texture> textures;
  
     m_renderer = new Renderer();
 
-    m_mesh = new Mesh(vertices, indices, textures, GL_TRIANGLES);
+    m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
 
     m_programcolor = m_program = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Basic.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Basic.frag.glsl");     

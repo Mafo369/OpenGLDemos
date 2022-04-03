@@ -87,6 +87,12 @@ void MyOpenGLWidget::paintGL() {
             if(ImGui::ColorEdit3("surface color", (float*)glm::value_ptr(color))){
                 _openglDemo->compute();
             }
+            ImGui::Text("Material:");
+            auto material = _openglDemo->getCurrentMaterial();
+            if(material->hasParams()){
+                ImGui::SliderFloat("metallic", material->getMetallic(), 0.0, 1.0);
+                ImGui::SliderFloat("roughness", material->getRoughness(), 0.0, 1.0);
+            }
             ImGui::Text("Control points:");
             if(ImGui::Checkbox("Display control points: ", &m_displayCtrlPts)){
                 _openglDemo->toggleCtrlPts();
@@ -102,6 +108,18 @@ void MyOpenGLWidget::paintGL() {
                 }
             }
         }
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Keybinds:");
+        ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "  Shaders:");
+        ImGui::Text("    'c' : glTF2.0 microfacets");
+        ImGui::Text("    'm' : modified microfacets");
+        ImGui::Text("    'l' : simple lambert");
+        ImGui::Text("    'n' : normals");
+        ImGui::Text("    't' : UV coords");
+        ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "  Demos:");
+        ImGui::Text("    '0' : clear");
+        ImGui::Text("    '1' : Hello triangle");
+        ImGui::Text("    '2' : Bezier Surface");
+        ImGui::Text("    '3' : Hello sphere");
     }
 
     std::int64_t starttime = QDateTime::currentMSecsSinceEpoch();

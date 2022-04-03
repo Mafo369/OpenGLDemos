@@ -43,16 +43,20 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     points4.push_back(glm::vec3(0.5f, 0.f, 1.5f));
     points4.push_back(glm::vec3(1.f, -1.0f, 1.5f));
     points4.push_back(glm::vec3(1.5f, 0.3f, 1.5f));
-    points4.push_back(glm::vec3(2.0f, -1.3f, 1.5f));
     m_controlPoints.push_back(points1);
     m_controlPoints.push_back(points2);
     m_controlPoints.push_back(points3);
     m_controlPoints.push_back(points4);
 
     m_renderer = new Renderer();
+    m_texture = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2.png");
 
     Shader* program = 
-        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Microfacet.frag.glsl");
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetTexture.frag.glsl");
+    //program->bind();
+    //m_texture->bind();
+    //program->setUniform1i("material.texDiffuse", 0);
+    //program->unbind();
     Shader* programModified = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetModified.frag.glsl");
     Shader* programLambert = 
@@ -62,11 +66,16 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     Shader* programParametric = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Parametric.frag.glsl");
 
-    m_material = new Material(program);
-    m_materialModified = new Material(programModified);
+    MaterialParams matParams;
+    matParams.texDiffuse = 0;
+    matParams.metallic = 0.6;
+    matParams.roughness = 0.6;
+    m_material = new Material(program, matParams, m_texture);
+    m_materialModified = new Material(programModified, matParams);
     m_materialLambert = new Material(programLambert);
     m_materialNormal = new Material(programNormal);
     m_materialParametric = new Material(programParametric);
+
     
     compute();
     m_first = false;
@@ -137,8 +146,7 @@ void SimpleCamera::compute() {
             8, 9, 9, 10, 10, 11,
             12, 13, 13, 14, 14, 15, 15, 16
         };
-        std::vector<Texture> textures;
-        Mesh* ctrlPtsMesh = new Mesh(vertices1, indices1, textures, GL_LINES);
+        Mesh* ctrlPtsMesh = new Mesh(vertices1, indices1, GL_LINES);
         if(!m_first){
             roCPM = new RenderObject(ctrlPtsMesh, m_renderer->getCurrentMaterial());
         }
@@ -186,6 +194,10 @@ void SimpleCamera::draw() {
     _model = glm::translate(glm::mat4(1.0), m_translation);
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
+
+    m_currentMaterial = m_renderer->getCurrentMaterial();
+    m_renderer->setMaterialParams();
+    
     m_renderer->setMVP(_model, _view, _projection);
     for(unsigned int i = 0; i < m_lights.size(); i++){
         auto& l = m_lights[i];

@@ -15,6 +15,7 @@ public:
     void addRenderObject(RenderObject* ro);
     void addLightRo(RenderObject* ro);
     void setMaterial(Material* material);
+    void setMaterialParams();
     void setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection, unsigned int id);
     void setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
     void setLight(Light* light, unsigned int id);
