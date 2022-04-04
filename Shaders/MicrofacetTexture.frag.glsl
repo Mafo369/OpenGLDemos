@@ -26,6 +26,7 @@ struct Light
 
 struct Material{
   sampler2D texDiffuse;
+  sampler2D texSpecular;
   float metallic;
   float roughness;
 };
@@ -56,9 +57,10 @@ void main(){
   float ior = 0.04;
   vec3 iorV = vec3(ior);
   vec4 texColor = texture(material.texDiffuse, texCoords);
+  vec4 texColorSpecular = texture(material.texSpecular, texCoords);
   vec3 baseColor = texColor.rgb;
   float metallic = material.metallic;
-  float roughness = material.roughness;
+  float roughness = float(texColorSpecular);
   vec3 n = gl_FrontFacing ? in_normal : -in_normal;
 
   vec3 v = normalize(eyePos - in_position.xyz);

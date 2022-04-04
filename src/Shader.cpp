@@ -63,6 +63,7 @@ void Shader::setLight(Light* light, unsigned int id){
 void Shader::setMaterialParams(MaterialParams params){
     bind();
     setUniform1i("material.texDiffuse", params.texDiffuse);
+    setUniform1i("material.texSpecular", params.texSpecular);
     setUniform1f("material.metallic", params.metallic);
     setUniform1f("material.roughness", params.roughness);
     unbind();
@@ -70,8 +71,8 @@ void Shader::setMaterialParams(MaterialParams params){
 
 int Shader::getUniformLocation(const std::string& name){
     glAssert(int location = glGetUniformLocation(m_rendererId, name.c_str()));
-    if(location == -1)
-        std::cout << "Warning: uniform " << name << "doesn't exist!" << std::endl;
+    //if(location == -1)
+    //    std::cout << "Warning: uniform " << name << "doesn't exist!" << std::endl;
     return location;
 }
 

@@ -30,8 +30,6 @@ public:
     void keyboardmove(int key, double time) override;
     bool keyboard(unsigned char k) override;
 
-    std::vector<std::vector<glm::vec3>>& getControlsPoints() override { return m_controlPoints; }
-
     void compute() override;
     glm::vec4& getColor() override { return m_color; }
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
@@ -46,10 +44,9 @@ private:
 
     Renderer* m_renderer;
     Texture* m_texture;
+    Texture* m_textureSpecular;
     bool m_first = true;
     bool m_displayCtrlPts = false;
-
-    std::vector<std::vector<glm::vec3>> m_controlPoints;
 
     // for mouse management
     int _button; // 0 --> left. 1 --> right. 2 --> middle. 3 --> other

@@ -50,13 +50,10 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
 
     m_renderer = new Renderer();
     m_texture = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2.png");
+    m_textureSpecular = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2_specular.png");
 
     Shader* program = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetTexture.frag.glsl");
-    //program->bind();
-    //m_texture->bind();
-    //program->setUniform1i("material.texDiffuse", 0);
-    //program->unbind();
     Shader* programModified = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetModified.frag.glsl");
     Shader* programLambert = 
@@ -68,14 +65,16 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
 
     MaterialParams matParams;
     matParams.texDiffuse = 0;
+    matParams.texSpecular = 1;
     matParams.metallic = 0.6;
     matParams.roughness = 0.6;
-    m_material = new Material(program, matParams, m_texture);
+    m_material = new Material(program, matParams, m_texture, m_textureSpecular);
     m_materialModified = new Material(programModified, matParams);
     m_materialLambert = new Material(programLambert);
     m_materialNormal = new Material(programNormal);
     m_materialParametric = new Material(programParametric);
-
+    
+    m_currentMaterial = m_material;
     
     compute();
     m_first = false;
@@ -117,6 +116,8 @@ SimpleCamera::~SimpleCamera() {
     delete m_materialLambert;
     delete m_materialNormal;
     delete m_materialParametric;
+    delete m_materialModified;
+    delete m_texture;
 }
 void SimpleCamera::compute() {
     RenderObject* roCPM;

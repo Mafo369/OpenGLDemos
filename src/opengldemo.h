@@ -28,7 +28,7 @@ public:
 
     void setClearColor(ImVec4 clearColor) { m_clearColor = clearColor; }
     void setTranslation(glm::vec3 translation) { m_translation = translation; }
-    virtual std::vector<std::vector<glm::vec3>>& getControlsPoints() { return m_controlPoints; }
+    std::vector<std::vector<glm::vec3>>& getControlsPoints() { return m_controlPoints; }
     virtual void compute() {}
     virtual glm::vec4& getColor() { return m_color; }
     Material* getCurrentMaterial() { return m_currentMaterial; }
