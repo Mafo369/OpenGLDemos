@@ -11,6 +11,5 @@ RenderObject::RenderObject(Mesh* mesh, Material* material) {
 
 RenderObject::~RenderObject(){
     delete m_mesh;
-    delete m_material;
 }
 

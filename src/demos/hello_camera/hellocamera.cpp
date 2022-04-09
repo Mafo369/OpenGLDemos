@@ -49,8 +49,8 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_controlPoints.push_back(points4);
 
     m_renderer = new Renderer();
-    m_texture = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2.png");
-    m_textureSpecular = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2_specular.png");
+    Texture* texture = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2.png");
+    Texture* textureSpecular = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2_specular.png");
 
     Shader* program = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Microfacet.frag.glsl");
@@ -75,8 +75,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_materialLambert = new Material(programLambert);
     m_materialNormal = new Material(programNormal);
     m_materialParametric = new Material(programParametric);
-    matParams.metallic = 0.01;
-    m_materialTexture = new Material(programTexture, matParams, m_texture, m_textureSpecular);
+    m_materialTexture = new Material(programTexture, matParams, texture, textureSpecular);
     
     m_currentMaterial = m_material;
     
@@ -121,8 +120,9 @@ SimpleCamera::~SimpleCamera() {
     delete m_materialNormal;
     delete m_materialParametric;
     delete m_materialModified;
-    delete m_texture;
-    delete m_textureSpecular;
+    delete m_materialTexture;
+    for(auto& l : m_lights)
+        delete l;
 }
 
 void SimpleCamera::compute() {

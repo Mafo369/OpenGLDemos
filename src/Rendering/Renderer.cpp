@@ -103,3 +103,10 @@ void Renderer::setCameraPosition(glm::vec3 position){
         ro->getMaterial()->getShader()->setCameraPosition(position);
     }
 }
+
+void Renderer::clearRenderObjects(){
+    for(auto& ro : m_roList){
+        delete ro;
+    }
+    m_roList.clear();
+}

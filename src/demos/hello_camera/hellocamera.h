@@ -44,8 +44,6 @@ private:
     Material* m_materialTexture;
 
     Renderer* m_renderer;
-    Texture* m_texture;
-    Texture* m_textureSpecular;
     bool m_first = true;
     bool m_displayCtrlPts = false;
 

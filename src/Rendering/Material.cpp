@@ -23,4 +23,8 @@ Material::Material(Shader* shader, MaterialParams materialParams, Texture* textu
 
 Material::~Material(){
     delete m_shader;
+    if(m_hasTexture){
+        delete m_texture;
+        delete m_textureSpecular;
+    }
 }
