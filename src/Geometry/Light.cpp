@@ -1,5 +1,5 @@
 #include "Light.h"
-#include "Geometry/Cube.h"
+#include "Cube.h"
 #include "ext/matrix_transform.hpp"
 
 Light::Light(LightParams lightParams) : RenderObject(){

@@ -1,6 +1,6 @@
 #include "BezierCurve.h"
 #include "Utils.h"
-#include "Renderer.h"
+#include "../Rendering/Renderer.h"
 
 BezierCurve::BezierCurve(std::vector<glm::vec3> controlPoints, unsigned int nbSegments,
                          glm::vec4 color) : Mesh() {

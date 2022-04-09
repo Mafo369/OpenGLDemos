@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Geometry/Mesh.h"
+#include "Mesh.h"
 #include "Light.h"
 
 class Cube : public Mesh {

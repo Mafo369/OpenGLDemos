@@ -1,7 +1,7 @@
 #ifndef SIMPLETRIANGLE_H
 #define SIMPLETRIANGLE_H
 
-#include "Renderer.h"
+#include "../../Rendering/Renderer.h"
 #include "imgui.h"
 
 /** Simple drawing demonstration

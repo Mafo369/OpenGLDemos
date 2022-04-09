@@ -36,6 +36,7 @@ public:
 
     void setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection);
     void setLight(Light* light, unsigned int id);
+    void setCameraPosition(glm::vec3 position);
     void setMaterialParams(MaterialParams params);
 private:
     std::stringstream readShader(const std::string& filepath);

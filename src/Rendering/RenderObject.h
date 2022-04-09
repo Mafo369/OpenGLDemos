@@ -2,7 +2,7 @@
 #define RENDEROBJECT_H
 #pragma once
 #include "Material.h"
-#include "Geometry/Mesh.h"
+#include "../Geometry/Mesh.h"
 
 class RenderObject {
 public:

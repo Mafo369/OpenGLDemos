@@ -14,9 +14,9 @@
 #include <string>
 
 #include "gtc/type_ptr.hpp"
-#include "hello_triangles/hellotriangles.h"
-#include "hello_camera/hellocamera.h"
-#include "hello_spheres/hellospheres.h"
+#include "demos/hello_triangles/hellotriangles.h"
+#include "demos/hello_camera/hellocamera.h"
+#include "demos/hello_spheres/hellospheres.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
@@ -112,9 +112,10 @@ void MyOpenGLWidget::paintGL() {
         ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "  Shaders:");
         ImGui::Text("    'c' : glTF2.0 microfacets");
         ImGui::Text("    'm' : modified microfacets");
+        ImGui::Text("    't' : texture microfacets");
         ImGui::Text("    'l' : simple lambert");
         ImGui::Text("    'n' : normals");
-        ImGui::Text("    't' : UV coords");
+        ImGui::Text("    'u' : UV coords");
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "  Demos:");
         ImGui::Text("    '0' : clear");
         ImGui::Text("    '1' : Hello triangle");

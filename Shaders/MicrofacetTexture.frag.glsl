@@ -6,7 +6,8 @@ layout (location = 0) in vec4 in_position;
 layout (location = 1) in vec3 in_normal;
 layout (location = 2) in vec2 texCoords;
 layout (location = 3) in vec4 in_color;
-layout (location = 4) in vec3 eyePos;
+
+uniform vec3 eyePosition;
 
 out vec4 color;
 
@@ -54,16 +55,23 @@ float smith(float NdotL, float HdotL, float NdotV, float HdotV, float alpha2){
 void main(){
   
   const vec3 black = vec3(0);
-  float ior = 0.04;
-  vec3 iorV = vec3(ior);
+  vec3 iorV = vec3(0.04);
+
   vec4 texColor = texture(material.texDiffuse, texCoords);
   vec4 texColorSpecular = texture(material.texSpecular, texCoords);
   vec3 baseColor = texColor.rgb;
-  float metallic = material.metallic;
+  float metallic = float(texColorSpecular);
   float roughness = float(texColorSpecular);
-  vec3 n = gl_FrontFacing ? in_normal : -in_normal;
 
-  vec3 v = normalize(eyePos - in_position.xyz);
+  vec3 f0 = mix(iorV, baseColor.rgb, metallic);
+  vec3 c_diff = mix(baseColor.rgb, black, metallic);
+  float alpha = roughness * roughness;
+  float alpha2 = alpha * alpha;
+
+  vec3 n = gl_FrontFacing ? in_normal : -in_normal;
+  n = normalize(n);
+
+  vec3 v = normalize(eyePosition - in_position.xyz);
   vec3 material = vec3(0.0);
   for(int i =0; i < 3; i++){
     vec3 l = normalize(light[i].position - in_position.xyz);
@@ -73,11 +81,6 @@ void main(){
     float NdotL = dot(n, l);
     float HdotL = dot(h, l);
     float NdotV = dot(n, v);
-
-    vec3 c_diff = mix(baseColor.rgb, black, metallic);
-    vec3 f0 = mix(iorV, baseColor.rgb, metallic);
-    float alpha = roughness * roughness;
-    float alpha2 = alpha * alpha;
 
     vec3 F = f0 + (1-f0) * pow(1 - abs(VdotH),5);
 
@@ -89,7 +92,6 @@ void main(){
     material += (f_diffuse + f_specular);
   }
 
-  material = clamp(material, 0.0, 1.0);
 
   color = vec4(material, 1.0);
 }

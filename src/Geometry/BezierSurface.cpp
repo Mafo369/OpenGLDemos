@@ -1,6 +1,6 @@
 #include "BezierSurface.h"
 #include "Utils.h"
-#include "Renderer.h"
+#include "../Rendering/Renderer.h"
 
 BezierSurface::BezierSurface(std::vector<std::vector<glm::vec3>> controlPoints, unsigned int nbSegmentsU, 
                              unsigned int nbSegmentsV, glm::vec4 color) : Mesh() {

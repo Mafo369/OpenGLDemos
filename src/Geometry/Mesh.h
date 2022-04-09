@@ -5,10 +5,10 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
-#include "VertexArray.h"
-#include "Buffer.h"
-#include "Shader.h"
-#include "Texture.h"
+#include "../Rendering/VertexArray.h"
+#include "../Rendering/Buffer.h"
+#include "../Rendering/Shader.h"
+#include "../Rendering/Texture.h"
 
 class Renderer;
 

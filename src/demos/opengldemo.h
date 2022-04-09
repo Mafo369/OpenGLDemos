@@ -4,10 +4,10 @@
 
 #include <vector>
 
-#include "error_handling.h"
+#include "../Rendering/error_handling.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <imgui.h>
-#include "Light.h"
+#include "Geometry/Light.h"
 
 /** Simple class for managing an OpenGL demo
  */

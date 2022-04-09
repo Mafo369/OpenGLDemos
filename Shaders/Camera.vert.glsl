@@ -11,7 +11,6 @@ layout (location = 0) out vec4 out_position;
 layout (location = 1) out vec3 out_normal;
 layout (location = 2) out vec2 out_texCoords;
 layout (location = 3) out vec4 out_color;
-layout (location = 4) out vec3 eyePos;
 
 void main()
 {
@@ -21,5 +20,4 @@ void main()
     out_texCoords = itexCoords;
     out_position = model * vec4(position, 1.0);
     out_color = in_color;
-    eyePos = vec3(view[3].xyz);
 };

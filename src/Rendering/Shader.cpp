@@ -1,6 +1,6 @@
 #include "Shader.h"
 #include "Renderer.h"
-#include "Light.h"
+#include "../Geometry/Light.h"
 
 Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFilepath) 
 {
@@ -57,6 +57,12 @@ void Shader::setLight(Light* light, unsigned int id){
     setUniform1f( lightname + ".attenuation.constant", lightParams.attenuation.constant);
     setUniform1f( lightname + ".attenuation.linear", lightParams.attenuation.linear);
     setUniform1f( lightname + ".attenuation.quadratic", lightParams.attenuation.quadratic);
+    unbind();
+}
+
+void Shader::setCameraPosition(glm::vec3 position){
+    bind();
+    setUniform3f("eyePosition", position);
     unbind();
 }
 

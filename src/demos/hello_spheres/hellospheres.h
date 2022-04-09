@@ -2,7 +2,7 @@
 #define SIMPLESPHERES_H
 
 #include <imgui.h>
-#include "opengldemo.h"
+#include "../opengldemo.h"
 
 #include "../hello_camera/camera.h"
 

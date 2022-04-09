@@ -1,9 +1,9 @@
 #ifndef SIMPLECAMERA_H
 #define SIMPLECAMERA_H
 
-#include "Renderer.h"
+#include "../../Rendering/Renderer.h"
 
-#include "Texture.h"
+#include "../../Rendering/Texture.h"
 #include "camera.h"
 #include "fwd.hpp"
 
@@ -41,6 +41,7 @@ private:
     Material* m_materialLambert;
     Material* m_materialNormal;
     Material* m_materialParametric;
+    Material* m_materialTexture;
 
     Renderer* m_renderer;
     Texture* m_texture;

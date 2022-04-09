@@ -9,7 +9,7 @@
 
 #include <imgui.h>
 
-#include "opengldemo.h"
+#include "demos/opengldemo.h"
 
 #include <QTimer>
 

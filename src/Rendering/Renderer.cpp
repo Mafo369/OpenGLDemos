@@ -1,5 +1,13 @@
 #include "Renderer.h"
 
+Renderer::Renderer(){
+
+}
+
+Renderer::~Renderer(){
+
+}
+
 void Renderer::draw(VertexArray *vao, IndexBuffer *ebo, Shader* shader) const{
     shader->bind();
     vao->bind();
@@ -87,5 +95,11 @@ void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
 void Renderer::setLight(Light* light, unsigned int id){
     for(auto& ro: m_roList){
         ro->getMaterial()->getShader()->setLight(light, id);
+    }
+}
+
+void Renderer::setCameraPosition(glm::vec3 position){
+    for(auto& ro: m_roList){
+        ro->getMaterial()->getShader()->setCameraPosition(position);
     }
 }

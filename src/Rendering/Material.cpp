@@ -22,6 +22,5 @@ Material::Material(Shader* shader, MaterialParams materialParams, Texture* textu
 }
 
 Material::~Material(){
-    delete m_texture;
     delete m_shader;
 }

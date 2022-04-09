@@ -6,7 +6,7 @@
 #include "Geometry/BezierSurface.h"
 #include "Geometry/Cube.h"
 #include "Geometry/Mesh.h"
-#include "RenderObject.h"
+#include "../../Rendering/RenderObject.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
@@ -27,22 +27,22 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     std::vector<glm::vec3> points3;
     std::vector<glm::vec3> points4;
     m_color = glm::vec4(1.0f, 0.5f, 0.2f, 1.f);
-    points1.push_back(glm::vec3(0.f,  -0.5f, 0.0f));
+    points1.push_back(glm::vec3(-0.5f,  -0.5f, 0.0f));
+    points1.push_back(glm::vec3(0.f, 0.f, 0.0f));
     points1.push_back(glm::vec3(0.5f, 0.f, 0.0f));
-    points1.push_back(glm::vec3(1.f, 0.f, 0.0f));
-    points1.push_back(glm::vec3(1.5f, -0.5f, 0.0f));
-    points2.push_back(glm::vec3(0.f,  -0.5f, 0.5f));
-    points2.push_back(glm::vec3(0.5f, 0.f, 0.5f));
-    points2.push_back(glm::vec3(1.f, 0.5f, 0.5f));
-    points2.push_back(glm::vec3(1.5f, -0.5f, 0.5f));
-    points3.push_back(glm::vec3(0.f,  -0.5f, 1.0f));
-    points3.push_back(glm::vec3(0.5f, 0.5f, 1.0f));
-    points3.push_back(glm::vec3(1.f, 1.0f, 1.0f));
-    points3.push_back(glm::vec3(1.5f, -0.3f, 1.0f));
-    points4.push_back(glm::vec3(0.f,  1.5f, 1.5f));
-    points4.push_back(glm::vec3(0.5f, 0.f, 1.5f));
-    points4.push_back(glm::vec3(1.f, -1.0f, 1.5f));
-    points4.push_back(glm::vec3(1.5f, 0.3f, 1.5f));
+    points1.push_back(glm::vec3(1.f, -0.5f, 0.0f));
+    points2.push_back(glm::vec3(-0.5f,  -0.5f, 0.5f));
+    points2.push_back(glm::vec3(0.f, 0.f, 0.5f));
+    points2.push_back(glm::vec3(0.5f, 0.5f, 0.5f));
+    points2.push_back(glm::vec3(1.f, -0.5f, 0.5f));
+    points3.push_back(glm::vec3(-0.5f,  -0.5f, 1.0f));
+    points3.push_back(glm::vec3(0.f, 0.5f, 1.0f));
+    points3.push_back(glm::vec3(-0.5f, 1.0f, 1.0f));
+    points3.push_back(glm::vec3(1.f, -0.3f, 1.0f));
+    points4.push_back(glm::vec3(-0.5f,  0.f, 1.5f));
+    points4.push_back(glm::vec3(0.f, 0.f, 1.5f));
+    points4.push_back(glm::vec3(0.5f, -1.0f, 1.5f));
+    points4.push_back(glm::vec3(1.f, 0.3f, 1.5f));
     m_controlPoints.push_back(points1);
     m_controlPoints.push_back(points2);
     m_controlPoints.push_back(points3);
@@ -53,7 +53,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_textureSpecular = new Texture("/home/mafo/dev/helloOpenGL/src/Assets/container2_specular.png");
 
     Shader* program = 
-        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetTexture.frag.glsl");
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Microfacet.frag.glsl");
     Shader* programModified = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetModified.frag.glsl");
     Shader* programLambert = 
@@ -62,17 +62,21 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Camera.frag.glsl");
     Shader* programParametric = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Parametric.frag.glsl");
+    Shader* programTexture = 
+        new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/MicrofacetTexture.frag.glsl");
 
     MaterialParams matParams;
     matParams.texDiffuse = 0;
     matParams.texSpecular = 1;
     matParams.metallic = 0.6;
     matParams.roughness = 0.6;
-    m_material = new Material(program, matParams, m_texture, m_textureSpecular);
+    m_material = new Material(program, matParams);
     m_materialModified = new Material(programModified, matParams);
     m_materialLambert = new Material(programLambert);
     m_materialNormal = new Material(programNormal);
     m_materialParametric = new Material(programParametric);
+    matParams.metallic = 0.01;
+    m_materialTexture = new Material(programTexture, matParams, m_texture, m_textureSpecular);
     
     m_currentMaterial = m_material;
     
@@ -92,11 +96,11 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     _model = glm::translate(glm::mat4(1.0), m_translation);
 
     LightParams lightParams;
-    lightParams.position = glm::vec3(2.f,1.f,4.f);
+    lightParams.position = glm::vec3(2.f, 5.f, 2.9f);
     lightParams.color = glm::vec3(1.0f);
     Light* light = new Light(lightParams);
     
-    lightParams.position = glm::vec3(2.f, 1.f, -4.f);
+    lightParams.position = glm::vec3(0.95f, 1.43f, 1.28f);
     Light* light1 = new Light(lightParams);
 
     lightParams.position = glm::vec3(-2.f, 0.3, 0.0f);
@@ -118,7 +122,9 @@ SimpleCamera::~SimpleCamera() {
     delete m_materialParametric;
     delete m_materialModified;
     delete m_texture;
+    delete m_textureSpecular;
 }
+
 void SimpleCamera::compute() {
     RenderObject* roCPM;
     if(m_displayCtrlPts){
@@ -138,14 +144,13 @@ void SimpleCamera::compute() {
         Vertex v13 = {m_controlPoints[3][1], glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
         Vertex v14 = {m_controlPoints[3][2], glm::vec3(-0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
         Vertex v15 = {m_controlPoints[3][3], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-        Vertex v16 = {m_controlPoints[3][4], glm::vec3(-0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
         std::vector<Vertex> vertices1 = { v0, v1, v2, v3, v4, v5, v6, v7, v8, v9,
-                                          v10, v11, v12, v13, v14, v15, v16 };
+                                          v10, v11, v12, v13, v14, v15 };
         std::vector<unsigned int> indices1 = {
             0, 1, 1, 2, 2, 3,
             4, 5, 5, 6, 6, 7,
             8, 9, 9, 10, 10, 11,
-            12, 13, 13, 14, 14, 15, 15, 16
+            12, 13, 13, 14, 14, 15, 15
         };
         Mesh* ctrlPtsMesh = new Mesh(vertices1, indices1, GL_LINES);
         if(!m_first){
@@ -157,7 +162,21 @@ void SimpleCamera::compute() {
 
     }
     Mesh* mesh = new BezierSurface(m_controlPoints, 100, 100, m_color);
+    //std::vector<Vertex> normalVertices;
+    //normalVertices.insert(normalVertices.end(), mesh->m_vertices.begin(), mesh->m_vertices.end());
+    //std::vector<unsigned int> normalInds;
+    //unsigned int idN = normalVertices.size();
+    //unsigned len = idN;
+    //for(unsigned int i = 0; i < len; i++){
+    //    Vertex normalV = { (normalVertices[i].m_position + normalVertices[i].m_normal), glm::vec3(0.f), normalVertices[i].m_texCoords, m_color};
+    //    normalVertices.push_back(normalV);
+    //    normalInds.push_back(i);
+    //    normalInds.push_back(idN);
+    //    idN++;
+    //}
+    //Mesh* normalMesh = new Mesh(normalVertices, normalInds, GL_LINES);
     RenderObject* ro;
+    //RenderObject* roN = new RenderObject(normalMesh, m_materialLambert);
     if(!m_first){
         ro = new RenderObject(mesh, m_renderer->getCurrentMaterial());
     }
@@ -166,6 +185,7 @@ void SimpleCamera::compute() {
     }
     m_renderer->clearRenderObjects();
     m_renderer->addRenderObject(ro);
+    //m_renderer->addRenderObject(roN);
     if(m_displayCtrlPts)
         m_renderer->addRenderObject(roCPM);
 
@@ -200,6 +220,7 @@ void SimpleCamera::draw() {
     m_renderer->setMaterialParams();
     
     m_renderer->setMVP(_model, _view, _projection);
+    m_renderer->setCameraPosition(_camera->position());
     for(unsigned int i = 0; i < m_lights.size(); i++){
         auto& l = m_lights[i];
         l->update(m_translation);
@@ -245,11 +266,14 @@ bool SimpleCamera::keyboard(unsigned char k) {
         case 'n' :
             m_renderer->setMaterial(m_materialNormal);
             return true;
-        case 't' :
+        case 'u' :
             m_renderer->setMaterial(m_materialParametric);
             return true;
         case 'l' :
             m_renderer->setMaterial(m_materialLambert);
+            return true;
+        case 't' :
+            m_renderer->setMaterial(m_materialTexture);
             return true;
         default:
             return false;
