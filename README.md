@@ -2,7 +2,7 @@
 
 ## IMPORTANT NOTE:
 
-**FILE HAS TO BE EXECUTED FROM bin/ DUE RESSOURCES ACCESS LIKE Shaders/ AND Assets/**
+**FILE HAS TO BE EXECUTED FROM bin/ DUE TO RESSOURCES ACCESS LIKE Shaders/ AND Assets/**
 
 ## Getting Started
 
@@ -35,22 +35,29 @@ Demos:
 ## Results
 
 Microfacets
+
 ![alt text](results/microfacets.png)
 
 Microfacets modified
+
 ![alt text](results/microfacetsmodified.png)
 
 Microfacets + texture
+
 ![alt text](results/microfacetstexture.png)
 
 Microfacets modified
+
 ![alt text](results/microfacetsmodified1.png)
 
 Lambert
+
 ![alt text](results/lambert.png)
 
 Normals
+
 ![alt text](results/normals.png)
 
 Parametric
+
 ![alt text](results/parametric.png)
