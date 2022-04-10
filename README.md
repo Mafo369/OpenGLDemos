@@ -36,7 +36,7 @@ Demos:
 - **2** : Bezier Surface
 - **3** : Hello Sphere
 
-## Results
+## Results: Bezier Surface
 
 Microfacets
 
