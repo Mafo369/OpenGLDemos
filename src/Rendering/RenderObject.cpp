@@ -4,7 +4,7 @@ RenderObject::RenderObject(){
 
 }
 
-RenderObject::RenderObject(Mesh* mesh, Material* material) {
+RenderObject::RenderObject(Mesh* mesh, std::shared_ptr<Material> material) {
     m_mesh = mesh;
     m_material = material;
 }

@@ -54,7 +54,7 @@ void Renderer::addLightRo(RenderObject* ro){
     m_roLights.push_back(ro);
 }
 
-void Renderer::setMaterial(Material* material){
+void Renderer::setMaterial(std::shared_ptr<Material> material){
     for(auto& ro: m_roList){
         ro->setMaterial(material);
     }

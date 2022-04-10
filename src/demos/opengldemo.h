@@ -2,6 +2,7 @@
 #define SCENE_H
 
 
+#include <memory>
 #include <vector>
 
 #include "../Rendering/error_handling.h"
@@ -31,7 +32,7 @@ public:
     std::vector<std::vector<glm::vec3>>& getControlsPoints() { return m_controlPoints; }
     virtual void compute() {}
     virtual glm::vec4& getColor() { return m_color; }
-    Material* getCurrentMaterial() { return m_currentMaterial; }
+    std::shared_ptr<Material> getCurrentMaterial() { return m_currentMaterial; }
     std::vector<Light*>& getLights() { return m_lights; }
 
     void toggledrawmode();
@@ -47,7 +48,7 @@ protected:
     glm::vec4 m_color;
     std::vector<std::vector<glm::vec3>> m_controlPoints;
     std::vector<Light*> m_lights;
-    Material* m_currentMaterial;
+    std::shared_ptr<Material> m_currentMaterial;
 
 private:
     // Rendering mode (true is filled, false is wireframed

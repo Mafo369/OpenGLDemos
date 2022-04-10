@@ -36,12 +36,12 @@ public:
 
 private:
     // Shader program for rendering
-    Material* m_material;
-    Material* m_materialModified;
-    Material* m_materialLambert;
-    Material* m_materialNormal;
-    Material* m_materialParametric;
-    Material* m_materialTexture;
+    std::shared_ptr<Material> m_material;
+    std::shared_ptr<Material> m_materialModified;
+    std::shared_ptr<Material> m_materialLambert;
+    std::shared_ptr<Material> m_materialNormal;
+    std::shared_ptr<Material> m_materialParametric;
+    std::shared_ptr<Material> m_materialTexture;
 
     Renderer* m_renderer;
     bool m_first = true;

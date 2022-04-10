@@ -1,12 +1,13 @@
 #include "Light.h"
 #include "Cube.h"
 #include "ext/matrix_transform.hpp"
+#include <memory>
 
 Light::Light(LightParams lightParams) : RenderObject(){
     m_lightParams = lightParams;
     Shader* programLight = 
         new Shader("/home/mafo/dev/helloOpenGL/Shaders/Camera.vert.glsl", "/home/mafo/dev/helloOpenGL/Shaders/Light.frag.glsl");
-    Material* lightMaterial = new Material(programLight);
+    std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(programLight);
     m_mesh = new Cube(lightParams.position);
     m_material = lightMaterial;
 }

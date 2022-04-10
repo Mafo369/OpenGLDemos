@@ -15,7 +15,7 @@
 
 #include "gtc/type_ptr.hpp"
 #include "demos/hello_triangles/hellotriangles.h"
-#include "demos/hello_camera/hellocamera.h"
+#include "demos/hello_bezier/hellocamera.h"
 #include "demos/hello_spheres/hellospheres.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {

@@ -52,6 +52,9 @@ SOURCE_GROUP("Source Files" FILES ${folder_source})
 SOURCE_GROUP("Header Files" FILES ${folder_header})
 SOURCE_GROUP("Shader Files" FILES ${folder_shader})
 
+FILE(COPY ${CMAKE_SOURCE_DIR}/Shaders DESTINATION "${CMAKE_SOURCE_DIR}/bin")
+FILE(COPY ${CMAKE_SOURCE_DIR}/src/Assets DESTINATION "${CMAKE_SOURCE_DIR}/bin")
+
 ################################################################################
 # Configure QT
 

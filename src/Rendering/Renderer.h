@@ -16,14 +16,14 @@ public:
     ~Renderer();
     void addRenderObject(RenderObject* ro);
     void addLightRo(RenderObject* ro);
-    void setMaterial(Material* material);
+    void setMaterial(std::shared_ptr<Material> material);
     void setMaterialParams();
     void setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection, unsigned int id);
     void setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection);
     void setLight(Light* light, unsigned int id);
     void setCameraPosition(glm::vec3 position);
     void clearRenderObjects(); 
-    Material* getCurrentMaterial() { return m_roList[0]->getMaterial(); }
+    std::shared_ptr<Material> getCurrentMaterial() { return m_roList[0]->getMaterial(); }
 
 
     void draw(VertexArray* vao, IndexBuffer* ebo, Shader* shader) const;
