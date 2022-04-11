@@ -12,6 +12,7 @@ git clone --recursive https://github.com/Mafo369/OpenGLDemos.git
 
 ```bash
 mkdir build
+cd build
 cmake ..
 make
 cd ../bin
