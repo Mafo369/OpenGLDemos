@@ -21,9 +21,6 @@
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
     _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
-        std::cout << "Hello clear ..." << std::endl; return new OpenGLDemo(width, height, clearColor);
-        } );
-    _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
         std::cout << "Hello triangles ..." << std::endl; return new SimpleTriangle(width, height, clearColor);
         } );
     _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
@@ -117,10 +114,9 @@ void MyOpenGLWidget::paintGL() {
         ImGui::Text("    'n' : normals");
         ImGui::Text("    'u' : UV coords");
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "  Demos:");
-        ImGui::Text("    '0' : clear");
-        ImGui::Text("    '1' : Hello triangle");
-        ImGui::Text("    '2' : Bezier Surface");
-        ImGui::Text("    '3' : Hello sphere");
+        ImGui::Text("    '0' : Hello triangle");
+        ImGui::Text("    '1' : Bezier Surface");
+        ImGui::Text("    '2' : Hello sphere");
     }
 
     std::int64_t starttime = QDateTime::currentMSecsSinceEpoch();

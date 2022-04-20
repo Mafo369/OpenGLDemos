@@ -6,9 +6,9 @@ Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFil
 {
     ShaderProgramSource source = parseShader(vertexFilepath, fragmentFilepath);
     if(source.vertexSource.empty())
-        std::cout << "Error: Invalid vertex shader!" << std::endl;
+        std::cout << "Error: Invalid vertex shader!" << vertexFilepath << std::endl;
     if(source.fragmentSource.empty())
-        std::cout << "Error: Invalid fragment shader!" << std::endl;
+        std::cout << "Error: Invalid fragment shader!" << fragmentFilepath << std::endl;
     m_rendererId = createShader( source.vertexSource, source.fragmentSource );
 }
 
@@ -76,7 +76,7 @@ void Shader::setMaterialParams(MaterialParams params){
 }
 
 int Shader::getUniformLocation(const std::string& name){
-    glAssert(int location = glGetUniformLocation(m_rendererId, name.c_str()));
+    int location = glGetUniformLocation(m_rendererId, name.c_str());
     //if(location == -1)
     //    std::cout << "Warning: uniform " << name << "doesn't exist!" << std::endl;
     return location;
