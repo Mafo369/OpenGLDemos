@@ -38,22 +38,28 @@ void VertexArray::unbind() const
     glAssert(glBindVertexArray(0));
 }
 
-template<>
-void VertexBufferLayout::push<float>(unsigned int count)
+template<typename T>
+void VertexBufferLayout::push(unsigned int count)
+{
+    std::cerr << 
+        "VertexBufferLayout: Unsupported type for count:" << count 
+    << std::endl;
+    assert(false);
+}
+
+template<> void VertexBufferLayout::push<float>(unsigned int count)
 {
    m_elements.push_back({GL_FLOAT, count, GL_FALSE});
    m_stride += count * VertexBufferElement::getSizeOfType(GL_FLOAT);
 }
 
-template<>
-void VertexBufferLayout::push<unsigned int>(unsigned int count)
+template<> void VertexBufferLayout::push<unsigned int>(unsigned int count)
 {
    m_elements.push_back({GL_UNSIGNED_INT, count, GL_FALSE});
    m_stride += count * VertexBufferElement::getSizeOfType(GL_UNSIGNED_INT);
 }
 
-template<>
-void VertexBufferLayout::push<unsigned char>(unsigned int count)
+template<> void VertexBufferLayout::push<unsigned char>(unsigned int count)
 {
    m_elements.push_back({GL_UNSIGNED_BYTE, count, GL_TRUE});
    m_stride += count * VertexBufferElement::getSizeOfType(GL_UNSIGNED_BYTE);

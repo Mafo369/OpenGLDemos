@@ -1,3 +1,9 @@
 [submodule "libs/qtimgui"]
 	path = libs/qtimgui
 	url = git@github.com:Mafo369/qtimgui.git
+[submodule "libs/eigen"]
+	path = libs/eigen
+	url = https://gitlab.com/libeigen/eigen
+[submodule "libs/OpenMesh"]
+	path = libs/OpenMesh
+	url = https://gitlab.vci.rwth-aachen.de:9000/OpenMesh/OpenMesh.git

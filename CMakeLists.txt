@@ -76,4 +76,8 @@ set(EXT_LIBS Qt5::OpenGL ${OPENGL_LIBRARIES})
 
 add_subdirectory(libs/qtimgui)
 
-target_link_libraries(OpenGLDemos ${EXT_LIBS} qt_imgui_widgets implot  )
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+
+add_subdirectory(libs/OpenMesh)
+
+target_link_libraries(OpenGLDemos ${EXT_LIBS} qt_imgui_widgets implot Eigen3::Eigen OpenMeshCore )
