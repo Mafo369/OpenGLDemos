@@ -1,4 +1,4 @@
-project(helloopenGL)
+project(OpenGLDemos)
 
 ############################################
 # Configure CMake and GCC flags
@@ -66,7 +66,7 @@ set( CMAKE_INCLUDE_CURRENT_DIR ON )
 ################################################################################
 # Build target application
 
-add_executable(helloopenGL
+add_executable(OpenGLDemos
                ${folder_source}
                ${folder_header}
                ${folder_ui}
@@ -76,4 +76,4 @@ set(EXT_LIBS Qt5::OpenGL ${OPENGL_LIBRARIES})
 
 add_subdirectory(libs/qtimgui)
 
-target_link_libraries(helloopenGL ${EXT_LIBS} qt_imgui_widgets implot  )
+target_link_libraries(OpenGLDemos ${EXT_LIBS} qt_imgui_widgets implot  )
