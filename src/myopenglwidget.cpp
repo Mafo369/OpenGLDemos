@@ -17,6 +17,7 @@
 #include "demos/hello_triangles/hellotriangles.h"
 #include "demos/hello_bezier/hellocamera.h"
 #include "demos/hello_spheres/hellospheres.h"
+#include "demos/hello_mesh/hello_mesh.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
@@ -28,6 +29,9 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenG
         } );
     _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
         std::cout << "Hello spheres ..." << std::endl; return new SimpleSpheres(width, height, clearColor);
+        } );
+    _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
+        std::cout << "Hello spheres ..." << std::endl; return new MeshDemo(width, height, clearColor);
         } );
 }
 
@@ -71,8 +75,10 @@ void MyOpenGLWidget::paintGL() {
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
         ImGui::Text("Scene:");
         ImGui::ColorEdit3("clear color", (float*)&m_clear_color);
+        ImGui::SliderFloat("Scale", &_openglDemo->m_scale, 0.01, 10);
+        ImGui::SliderFloat3("Translation", glm::value_ptr(_openglDemo->m_objTranslation), -10.f, 10.f);
+        ImGui::SliderFloat("Rotation", &_openglDemo->m_rotation, -180.f, 180.f);
         if(!_openglDemo->getControlsPoints().empty()){
-            ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
             ImGui::Text("Light:");
             auto& lights = _openglDemo->getLights();
             for(unsigned int i = 0; i < lights.size(); i++){
@@ -82,7 +88,7 @@ void MyOpenGLWidget::paintGL() {
             ImGui::Text("Surface:");
             auto& color = _openglDemo->getColor();
             if(ImGui::ColorEdit3("surface color", (float*)glm::value_ptr(color))){
-                _openglDemo->compute();
+                _openglDemo->compute(false);
             }
             ImGui::Text("Material:");
             auto material = _openglDemo->getCurrentMaterial();
@@ -200,6 +206,11 @@ void MyOpenGLWidget::keyPressEvent(QKeyEvent *event) {
                 update();
             }
         break;
+        case Qt::Key_S:
+            makeCurrent();
+            _openglDemo->compute();
+            doneCurrent();
+          break;
         // Other keys are transmitted to the scene
         default :
             if(!ImGui::GetIO().WantCaptureMouse){

@@ -1,5 +1,5 @@
-#ifndef SIMPLECAMERA_H
-#define SIMPLECAMERA_H
+#ifndef HELLO_MESH_H
+#define HELLO_MESH_H
 
 #include "../../Rendering/Renderer.h"
 
@@ -12,13 +12,17 @@
 #include <imgui.h>
 #include <vector>
 
+#include <OpenMesh/Core/IO/MeshIO.hh>
+#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+typedef OpenMesh::TriMesh_ArrayKernelT<>  MyMesh;
+
 
 /** Simple drawing demonstration
  */
-class SimpleCamera : public OpenGLDemo {
+class MeshDemo : public OpenGLDemo {
 public:
-    explicit SimpleCamera(int width, int height, ImVec4 clearColor);
-    ~SimpleCamera() override;
+    explicit MeshDemo(int width, int height, ImVec4 clearColor);
+    ~MeshDemo() override;
 
     void resize(int width, int height) override;
     void draw() override;
@@ -65,10 +69,14 @@ private:
     glm::mat4 _view;
     glm::mat4 _projection;
 
-    glm::vec4 m_color;
+
+    MyMesh m_myMesh;
+
+    std::vector<unsigned int> m_indices;
+
 };
 
 /*------------------------------------------------------------------------------------------------------------------------*/
 
 
-#endif // SIMPLECAMERA_H
+#endif // HELLO_MESH_H

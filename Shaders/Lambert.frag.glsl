@@ -1,9 +1,9 @@
 #version 410 core
 
-layout (location = 0) in vec4 in_position;
-layout (location = 1) in vec3 in_normal;
-layout (location = 2) in vec2 in_texCoords;
-layout (location = 3) in vec4 in_color;
+in vec3 out_position;
+in vec3 out_normal;
+in vec2 out_texCoords;
+in vec4 out_color;
 
 out vec4 color;
 
@@ -42,9 +42,9 @@ void main()
 {
   vec4 result = vec4(0.0);
   for(int i =0; i < 3; i++){
-    vec3 I = lightContributionFrom(light[i], in_position.xyz);
-    vec3 n = gl_FrontFacing ? in_normal : -in_normal;
-    result += in_color * lambert(n, light[i].position) * vec4(I, 1.0);
+    vec3 I = lightContributionFrom(light[i], out_position.xyz);
+    vec3 n = gl_FrontFacing ? out_normal : -out_normal;
+    result += out_color * lambert(n, light[i].position - out_position) * vec4(I, 1.0);
   }
 
   result = clamp(result, 0.0, 1.0);

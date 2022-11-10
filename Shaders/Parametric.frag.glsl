@@ -1,6 +1,6 @@
 #version 410 core
     
-layout (location = 2) in vec2 texCoords;
+in vec2 out_texCoords;
 
 out vec4 color;
 

@@ -1,4 +1,4 @@
-#include "hellocamera.h"
+#include "hello_mesh.h"
 #include <iostream>
 #include <math.h>
 #include <memory>
@@ -18,45 +18,59 @@
 /*------------------------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------------------------*/
 
-
 #define deg2rad(x) float(M_PI)*(x)/180.f
 
-SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
+MeshDemo::MeshDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
+    m_controlPoints.push_back({{0,0,0}});
     /*** Initialise geometric data ***/
-    std::vector<glm::vec3> points1;
-    std::vector<glm::vec3> points2;
-    std::vector<glm::vec3> points3;
-    std::vector<glm::vec3> points4;
-    m_color = glm::vec4(1.0f, 0.5f, 0.2f, 1.f);
-    points1.push_back(glm::vec3(-0.5f,  -0.5f, 0.0f));
-    points1.push_back(glm::vec3(0.f, 0.f, 0.0f));
-    points1.push_back(glm::vec3(0.5f, 0.f, 0.0f));
-    points1.push_back(glm::vec3(1.f, -0.5f, 0.0f));
-    points2.push_back(glm::vec3(-0.5f,  -0.5f, 0.5f));
-    points2.push_back(glm::vec3(0.f, 0.f, 0.5f));
-    points2.push_back(glm::vec3(0.5f, 0.5f, 0.5f));
-    points2.push_back(glm::vec3(1.f, -0.5f, 0.5f));
-    points3.push_back(glm::vec3(-0.5f,  -0.5f, 1.0f));
-    points3.push_back(glm::vec3(0.f, 0.5f, 1.0f));
-    points3.push_back(glm::vec3(0.83f, 1.3f, 1.0f));
-    points3.push_back(glm::vec3(1.f, -0.3f, 1.0f));
-    points4.push_back(glm::vec3(-0.5f,  0.f, 1.5f));
-    points4.push_back(glm::vec3(0.f, 0.f, 1.5f));
-    points4.push_back(glm::vec3(0.5f, -1.0f, 1.5f));
-    points4.push_back(glm::vec3(1.f, 0.3f, 1.5f));
-    m_controlPoints.push_back(points1);
-    m_controlPoints.push_back(points2);
-    m_controlPoints.push_back(points3);
-    m_controlPoints.push_back(points4);
+    MyMesh mesh;
+    std::vector<Vertex> vertices;
+    mesh.request_vertex_normals();
+    mesh.request_face_normals();
+
+    if (!OpenMesh::IO::read_mesh(mesh, "/home/mafo/dev/Raytracer/assets/bunny.obj")) 
+    {
+      std::cerr << "read error\n";
+      exit(1);
+    }
+
+    // If the file did not provide vertex normals, then calculate them
+    OpenMesh::IO::Options opt;
+    if ( !opt.check( OpenMesh::IO::Options::VertexNormal ) &&
+         mesh.has_face_normals() && mesh.has_vertex_normals() )
+    {
+      // let the mesh update the normals
+      mesh.update_normals();
+    }
+
+    MyMesh::VertexIter v_it, v_end(mesh.vertices_end());
+    for(v_it=mesh.vertices_begin(); v_it != v_end; ++v_it) {
+        MyMesh::Point p = mesh.point(*v_it);
+        MyMesh::Normal n = mesh.normal(*v_it);
+        std::cout << "Vertex #" << *v_it << ": " << p << std::endl;
+        std::cout << "Normal #" << *v_it << ": " << n << std::endl;
+        Vertex v;
+        v.m_position = glm::vec3(p[0], p[1], p[2]);
+        v.m_normal = glm::vec3(n[0], n[1], n[2]);
+        v.m_color = m_color;
+        vertices.push_back(v);
+    }
+    std::cout << "END" << std::endl;
+    MyMesh::FaceIter f_it, f_end(mesh.faces_end());
+    for(f_it = mesh.faces_begin(); f_it != f_end; ++f_it){
+      for(auto v_it=f_it->vertices().begin(); v_it != f_it->vertices().end(); ++v_it) {
+          m_indices.push_back(v_it->idx());
+      }
+    }
+
+    auto cube = new Mesh(vertices, m_indices, GL_TRIANGLES);
+
+    m_myMesh = mesh;
 
     /*** Initialise renderer ***/
     m_renderer = new Renderer();
 
     /*** Create render objects ***/
-
-    // Textures
-    Texture* texture = new Texture("Assets/container2.png");
-    Texture* textureSpecular = new Texture("Assets/container2_specular.png");
     
     // Shaders
     Shader* program = 
@@ -66,11 +80,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     Shader* programLambert = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Lambert.frag.glsl");
     Shader* programNormal = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/Camera.frag.glsl");
-    Shader* programParametric = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/Parametric.frag.glsl");
-    Shader* programTexture = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/Normals.frag.glsl");
 
     // Materials
     MaterialParams matParams;
@@ -82,13 +92,13 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_materialModified = std::make_shared<Material>(programModified, matParams);
     m_materialLambert = std::make_shared<Material>(programLambert);
     m_materialNormal = std::make_shared<Material>(programNormal);
-    m_materialParametric = std::make_shared<Material>(programParametric);
-    m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular);
     
     m_currentMaterial = m_material;
+
+    auto ro = new RenderObject(cube, m_material);
+    m_renderer->addRenderObject(ro);
     
     // Render objects
-    compute();
     m_first = false;
 
     /*** Create Camera ***/
@@ -98,7 +108,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
-    _model = glm::translate(glm::mat4(1.0), m_translation);
+    _model = glm::translate(glm::mat4(1.0), m_objTranslation);
 
     /*** Create lights ***/
     LightParams lightParams;
@@ -121,60 +131,65 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_lights.push_back(light2);
 }
 
-SimpleCamera::~SimpleCamera() {
+MeshDemo::~MeshDemo() {
     delete m_renderer;
     for(auto& l : m_lights)
         delete l;
 }
 
-void SimpleCamera::compute(bool update) {
-    /*** Create control points render objects if needed ***/
-    RenderObject* roCPM;
-    if(m_displayCtrlPts){
-        std::vector<Vertex> vertices1;
-        for(auto& points : m_controlPoints){
-            for(auto& point : points){
-                Vertex v = {point, glm::vec3(0.f), glm::vec2(0.f), m_color};
-                vertices1.push_back(v);
-            }
-        } 
-        std::vector<unsigned int> indices1;
-        unsigned int id = 0;
-        for(unsigned int i = 0; i < m_controlPoints.size(); i++){
-            for(unsigned int j = 0; j < m_controlPoints[i].size()-1; j++){
-                indices1.push_back(id);
-                id++;
-                indices1.push_back(id);
-            }
-            id++;
-        }
-        Mesh* ctrlPtsMesh = new Mesh(vertices1, indices1, GL_LINES);
-        if(!m_first){
-            roCPM = new RenderObject(ctrlPtsMesh, m_renderer->getCurrentMaterial());
-        }
-        else{
-            roCPM = new RenderObject(ctrlPtsMesh, m_material);
-        }
+void MeshDemo::compute(bool update) {
+  // (linearly) iterate over all vertices
+  std::vector<Vertex> vertices;
+  std::vector<MyMesh::Point> new_vertices;
+  for (MyMesh::VertexIter v_it=m_myMesh.vertices_sbegin(); v_it!=m_myMesh.vertices_end(); ++v_it)
+  {
+    // circulate around the current vertex
+    int N = 0;
+    OpenMesh::Vec3f sum = {0.f, 0.f, 0.f};
+    for (MyMesh::VertexVertexIter vv_it=m_myMesh.vv_iter(*v_it); vv_it.is_valid(); ++vv_it)
+    {
+      sum += m_myMesh.point(*vv_it);
+      N++;
     }
+    auto ci = (1.f / N) * sum;
+    float alpha = 0.75;
+    MyMesh::Point p;
+    if(update){
+       p = alpha * m_myMesh.point(*v_it) + (1.f - alpha) * ci;
+    }
+    else
+    {
+      p = m_myMesh.point(*v_it);
+    }
+    MyMesh::Normal n = m_myMesh.normal(*v_it);
+    Vertex v;
+    v.m_position = glm::vec3(p[0], p[1], p[2]);
+    v.m_normal = glm::vec3(n[0], n[1], n[2]);
+    v.m_color = m_color;
+    vertices.push_back(v);
+    new_vertices.push_back(p);
+  }
 
-    /*** Create Bezier surface render object ***/
-    Mesh* mesh = new BezierSurface(m_controlPoints, 100, 100, m_color);
-    RenderObject* ro;
-    if(!m_first){
-        ro = new RenderObject(mesh, m_renderer->getCurrentMaterial());
-    }
-    else{
-        ro = new RenderObject(mesh, m_material);
-    }
+  Mesh* mesh = new Mesh(vertices, m_indices, GL_TRIANGLES);
+  RenderObject* ro;
+  ro = new RenderObject(mesh, m_material);
 
-    /*** Delete old render objects and add new ones ***/
-    m_renderer->clearRenderObjects();
-    m_renderer->addRenderObject(ro);
-    if(m_displayCtrlPts)
-        m_renderer->addRenderObject(roCPM);
+  /*** Delete old render objects and add new ones ***/
+  m_renderer->clearRenderObjects();
+  m_renderer->addRenderObject(ro);
+
+  std::vector<MyMesh::Point>::iterator p_iter;
+  MyMesh::VertexIter v_iter;
+
+  for(v_iter = m_myMesh.vertices().begin(), p_iter = new_vertices.begin();
+      v_iter != m_myMesh.vertices().end();
+      v_iter++, p_iter++)
+  {
+    m_myMesh.set_point(*v_iter, *p_iter);
+  }
 }
 
-void SimpleCamera::resize(int width, int height){
+void MeshDemo::resize(int width, int height){
     OpenGLDemo::resize(width, height);
     _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
 }
@@ -192,11 +207,11 @@ void printmatrix(T * ptr) {
     std::cerr  << std::defaultfloat << std::endl;
 }
 
-void SimpleCamera::draw() {
+void MeshDemo::draw() {
     OpenGLDemo::draw();
 
     /*** Compute new camera transform ***/
-    _model = glm::translate(glm::mat4(1.0), m_translation);
+    //_model = glm::translate(glm::mat4(1.0), m_translation);
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 
@@ -205,6 +220,7 @@ void SimpleCamera::draw() {
     m_renderer->setMaterialParams();
    
     /*** Update scene ***/
+    _model = glm::translate(glm::mat4(1.f), m_objTranslation) * glm::rotate(glm::mat4(1.f), deg2rad(m_rotation), glm::vec3(1,0,0)) * glm::scale(glm::mat4(1.f), glm::vec3(m_scale));
     m_renderer->setMVP(_model, _view, _projection);
     m_renderer->setCameraPosition(_camera->position());
     for(unsigned int i = 0; i < m_lights.size(); i++){
@@ -218,26 +234,26 @@ void SimpleCamera::draw() {
     m_renderer->draw();
 }
 
-void SimpleCamera::mouseclick(int button, float xpos, float ypos) {
+void MeshDemo::mouseclick(int button, float xpos, float ypos) {
     _button = button;
     _mousex = xpos;
     _mousey = ypos;
     _camera->processmouseclick(_button, xpos, ypos);
 }
 
-void SimpleCamera::mousemove(float xpos, float ypos) {
+void MeshDemo::mousemove(float xpos, float ypos) {
     _camera->processmousemovement(_button, xpos, ypos, true);
 }
 
-void SimpleCamera::mousewheel(float delta) {
+void MeshDemo::mousewheel(float delta) {
     _camera->processmousescroll(delta);
 }
 
-void SimpleCamera::keyboardmove(int key, double time) {
+void MeshDemo::keyboardmove(int key, double time) {
     _camera->processkeyboard(Camera_Movement(key), time);
 }
 
-bool SimpleCamera::keyboard(unsigned char k) {
+bool MeshDemo::keyboard(unsigned char k) {
     switch(k) {
         case 'p':
             _activecamera = (_activecamera+1)%2;
@@ -253,14 +269,8 @@ bool SimpleCamera::keyboard(unsigned char k) {
         case 'n' :
             m_renderer->setMaterial(m_materialNormal);
             return true;
-        case 'u' :
-            m_renderer->setMaterial(m_materialParametric);
-            return true;
         case 'l' :
             m_renderer->setMaterial(m_materialLambert);
-            return true;
-        case 't' :
-            m_renderer->setMaterial(m_materialTexture);
             return true;
         default:
             return false;

@@ -15,7 +15,7 @@ public:
 
     bool keyboard(unsigned char k) override;
 
-    void compute() override {}
+    void compute(bool update=true) override {}
     glm::vec4& getColor() override { return m_color; }
 private:
     // A simple geometry

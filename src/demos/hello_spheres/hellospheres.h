@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include "../opengldemo.h"
 
-#include "../hello_bezier/camera.h"
+#include "../camera.h"
 
 #include <memory>
 
@@ -25,7 +25,7 @@ public:
 
     void keyboardmove(int key, double time) override;
     bool keyboard(unsigned char k) override;
-    void compute() override {}
+    void compute(bool update=true) override {}
 
     glm::vec4& getColor() override { return m_color; }
 

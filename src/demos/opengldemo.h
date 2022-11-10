@@ -29,8 +29,10 @@ public:
 
     void setClearColor(ImVec4 clearColor) { m_clearColor = clearColor; }
     void setTranslation(glm::vec3 translation) { m_translation = translation; }
+    void setObjTranslation(glm::vec3 translation) { m_objTranslation = translation; }
+    void setScale(float scale) { m_scale = scale; }
     std::vector<std::vector<glm::vec3>>& getControlsPoints() { return m_controlPoints; }
-    virtual void compute() {}
+    virtual void compute(bool update = true) {}
     virtual glm::vec4& getColor() { return m_color; }
     std::shared_ptr<Material> getCurrentMaterial() { return m_currentMaterial; }
     std::vector<Light*>& getLights() { return m_lights; }
@@ -39,13 +41,17 @@ public:
 
     virtual void toggleCtrlPts() {}
 
+    float m_scale = 1.f;
+    glm::vec3 m_objTranslation = glm::vec3(0.f);
+    float m_rotation = 0.f;
+
 protected:
     // Width and heigth of the viewport
     int _width;
     int _height;
     ImVec4 m_clearColor;
     glm::vec3 m_translation = glm::vec3(0.f);
-    glm::vec4 m_color;
+    glm::vec4 m_color { 0.3, 1, 0.3, 1 };
     std::vector<std::vector<glm::vec3>> m_controlPoints;
     std::vector<Light*> m_lights;
     std::shared_ptr<Material> m_currentMaterial;
