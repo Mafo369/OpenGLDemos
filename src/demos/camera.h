@@ -28,6 +28,8 @@ public:
 
     void setviewport(glm::vec4 viewport);
 
+    glm::vec4 getViewport() { return _viewport; }
+
     // Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
     virtual void processkeyboard(Camera_Movement direction, GLfloat deltaTime);
     // Processes input received from a mouse input system.

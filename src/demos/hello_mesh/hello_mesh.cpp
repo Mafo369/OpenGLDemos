@@ -20,13 +20,18 @@
 
 #define deg2rad(x) float(M_PI)*(x)/180.f
 
+glm::vec3 MeshDemo::convertCoords(float winX, float winY){
+  auto modelview = _model * _view;
+  return glm::unProjectNO(glm::vec3(winX, float(_height - winY), _camera->zoom()), modelview, _projection, _camera->getViewport());
+}
+
 MeshDemo::MeshDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     m_controlPoints.push_back({{0,0,0}});
     /*** Initialise geometric data ***/
     MyMesh mesh;
-    std::vector<Vertex> vertices;
     mesh.request_vertex_normals();
     mesh.request_face_normals();
+    mesh.request_vertex_colors();
 
     if (!OpenMesh::IO::read_mesh(mesh, "/home/mafo/dev/Raytracer/assets/bunny.obj")) 
     {
@@ -47,13 +52,15 @@ MeshDemo::MeshDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width,
     for(v_it=mesh.vertices_begin(); v_it != v_end; ++v_it) {
         MyMesh::Point p = mesh.point(*v_it);
         MyMesh::Normal n = mesh.normal(*v_it);
-        std::cout << "Vertex #" << *v_it << ": " << p << std::endl;
-        std::cout << "Normal #" << *v_it << ": " << n << std::endl;
+        mesh.set_color(*v_it, MyMesh::Color(m_color.r*255.f,m_color.g*255.f,m_color.b*255.f));
+        MyMesh::Color c = mesh.color(*v_it);
+        //std::cout << "Vertex #" << *v_it << ": " << p << std::endl;
+        //std::cout << "Normal #" << *v_it << ": " << n << std::endl;
         Vertex v;
         v.m_position = glm::vec3(p[0], p[1], p[2]);
         v.m_normal = glm::vec3(n[0], n[1], n[2]);
-        v.m_color = m_color;
-        vertices.push_back(v);
+        v.m_color = glm::vec4(c[0]/255.f, c[1]/255.f, c[2]/255.f, 1.f);
+        m_vertices.push_back(v);
     }
     std::cout << "END" << std::endl;
     MyMesh::FaceIter f_it, f_end(mesh.faces_end());
@@ -63,7 +70,7 @@ MeshDemo::MeshDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width,
       }
     }
 
-    auto cube = new Mesh(vertices, m_indices, GL_TRIANGLES);
+    auto cube = new Mesh(m_vertices, m_indices, GL_TRIANGLES);
 
     m_myMesh = mesh;
 
@@ -136,20 +143,67 @@ MeshDemo::~MeshDemo() {
     for(auto& l : m_lights)
         delete l;
 }
+#include <random>
+
+static thread_local std::default_random_engine engine;
+static thread_local std::uniform_real_distribution<float> uniform0255 {0, 255};
 
 void MeshDemo::compute(bool update) {
   // (linearly) iterate over all vertices
   std::vector<Vertex> vertices;
   std::vector<MyMesh::Point> new_vertices;
+  std::vector<MyMesh::VertexVertexIter> neighbors;
   for (MyMesh::VertexIter v_it=m_myMesh.vertices_sbegin(); v_it!=m_myMesh.vertices_end(); ++v_it)
   {
     // circulate around the current vertex
     int N = 0;
     OpenMesh::Vec3f sum = {0.f, 0.f, 0.f};
-    for (MyMesh::VertexVertexIter vv_it=m_myMesh.vv_iter(*v_it); vv_it.is_valid(); ++vv_it)
+    if(m_v_iter == v_it){
+      std::cout << "AH" << std::endl;
+      m_myMesh.set_color(*v_it, MyMesh::Color(255, 255, 255));
+      for (MyMesh::VertexVertexIter vv_it=m_myMesh.vv_iter(*v_it); vv_it.is_valid(); ++vv_it)
+      {
+        sum += m_myMesh.point(*vv_it);
+        m_myMesh.set_color(*vv_it, MyMesh::Color(0, 0, 255));
+        neighbors.push_back(vv_it);
+        N++;
+      }
+      size_t neighIdx = 0;
+      for (int i = 0; i < m_ringSize-1; i++) {
+        std::vector<MyMesh::VertexVertexIter> neighCopy;
+        neighCopy = neighbors;
+        for(; neighIdx < neighCopy.size(); neighIdx++){
+          for (MyMesh::VertexVertexIter vv_it=m_myMesh.vv_iter(*neighbors[neighIdx]); vv_it.is_valid(); ++vv_it){
+            if(*vv_it == *m_v_iter) continue;
+            m_myMesh.set_color(*vv_it, MyMesh::Color(0, 0, 255));
+            neighbors.push_back(vv_it);
+          }
+        }
+      }
+      m_oldv_iter = m_v_iter;
+      m_v_iter = MyMesh::VertexIter();
+      v_it = m_myMesh.vertices_begin();
+      vertices.clear();
+      new_vertices.clear();
+    }
+    else
     {
-      sum += m_myMesh.point(*vv_it);
-      N++;
+      bool found = false;
+      for(auto neigh: neighbors){
+        if(*neigh == *v_it){
+          found = true;
+        }
+      }
+      if(*m_oldv_iter == *v_it){
+        found = true;
+      }
+      if(!found)
+        m_myMesh.set_color(*v_it, MyMesh::Color(m_color.r*255.f,m_color.g*255.f,m_color.b*255.f));
+      for (MyMesh::VertexVertexIter vv_it=m_myMesh.vv_iter(*v_it); vv_it.is_valid(); ++vv_it)
+      {
+        sum += m_myMesh.point(*vv_it);
+        N++;
+      }
     }
     auto ci = (1.f / N) * sum;
     float alpha = 0.75;
@@ -162,10 +216,11 @@ void MeshDemo::compute(bool update) {
       p = m_myMesh.point(*v_it);
     }
     MyMesh::Normal n = m_myMesh.normal(*v_it);
+    MyMesh::Color c = m_myMesh.color(*v_it);
     Vertex v;
     v.m_position = glm::vec3(p[0], p[1], p[2]);
     v.m_normal = glm::vec3(n[0], n[1], n[2]);
-    v.m_color = m_color;
+    v.m_color = glm::vec4(c[0]/255.f, c[1]/255.f, c[2]/255.f, 1.f);
     vertices.push_back(v);
     new_vertices.push_back(p);
   }
@@ -238,10 +293,41 @@ void MeshDemo::mouseclick(int button, float xpos, float ypos) {
     _button = button;
     _mousex = xpos;
     _mousey = ypos;
-    _camera->processmouseclick(_button, xpos, ypos);
+
+    if(button == 0){
+      std::cout << "CLICK" << std::endl;
+      auto worldPos = convertCoords(_mousex, _mousey);
+      float min_dist = MAXFLOAT;
+      int i = 0;
+      for (MyMesh::VertexIter v_it=m_myMesh.vertices_sbegin(); v_it!=m_myMesh.vertices_end(); ++v_it)
+      {
+        auto& v = m_myMesh.point(*v_it);
+        //std::cout << v << std::endl;
+        auto pos = glm::vec3(v[0], v[1], v[2]);
+        float dist = glm::distance(pos, worldPos);
+        if(dist < min_dist){
+          min_dist = dist;  
+          m_v_iter = v_it;
+        }
+        i++;
+      }
+      //_camera->processmouseclick(_button, xpos, ypos);
+      compute(false);
+
+    }
+    else
+    {
+      _camera->processmouseclick(_button, xpos, ypos);
+    }
 }
 
 void MeshDemo::mousemove(float xpos, float ypos) {
+    //auto worldPos = convertCoords(xpos, ypos);
+    //worldPos = glm::vec3(0,0,0);
+    //MyMesh::Point p(0,0,0);
+    //m_myMesh.set_point(*m_myMesh.vertices_sbegin(), p);
+    //compute(true);
+
     _camera->processmousemovement(_button, xpos, ypos, true);
 }
 

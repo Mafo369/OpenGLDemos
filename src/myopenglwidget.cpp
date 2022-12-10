@@ -101,6 +101,12 @@ void MyOpenGLWidget::paintGL() {
                 _openglDemo->toggleCtrlPts();
                 _openglDemo->compute();
             }
+            if(ImGui::InputInt("Ring size", &_openglDemo->m_ringSize)){
+                if(auto demo = dynamic_cast<MeshDemo*>(_openglDemo.get())){
+                  demo->m_v_iter = demo->m_oldv_iter;
+                }
+                _openglDemo->compute(false);
+            }
             auto& ctrlPts = _openglDemo->getControlsPoints();
             for(unsigned int i = 0; i < ctrlPts.size(); i++){
                 for(unsigned int j = 0; j < ctrlPts[i].size(); j++){
@@ -142,22 +148,27 @@ void MyOpenGLWidget::resizeGL(int width, int height) {
 }
 
 void MyOpenGLWidget::mousePressEvent(QMouseEvent *event) {
-    // buttons are 0(left), 1(right) to 2(middle)
-    int b;
-    Qt::MouseButton button=event->button();
-    if (button & Qt::LeftButton) {
-        if ((event->modifiers() & Qt::AltModifier))
-            b = 2;
-        else
-            b = 0;
-    } else if (button & Qt::RightButton)
-        b = 1;
-    else if (button & Qt::MiddleButton)
-        b = 2;
-    else
-        b=3;
-    _openglDemo->mouseclick(b, event->x(), event->y());
-    _lastime = QDateTime::currentMSecsSinceEpoch();
+    if(!ImGui::GetIO().WantCaptureMouse){
+      // buttons are 0(left), 1(right) to 2(middle)
+      int b;
+      Qt::MouseButton button=event->button();
+      if (button & Qt::LeftButton) {
+          if ((event->modifiers() & Qt::AltModifier))
+              b = 2;
+          else
+              b = 0;
+      } else if (button & Qt::RightButton)
+          b = 1;
+      else if (button & Qt::MiddleButton)
+          b = 2;
+      else
+          b=3;
+      makeCurrent();
+      _openglDemo->mouseclick(b, event->x(), event->y());
+      doneCurrent();
+      update();
+      _lastime = QDateTime::currentMSecsSinceEpoch();
+    }
 }
 
 void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event) {

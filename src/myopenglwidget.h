@@ -13,6 +13,8 @@
 
 #include <QTimer>
 
+#include <GL/glu.h>
+
 
 class MyOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core {
 

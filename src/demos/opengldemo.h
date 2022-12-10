@@ -36,6 +36,7 @@ public:
     virtual glm::vec4& getColor() { return m_color; }
     std::shared_ptr<Material> getCurrentMaterial() { return m_currentMaterial; }
     std::vector<Light*>& getLights() { return m_lights; }
+    int getHeight() { return _height; }
 
     void toggledrawmode();
 
@@ -44,6 +45,7 @@ public:
     float m_scale = 1.f;
     glm::vec3 m_objTranslation = glm::vec3(0.f);
     float m_rotation = 0.f;
+    int m_ringSize = 1;
 
 protected:
     // Width and heigth of the viewport

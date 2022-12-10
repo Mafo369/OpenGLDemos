@@ -37,6 +37,9 @@ public:
     void compute(bool update=false) override;
     glm::vec4& getColor() override { return m_color; }
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
+    glm::vec3 convertCoords(float winX, float winY);
+    MyMesh::VertexIter m_v_iter;
+    MyMesh::VertexIter m_oldv_iter;
 
 private:
     // Shader program for rendering
@@ -73,6 +76,8 @@ private:
     MyMesh m_myMesh;
 
     std::vector<unsigned int> m_indices;
+    std::vector<Vertex> m_vertices;
+
 
 };
 
