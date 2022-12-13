@@ -10,10 +10,9 @@
 /*------------------------------------------------------------------------------------------------------------------------*/
 /*------------------------------------------------------------------------------------------------------------------------*/
 
+#define deg2rad( x ) float( M_PI ) * ( x ) / 180.f
 
-#define deg2rad(x) float(M_PI)*(x)/180.f
-
-static const char* vertexshader_source ="#version 410 core\n\
+static const char* vertexshader_source = "#version 410 core\n\
         layout (location = 0) in vec3 position;\n\
         uniform mat4 model;\n\
         uniform mat4 view;\n\
@@ -28,7 +27,7 @@ static const char* vertexshader_source ="#version 410 core\n\
             pos = position;\
         }\n";
 
-static const char* fragmentshader_source ="#version 410 core\n\
+static const char* fragmentshader_source = "#version 410 core\n\
         in vec3 normal;\n\
         in vec3 pos;\
         uniform int mode;\
@@ -44,177 +43,184 @@ static const char* fragmentshader_source ="#version 410 core\n\
             }\
         }\n";
 
-
-void SimpleSpheres::Sphere::buildFrom(const MathiasMesh &m) {
-  for(const auto& v : m.vertices) {
-    _vertices.emplace_back(v.x);
-    _vertices.emplace_back(v.y);
-    _vertices.emplace_back(v.z);
-  }
-  _indices = std::move(m.triangles);
-  std::cout << "Spher with " << _indices.size()/3 << " triangles." << std::endl;
-  // Initialize the geometry
-  // 1. Generate geometry buffers
-  glGenBuffers(1, &_vbo);
-  glGenBuffers(1, &_ebo);
-  glGenVertexArrays(1, &_vao);
-  // 2. Bind Vertex Array Object
-  glBindVertexArray(_vao);
-  // 3. Copy our vertices array in a buffer for OpenGL to use
-  glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-  glBufferData(GL_ARRAY_BUFFER, _vertices.size()*sizeof (GLfloat), _vertices.data(), GL_STATIC_DRAW);
-  // 4. Copy our index array in a element buffer for OpenGL to use
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, _indices.size()*sizeof (GLfloat), _indices.data(), GL_STATIC_DRAW);
-  // 5. Then set our vertex attributes pointers
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-  glEnableVertexAttribArray(0);
-  //6. Unbind the VAO
-  glBindVertexArray(0);
-
+void SimpleSpheres::Sphere::buildFrom( const MathiasMesh& m ) {
+    for ( const auto& v : m.vertices ) {
+        _vertices.emplace_back( v.x );
+        _vertices.emplace_back( v.y );
+        _vertices.emplace_back( v.z );
+    }
+    _indices = std::move( m.triangles );
+    std::cout << "Spher with " << _indices.size() / 3 << " triangles." << std::endl;
+    // Initialize the geometry
+    // 1. Generate geometry buffers
+    glGenBuffers( 1, &_vbo );
+    glGenBuffers( 1, &_ebo );
+    glGenVertexArrays( 1, &_vao );
+    // 2. Bind Vertex Array Object
+    glBindVertexArray( _vao );
+    // 3. Copy our vertices array in a buffer for OpenGL to use
+    glBindBuffer( GL_ARRAY_BUFFER, _vbo );
+    glBufferData(
+        GL_ARRAY_BUFFER, _vertices.size() * sizeof( GLfloat ), _vertices.data(), GL_STATIC_DRAW );
+    // 4. Copy our index array in a element buffer for OpenGL to use
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, _ebo );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER,
+                  _indices.size() * sizeof( GLfloat ),
+                  _indices.data(),
+                  GL_STATIC_DRAW );
+    // 5. Then set our vertex attributes pointers
+    glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), (GLvoid*)0 );
+    glEnableVertexAttribArray( 0 );
+    // 6. Unbind the VAO
+    glBindVertexArray( 0 );
 }
 
 void SimpleSpheres::Sphere::draw() {
-  glBindVertexArray(_vao);
-  glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
-  glBindVertexArray(0);
+    glBindVertexArray( _vao );
+    glDrawElements( GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0 );
+    glBindVertexArray( 0 );
 }
 
-SimpleSpheres::SimpleSpheres(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _camera(nullptr) {
-      MathiasMesh m0;
-      MathiasMesh m1;
-      MathiasMesh m2;
-      MathiasMesh m3;
-      MathiasMesh m4;
-      UVSphere(18, 10, m4);
-      _parametric.buildFrom(m4);
+SimpleSpheres::SimpleSpheres( int width, int height, ImVec4 clearColor ) :
+    OpenGLDemo( width, height, clearColor ), _camera( nullptr ) {
+    MathiasMesh m0;
+    MathiasMesh m1;
+    MathiasMesh m2;
+    MathiasMesh m3;
+    MathiasMesh m4;
+    UVSphere( 18, 10, m4 );
+    _parametric.buildFrom( m4 );
 
-      Icosahedron(m1);        // 20 triangles
-      SubdivideMathiasMesh(m1, m2);  // 80 triangles
-      SubdivideMathiasMesh(m2, m3);  // 320 triangls
+    Icosahedron( m1 );              // 20 triangles
+    SubdivideMathiasMesh( m1, m2 ); // 80 triangles
+    SubdivideMathiasMesh( m2, m3 ); // 320 triangls
 
-      SubdivideMathiasMesh(m3, m0);
-/*
-      SubdivideMathiasMesh(m2, m3);
-      SubdivideMathiasMesh(m3, m2);
-  */
+    SubdivideMathiasMesh( m3, m0 );
+    /*
+          SubdivideMathiasMesh(m2, m3);
+          SubdivideMathiasMesh(m3, m2);
+      */
     _geodesic.buildFrom( m0 );
 
-
     _toDraw = &_parametric;
-    _mode = 1;
+    _mode   = 1;
     // Initialize shaders
     GLint success;
     GLchar infoLog[512]; // warning fixed size ... request for LOG_LENGTH!!!
     GLuint vertexshader, fragmentshader;
 
     // 1. Generate the shader
-    vertexshader = glCreateShader(GL_VERTEX_SHADER);
+    vertexshader = glCreateShader( GL_VERTEX_SHADER );
     // 2. set the source
-    glShaderSource(vertexshader, 1, &vertexshader_source, NULL);
+    glShaderSource( vertexshader, 1, &vertexshader_source, NULL );
     // 3. Compile
-    glCompileShader(vertexshader);
+    glCompileShader( vertexshader );
     // 4. test for compile error
-    glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &success);
-    if(!success) {
-        glGetShaderInfoLog(vertexshader, 512, NULL, infoLog);
+    glGetShaderiv( vertexshader, GL_COMPILE_STATUS, &success );
+    if ( !success ) {
+        glGetShaderInfoLog( vertexshader, 512, NULL, infoLog );
         std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
-    fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentshader, 1, &fragmentshader_source, NULL);
-    glCompileShader(fragmentshader);
-    glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &success);
-    if(!success) {
-        glGetShaderInfoLog(fragmentshader, 512, NULL, infoLog);
+    fragmentshader = glCreateShader( GL_FRAGMENT_SHADER );
+    glShaderSource( fragmentshader, 1, &fragmentshader_source, NULL );
+    glCompileShader( fragmentshader );
+    glGetShaderiv( fragmentshader, GL_COMPILE_STATUS, &success );
+    if ( !success ) {
+        glGetShaderInfoLog( fragmentshader, 512, NULL, infoLog );
         std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
 
     // 1. Generate the program
     _program = glCreateProgram();
     // 2. Attach the shaders to the program
-    glAttachShader(_program, vertexshader);
-    glAttachShader(_program, fragmentshader);
+    glAttachShader( _program, vertexshader );
+    glAttachShader( _program, fragmentshader );
     // 3. Link the program
-    glLinkProgram(_program);
+    glLinkProgram( _program );
     // 4. Test for link errors
-    glGetProgramiv(_program, GL_LINK_STATUS, &success);
-    if(!success) {
-        glGetProgramInfoLog(_program, 512, NULL, infoLog);
+    glGetProgramiv( _program, GL_LINK_STATUS, &success );
+    if ( !success ) {
+        glGetProgramInfoLog( _program, 512, NULL, infoLog );
         std::cerr << "ERROR::SHADER::LINK_FAILED\n" << infoLog << std::endl;
     }
-    glDeleteShader(vertexshader);
-    glDeleteShader(fragmentshader);
+    glDeleteShader( vertexshader );
+    glDeleteShader( fragmentshader );
 
-    _camera.reset(new TrackballCamera(glm::vec3(0.f, 0.f, 3.f)));
-    _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
+    _camera.reset( new TrackballCamera( glm::vec3( 0.f, 0.f, 3.f ) ) );
+    _camera->setviewport( glm::vec4( 0.f, 0.f, _width, _height ) );
     _view = _camera->viewmatrix();
 
+    _projection = glm::perspective(
+        glm::radians( _camera->zoom() ), float( _width ) / _height, 0.1f, 100.0f );
 
-    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
-
-    _model = glm::mat4(1.0);
+    _model = glm::mat4( 1.0 );
 }
 
 SimpleSpheres::~SimpleSpheres() {
-    glDeleteProgram(_program);
-    glDeleteBuffers(1, &_parametric._vbo);
-    glDeleteBuffers(1, &_parametric._ebo);
-    glDeleteVertexArrays(1, &_parametric._vao) ;
+    glDeleteProgram( _program );
+    glDeleteBuffers( 1, &_parametric._vbo );
+    glDeleteBuffers( 1, &_parametric._ebo );
+    glDeleteVertexArrays( 1, &_parametric._vao );
 }
 
-void SimpleSpheres::resize(int width, int height){
-    OpenGLDemo::resize(width, height);
-    _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
-
+void SimpleSpheres::resize( int width, int height ) {
+    OpenGLDemo::resize( width, height );
+    _camera->setviewport( glm::vec4( 0.f, 0.f, _width, _height ) );
 }
 
 void SimpleSpheres::draw() {
     OpenGLDemo::draw();
 
-    glUseProgram(_program);
+    glUseProgram( _program );
 
-    _view = _camera->viewmatrix();
-    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
+    _view       = _camera->viewmatrix();
+    _projection = glm::perspective(
+        glm::radians( _camera->zoom() ), float( _width ) / _height, 0.1f, 100.0f );
 
-    glUniformMatrix4fv( glGetUniformLocation(_program, "model"), 1, GL_FALSE, glm::value_ptr(_model));
-    glUniformMatrix4fv( glGetUniformLocation(_program, "view"), 1, GL_FALSE, glm::value_ptr(_view));
-    glUniformMatrix4fv( glGetUniformLocation(_program, "projection"), 1, GL_FALSE, glm::value_ptr(_projection));
+    glUniformMatrix4fv(
+        glGetUniformLocation( _program, "model" ), 1, GL_FALSE, glm::value_ptr( _model ) );
+    glUniformMatrix4fv(
+        glGetUniformLocation( _program, "view" ), 1, GL_FALSE, glm::value_ptr( _view ) );
+    glUniformMatrix4fv( glGetUniformLocation( _program, "projection" ),
+                        1,
+                        GL_FALSE,
+                        glm::value_ptr( _projection ) );
 
-    glUniform1i( glGetUniformLocation(_program, "mode"), _mode );
+    glUniform1i( glGetUniformLocation( _program, "mode" ), _mode );
     _toDraw->draw();
 }
 
-void SimpleSpheres::mouseclick(int button, float xpos, float ypos) {
+void SimpleSpheres::mouseclick( int button, float xpos, float ypos ) {
     _button = button;
     _mousex = xpos;
     _mousey = ypos;
-    _camera->processmouseclick(_button, xpos, ypos);
+    _camera->processmouseclick( _button, xpos, ypos );
 }
 
-void SimpleSpheres::mousemove(float xpos, float ypos) {
-    _camera->processmousemovement(_button, xpos, ypos, true);
+void SimpleSpheres::mousemove( float xpos, float ypos ) {
+    _camera->processmousemovement( _button, xpos, ypos, true );
 }
 
-void SimpleSpheres::mousewheel(float delta) {
-    _camera->processmousescroll(delta);
+void SimpleSpheres::mousewheel( float delta ) {
+    _camera->processmousescroll( delta );
 }
 
-void SimpleSpheres::keyboardmove(int key, double time) {
-    _camera->processkeyboard(Camera_Movement(key), time);
+void SimpleSpheres::keyboardmove( int key, double time ) {
+    _camera->processkeyboard( Camera_Movement( key ), time );
 }
 
-bool SimpleSpheres::keyboard(unsigned char k) {
-  switch ( k ) {
-  case 'p' :
-    _toDraw = &_parametric;
-    return true;
-  case 'g' :
-    _toDraw = &_geodesic;
-    return true;
-  case 'm' :
-    _mode = 1 - _mode;
-    return true;
-  }
-  return OpenGLDemo::keyboard(k);
+bool SimpleSpheres::keyboard( unsigned char k ) {
+    switch ( k ) {
+    case 'p':
+        _toDraw = &_parametric;
+        return true;
+    case 'g':
+        _toDraw = &_geodesic;
+        return true;
+    case 'm':
+        _mode = 1 - _mode;
+        return true;
+    }
+    return OpenGLDemo::keyboard( k );
 }

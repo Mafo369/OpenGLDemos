@@ -16,6 +16,8 @@
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 typedef OpenMesh::TriMesh_ArrayKernelT<>  MyMesh;
 
+#include <Eigen/Dense>
+
 
 /** Simple drawing demonstration
  */
@@ -40,6 +42,13 @@ public:
     glm::vec3 convertCoords(float winX, float winY);
     MyMesh::VertexIter m_v_iter;
     MyMesh::VertexIter m_oldv_iter;
+    MyMesh m_myMesh;
+
+    void computeNeighbors(MyMesh::VertexIter& v_it, std::vector<MyMesh::VertexVertexIter>& neighbors, int* N, MyMesh::Point* sum, int* bord);
+    void solveSystem(std::vector<MyMesh::VertexVertexIter>& neighbors, int bord, Eigen::VectorXf& X);
+
+    MyMesh m_myOldMesh;
+    glm::vec3 m_diff {0, 0, 0};
 
 private:
     // Shader program for rendering
@@ -72,8 +81,6 @@ private:
     glm::mat4 _view;
     glm::mat4 _projection;
 
-
-    MyMesh m_myMesh;
 
     std::vector<unsigned int> m_indices;
     std::vector<Vertex> m_vertices;

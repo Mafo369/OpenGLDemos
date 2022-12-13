@@ -57,8 +57,8 @@ void main(){
   const vec3 black = vec3(0);
   vec3 iorV = vec3(0.04);
 
-  vec4 texColor = texture(material.texDiffuse, texCoords);
-  vec4 texColorSpecular = texture(material.texSpecular, texCoords);
+  vec4 texColor = texture(material.texDiffuse, out_texCoords);
+  vec4 texColorSpecular = texture(material.texSpecular, out_texCoords);
   vec3 baseColor = texColor.rgb;
   float metallic = float(texColorSpecular);
   float roughness = float(texColorSpecular);
