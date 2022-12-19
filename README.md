@@ -7,7 +7,9 @@
 ## Getting Started
 
 ```bash
-git clone --recursive https://github.com/Mafo369/OpenGLDemos.git
+git clone https://github.com/Mafo369/OpenGLDemos.git
+git checkout mesh
+git submodule update --init --recursive
 ```
 
 ```bash
