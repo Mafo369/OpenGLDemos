@@ -110,11 +110,25 @@ void MyOpenGLWidget::paintGL() {
                 ImGui::SliderFloat( "metallic", material->getMetallic(), 0.0, 1.0 );
                 ImGui::SliderFloat( "roughness", material->getRoughness(), 0.0, 1.0 );
             }
-            ImGui::Text( "Control points:" );
-            if ( ImGui::Checkbox( "Display control points: ", &m_displayCtrlPts ) ) {
-                _openglDemo->toggleCtrlPts();
-                _openglDemo->compute();
+            if ( auto demo = dynamic_cast<SimpleCamera*>( _openglDemo.get() ) ) {
+                ImGui::Text( "Control points:" );
+                if ( ImGui::Checkbox( "Display control points: ", &m_displayCtrlPts ) ) {
+                    _openglDemo->toggleCtrlPts();
+                    _openglDemo->compute();
+                }
+                auto& ctrlPts = _openglDemo->getControlsPoints();
+                for ( unsigned int i = 0; i < ctrlPts.size(); i++ ) {
+                    for ( unsigned int j = 0; j < ctrlPts[i].size(); j++ ) {
+                        std::string name =
+                            "ControlPoint " + std::to_string( i ) + " " + std::to_string( j );
+                        if ( ImGui::SliderFloat3(
+                                 name.c_str(), glm::value_ptr( ctrlPts[i][j] ), -5.f, 5.0 ) ) {
+                            _openglDemo->compute();
+                        }
+                    }
+                }
             }
+            ImGui::Text( "Rings info :" );
             if ( ImGui::InputInt( "Ring size", &_openglDemo->m_ringSize ) ) {
                 if ( auto demo = dynamic_cast<MeshDemo*>( _openglDemo.get() ) ) {
                     demo->m_v_iter = demo->m_oldv_iter;
@@ -134,17 +148,6 @@ void MyOpenGLWidget::paintGL() {
                         demo->m_v_iter = demo->m_oldv_iter;
                         demo->m_myMesh.set_point( *demo->m_oldv_iter, { pvec.x, pvec.y, pvec.z } );
                         demo->compute( false );
-                    }
-                }
-            }
-            auto& ctrlPts = _openglDemo->getControlsPoints();
-            for ( unsigned int i = 0; i < ctrlPts.size(); i++ ) {
-                for ( unsigned int j = 0; j < ctrlPts[i].size(); j++ ) {
-                    std::string name =
-                        "ControlPoint " + std::to_string( i ) + " " + std::to_string( j );
-                    if ( ImGui::SliderFloat3(
-                             name.c_str(), glm::value_ptr( ctrlPts[i][j] ), -5.f, 5.0 ) ) {
-                        _openglDemo->compute();
                     }
                 }
             }
