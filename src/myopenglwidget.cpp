@@ -153,6 +153,8 @@ void MyOpenGLWidget::paintGL() {
             }
         }
         ImGui::TextColored( ImVec4( 1.0f, 0.0f, 0.0f, 1.0f ), "Keybinds:" );
+        ImGui::TextColored( ImVec4( 0.5f, 0.8f, 0.1f, 1.0f ), "  Camera:" );
+        ImGui::Text( "    'p' : toggle trackball camera" );
         ImGui::TextColored( ImVec4( 0.0f, 1.0f, 1.0f, 1.0f ), "  Shaders:" );
         ImGui::Text( "    'c' : glTF2.0 microfacets" );
         ImGui::Text( "    'm' : modified microfacets" );
@@ -166,8 +168,9 @@ void MyOpenGLWidget::paintGL() {
         ImGui::Text( "    '2' : Hello sphere" );
         ImGui::Text( "    '3' : Hello bunny" );
         ImGui::Text( "    '4' : Hello monkey" );
-        ImGui::TextColored( ImVec4( 1.0f, 0.0f, 1.0f, 1.0f ), "  Utils:" );
+        ImGui::TextColored( ImVec4( 1.0f, 0.2f, 0.5f, 1.0f ), "  Utils:" );
         ImGui::Text( "    's' : laplacian smoothing" );
+        ImGui::Text( "    'w' : wireframe" );
     }
 
     std::int64_t starttime = QDateTime::currentMSecsSinceEpoch();
