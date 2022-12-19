@@ -28,7 +28,7 @@ glm::vec3 MeshDemo::convertCoords( float winX, float winY ) {
                              _camera->getViewport() );
 }
 
-MeshDemo::MeshDemo( int width, int height, ImVec4 clearColor ) :
+MeshDemo::MeshDemo( int width, int height, ImVec4 clearColor, std::string meshFile ) :
     OpenGLDemo( width, height, clearColor ), _activecamera( 0 ), _camera( nullptr ) {
     m_controlPoints.push_back( { { 0, 0, 0 } } );
     /*** Initialise geometric data ***/
@@ -38,7 +38,7 @@ MeshDemo::MeshDemo( int width, int height, ImVec4 clearColor ) :
     mesh.request_vertex_colors();
     mesh.request_vertex_texcoords2D();
 
-    if ( !OpenMesh::IO::read_mesh( mesh, "/home/mafo/dev/Raytracer/assets/bunny.obj" ) ) {
+    if ( !OpenMesh::IO::read_mesh( mesh, meshFile.c_str() ) ) {
         std::cerr << "read error\n";
         exit( 1 );
     }
@@ -66,7 +66,6 @@ MeshDemo::MeshDemo( int width, int height, ImVec4 clearColor ) :
         v.m_color    = glm::vec4( c[0] / 255.f, c[1] / 255.f, c[2] / 255.f, 1.f );
         m_vertices.push_back( v );
     }
-    std::cout << "END" << std::endl;
     MyMesh::FaceIter f_it, f_end( mesh.faces_end() );
     for ( f_it = mesh.faces_begin(); f_it != f_end; ++f_it ) {
         for ( auto v_it = f_it->vertices().begin(); v_it != f_it->vertices().end(); ++v_it ) {
@@ -168,17 +167,37 @@ void MeshDemo::computeNeighbors( MyMesh::VertexIter& v_it,
                                  int* N,
                                  MyMesh::Point* sum,
                                  int* bord ) {
+    std::cout << "Computing neighbors..." << std::endl;
     for ( MyMesh::VertexVertexIter vv_it = m_myMesh.vv_iter( *v_it ); vv_it.is_valid(); ++vv_it ) {
         *sum += m_myMesh.point( *vv_it );
         m_myMesh.set_color( *vv_it, MyMesh::Color( 0, 0, 255 ) );
         neighbors.push_back( vv_it );
         *N += 1;
     }
-    std::cout << "N: " << N << std::endl;
+    //std::cout << "N: " << *N << std::endl;
     size_t neighIdx = 0;
     *bord           = m_ringSize == 1 ? *N : 0;
     bool found      = false;
     MyMesh::VertexVertexIter myvv_it;
+    if(m_ringSize == 1){
+      // For colors really...
+      for ( int i = 0; i < 2; i++ ) {
+          std::vector<MyMesh::VertexVertexIter> neighCopy;
+          neighCopy = neighbors;
+          for ( ; neighIdx < neighCopy.size(); neighIdx++ ) {
+              for ( MyMesh::VertexVertexIter vv_it = m_myMesh.vv_iter( *neighbors[neighIdx] );
+                    vv_it.is_valid();
+                    ++vv_it ) {
+                  if ( *vv_it == *m_v_iter ) {
+                      found   = true;
+                      myvv_it = vv_it;
+                      continue;
+                  }
+              }
+          }
+      }
+
+    }
     for ( int i = 0; i < m_ringSize - 1; i++ ) {
         std::vector<MyMesh::VertexVertexIter> neighCopy;
         neighCopy = neighbors;
@@ -214,13 +233,14 @@ void MeshDemo::solveSystem( std::vector<MyMesh::VertexVertexIter>& neighbors,
     Eigen::MatrixXf A;
     A.resize( p, p );
     A.setZero();
+    std::cout << "Solving system..." << std::endl;
     std::cout << "p: " << p << std::endl;
     std::cout << "m: " << m << std::endl;
     for ( int i = 0; i < p; i++ ) {
         float rowSum = 0;
         for ( int j = 0; j < p; j++ ) {
             if ( *neighbors[i] == *neighbors[j] ) {
-                if ( i <= m ) { A.row( i ).col( j ) << -1; }
+                if ( i < m ) { A.row( i ).col( j ) << -1; }
                 else {
                     A.row( i ).col( j ) << 1;
                 }
@@ -233,9 +253,8 @@ void MeshDemo::solveSystem( std::vector<MyMesh::VertexVertexIter>& neighbors,
                 }
             }
         }
-        std::cout << rowSum << std::endl;
+        //std::cout << rowSum << std::endl;
         if ( rowSum < 1.f && rowSum > 0.f ) {
-            std::cout << "AH" << std::endl;
             m_myMesh.set_color( *neighbors[i], MyMesh::Color( 0, 0, 255 ) );
         }
     }
@@ -252,8 +271,8 @@ void MeshDemo::solveSystem( std::vector<MyMesh::VertexVertexIter>& neighbors,
         if ( i >= m ) X.row( i ) << 0.f;
     }
     X.row( p - 1 ) << 1.f;
-    std::cout << A << std::endl;
-    std::cout << B << std::endl;
+    std::cout <<"A:\n" << A << std::endl;
+    std::cout << "B:\n" << B << std::endl;
 }
 
 bool inRings( MyMesh::VertexIter& v_it, std::vector<MyMesh::VertexVertexIter>& neighbors ) {
@@ -268,10 +287,12 @@ bool inRings( MyMesh::VertexIter& v_it, std::vector<MyMesh::VertexVertexIter>& n
 
 void MeshDemo::compute( bool update ) {
     // (linearly) iterate over all vertices
+    std::cout << "Computing..." << std::endl;
     std::vector<Vertex> vertices;
     std::vector<MyMesh::Point> new_vertices;
     std::vector<MyMesh::VertexVertexIter> neighbors;
     Eigen::VectorXf X;
+    // Iterate over mesh vertices
     for ( MyMesh::VertexIter v_it = m_myMesh.vertices_sbegin(); v_it != m_myMesh.vertices_end();
           ++v_it ) {
         // circulate around the current vertex
@@ -293,12 +314,13 @@ void MeshDemo::compute( bool update ) {
             new_vertices.clear();
         }
         else {
-            // Update colors and weights
+            // Reset colors if vertex not in rings
             if ( !inRings( v_it, neighbors ) )
                 m_myMesh.set_color(
                     *v_it,
                     MyMesh::Color( m_color.r * 255.f, m_color.g * 255.f, m_color.b * 255.f ) );
             else {
+                // Color current vertex with least squares solution
                 int idxN = 0;
                 for ( auto neigh : neighbors ) {
                     if ( *neigh == *v_it ) {

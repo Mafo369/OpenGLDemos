@@ -59,7 +59,7 @@ SimpleTriangle::SimpleTriangle( int width, int height, ImVec4 clearColor ) :
 
     m_renderer = new Renderer();
 
-    m_mesh = new Mesh( vertices, indices, GL_LINES );
+    m_mesh = new Mesh( vertices, indices, GL_TRIANGLES );
 
     m_programcolor = m_program = new Shader( "Shaders/Basic.vert.glsl", "Shaders/Basic.frag.glsl" );
     m_programnormal = new Shader( "Shaders/Basic.vert.glsl", "Shaders/Normals.frag.glsl" );

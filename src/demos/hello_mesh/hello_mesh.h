@@ -23,7 +23,7 @@ typedef OpenMesh::TriMesh_ArrayKernelT<>  MyMesh;
  */
 class MeshDemo : public OpenGLDemo {
 public:
-    explicit MeshDemo(int width, int height, ImVec4 clearColor);
+    explicit MeshDemo(int width, int height, ImVec4 clearColor, std::string meshFile);
     ~MeshDemo() override;
 
     void resize(int width, int height) override;

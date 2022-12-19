@@ -37,8 +37,12 @@ MyOpenGLWidget::MyOpenGLWidget( QWidget* parent ) :
         return new SimpleSpheres( width, height, clearColor );
     } );
     _democonstructors.push_back( []( int width, int height, ImVec4 clearColor ) -> OpenGLDemo* {
-        std::cout << "Hello spheres ..." << std::endl;
-        return new MeshDemo( width, height, clearColor );
+        std::cout << "Hello Bunny ..." << std::endl;
+        return new MeshDemo( width, height, clearColor, "./Assets/bunny.obj" );
+    } );
+    _democonstructors.push_back( []( int width, int height, ImVec4 clearColor ) -> OpenGLDemo* {
+        std::cout << "Hello Bunny ..." << std::endl;
+        return new MeshDemo( width, height, clearColor, "./Assets/Suzanne.obj" );
     } );
 }
 
@@ -157,6 +161,10 @@ void MyOpenGLWidget::paintGL() {
         ImGui::Text( "    '0' : Hello triangle" );
         ImGui::Text( "    '1' : Bezier Surface" );
         ImGui::Text( "    '2' : Hello sphere" );
+        ImGui::Text( "    '3' : Hello bunny" );
+        ImGui::Text( "    '4' : Hello monkey" );
+        ImGui::TextColored( ImVec4( 1.0f, 0.0f, 1.0f, 1.0f ), "  Utils:" );
+        ImGui::Text( "    's' : laplacian smoothing" );
     }
 
     std::int64_t starttime = QDateTime::currentMSecsSinceEpoch();
