@@ -2,7 +2,7 @@
 
 ## IMPORTANT NOTE !!!
 
-**FILE HAS TO BE EXECUTED FROM bin/ DUE TO RESSOURCES ACCESS LIKE Shaders/ AND Assets/**
+**FILE HAS TO BE EXECUTED FROM build/ DUE TO RESSOURCES ACCESS LIKE Shaders/ AND Assets/**
 
 ## Getting Started
 
@@ -15,8 +15,7 @@ mkdir build
 cd build
 cmake ..
 make
-cd ../bin
-./helloopenGL
+./OpenGLDemos
 ```
 
 ## Keybinds:
@@ -36,6 +35,8 @@ Demos:
 - **1** : Hello triangle
 - **2** : Bezier Surface
 - **3** : Hello Sphere
+- **4** : Hello Bunny 
+- **5** : Hello Monkey
 
 ## Results: Bezier Surface
 
