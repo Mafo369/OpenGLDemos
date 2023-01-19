@@ -37,14 +37,7 @@ class VertexBufferLayout
     public:
         VertexBufferLayout() : m_stride(0) {}
 
-        template<typename T>
-        void push(unsigned int count)
-        {
-            std::cerr << 
-                "VertexBufferLayout: Unsupported type for count:" << count 
-            << std::endl;
-            assert(false);
-        }
+        template<typename T> void push(unsigned int count);
 
         inline const std::vector<VertexBufferElement> getElements() const { return m_elements; }
         inline unsigned int getStride() const { return m_stride; }

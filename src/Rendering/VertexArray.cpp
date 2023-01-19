@@ -38,6 +38,15 @@ void VertexArray::unbind() const
     glAssert(glBindVertexArray(0));
 }
 
+template<typename T>
+void push(unsigned int count)
+{
+    std::cerr << 
+        "VertexBufferLayout: Unsupported type for count:" << count 
+    << std::endl;
+    assert(false);
+}
+
 template<>
 void VertexBufferLayout::push<float>(unsigned int count)
 {

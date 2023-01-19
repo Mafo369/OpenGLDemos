@@ -11,7 +11,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
+#set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
 find_package(Qt5 COMPONENTS OpenGL REQUIRED)
 
@@ -52,8 +52,8 @@ SOURCE_GROUP("Source Files" FILES ${folder_source})
 SOURCE_GROUP("Header Files" FILES ${folder_header})
 SOURCE_GROUP("Shader Files" FILES ${folder_shader})
 
-FILE(COPY ${CMAKE_SOURCE_DIR}/Shaders DESTINATION "${CMAKE_SOURCE_DIR}/bin")
-FILE(COPY ${CMAKE_SOURCE_DIR}/src/Assets DESTINATION "${CMAKE_SOURCE_DIR}/bin")
+FILE(COPY ${CMAKE_SOURCE_DIR}/Shaders DESTINATION "${CMAKE_BINARY_DIR}")
+FILE(COPY ${CMAKE_SOURCE_DIR}/src/Assets DESTINATION "${CMAKE_BINARY_DIR}")
 
 ################################################################################
 # Configure QT

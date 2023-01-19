@@ -1,0 +1,101 @@
+{
+	"BUILD_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules/implot_autogen",
+	"CMAKE_BINARY_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/CMakeLists.txt"
+	],
+	"CMAKE_SOURCE_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/implot/implot.h",
+			"MU",
+			"RU5KJWRAB4/moc_implot.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/implot/implot_internal.h",
+			"MU",
+			"RU5KJWRAB4/moc_implot_internal.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules/implot_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules/implot_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : [ "GLM_FORCE_SILENT_WARNINGS", "GL_SILENCE_DEPRECATION" ],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/src",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/glm",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/imgui",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/implot",
+		"/usr/include/c++/10",
+		"/usr/include/x86_64-linux-gnu/c++/10",
+		"/usr/include/c++/10/backward",
+		"/usr/lib/gcc/x86_64-linux-gnu/10/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu",
+		"/usr/include"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake-3.24/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules/implot_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules/CMakeFiles/implot_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/lib/qt5/bin/uic",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 12,
+	"SETTINGS_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/libs/qtimgui/modules/CMakeFiles/implot_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/implot/implot.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/implot/implot_demo.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/implot/implot_items.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}

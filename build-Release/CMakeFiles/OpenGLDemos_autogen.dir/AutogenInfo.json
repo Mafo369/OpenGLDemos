@@ -1,0 +1,386 @@
+{
+	"BUILD_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/OpenGLDemos_autogen",
+	"CMAKE_BINARY_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/CMakeLists.txt",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/CMakeFiles/3.24.1/CMakeSystem.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeSystemSpecificInitialize.cmake",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/CMakeFiles/3.24.1/CMakeCCompiler.cmake",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/CMakeFiles/3.24.1/CMakeCXXCompiler.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeSystemSpecificInformation.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeGenericSystem.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeInitializeConfigs.cmake",
+		"/usr/share/cmake-3.24/Modules/Platform/Linux.cmake",
+		"/usr/share/cmake-3.24/Modules/Platform/UnixPaths.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeCInformation.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeLanguageInformation.cmake",
+		"/usr/share/cmake-3.24/Modules/Compiler/GNU-C.cmake",
+		"/usr/share/cmake-3.24/Modules/Compiler/GNU.cmake",
+		"/usr/share/cmake-3.24/Modules/Compiler/CMakeCommonCompilerMacros.cmake",
+		"/usr/share/cmake-3.24/Modules/Platform/Linux-GNU-C.cmake",
+		"/usr/share/cmake-3.24/Modules/Platform/Linux-GNU.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeCommonLanguageInclude.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeCXXInformation.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeLanguageInformation.cmake",
+		"/usr/share/cmake-3.24/Modules/Compiler/GNU-CXX.cmake",
+		"/usr/share/cmake-3.24/Modules/Compiler/GNU.cmake",
+		"/usr/share/cmake-3.24/Modules/Platform/Linux-GNU-CXX.cmake",
+		"/usr/share/cmake-3.24/Modules/Platform/Linux-GNU.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeCommonLanguageInclude.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5OpenGL/Qt5OpenGLConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5OpenGL/Qt5OpenGLConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfig.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Core/Qt5CoreMacros.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeParseArguments.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTabletPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake",
+		"/usr/share/cmake-3.24/Modules/CMakeParseArguments.cmake",
+		"/usr/share/cmake-3.24/Modules/FindOpenGL.cmake",
+		"/usr/share/cmake-3.24/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/share/cmake-3.24/Modules/FindPackageMessage.cmake"
+	],
+	"CMAKE_SOURCE_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/BezierCurve.h",
+			"MU",
+			"CYELRNJLE5/moc_BezierCurve.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/BezierSurface.h",
+			"MU",
+			"CYELRNJLE5/moc_BezierSurface.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Cube.h",
+			"MU",
+			"CYELRNJLE5/moc_Cube.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Light.h",
+			"MU",
+			"CYELRNJLE5/moc_Light.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Mesh.h",
+			"MU",
+			"CYELRNJLE5/moc_Mesh.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Utils.h",
+			"MU",
+			"CYELRNJLE5/moc_Utils.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Buffer.h",
+			"MU",
+			"UD4N4BNGCY/moc_Buffer.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Material.h",
+			"MU",
+			"UD4N4BNGCY/moc_Material.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/RenderObject.h",
+			"MU",
+			"UD4N4BNGCY/moc_RenderObject.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Renderer.h",
+			"MU",
+			"UD4N4BNGCY/moc_Renderer.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Shader.h",
+			"MU",
+			"UD4N4BNGCY/moc_Shader.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Texture.h",
+			"MU",
+			"UD4N4BNGCY/moc_Texture.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/VertexArray.h",
+			"MU",
+			"UD4N4BNGCY/moc_VertexArray.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/error_handling.h",
+			"MU",
+			"UD4N4BNGCY/moc_error_handling.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_bezier/camera.h",
+			"MU",
+			"Q4WSRSH5A6/moc_camera.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_bezier/hellocamera.h",
+			"MU",
+			"Q4WSRSH5A6/moc_hellocamera.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_spheres/hellospheres.h",
+			"MU",
+			"L226UA7K7V/moc_hellospheres.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_spheres/spheres.h",
+			"MU",
+			"L226UA7K7V/moc_spheres.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_triangles/hellotriangles.h",
+			"MU",
+			"PQZFJOS23B/moc_hellotriangles.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/opengldemo.h",
+			"MU",
+			"I2VQ5TQOJM/moc_opengldemo.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/mainwindow.h",
+			"MU",
+			"UVLADIE3JM/moc_mainwindow.cpp",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/myopenglwidget.h",
+			"MU",
+			"UVLADIE3JM/moc_myopenglwidget.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/OpenGLDemos_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/OpenGLDemos_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"GLM_FORCE_SILENT_WARNINGS",
+		"GL_SILENCE_DEPRECATION",
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NO_DEBUG",
+		"QT_OPENGL_LIB",
+		"QT_WIDGETS_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/src",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/glm",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/src",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/imgui",
+		"/home/mafo/ups/M2/IG3/OpenGLDemos/libs/qtimgui/modules/implot",
+		"/usr/include/x86_64-linux-gnu/qt5",
+		"/usr/include/x86_64-linux-gnu/qt5/QtOpenGL",
+		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
+		"/usr/include/x86_64-linux-gnu/qt5/QtGui",
+		"/usr/include/x86_64-linux-gnu/qt5/QtCore",
+		"/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
+		"/usr/include/c++/10",
+		"/usr/include/x86_64-linux-gnu/c++/10",
+		"/usr/include/c++/10/backward",
+		"/usr/lib/gcc/x86_64-linux-gnu/10/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu",
+		"/usr/include"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake-3.24/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/OpenGLDemos_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/CMakeFiles/OpenGLDemos_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/lib/qt5/bin/uic",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 12,
+	"SETTINGS_FILE" : "/home/mafo/ups/M2/IG3/OpenGLDemos/build-Release/CMakeFiles/OpenGLDemos_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[ "/home/mafo/ups/M2/IG3/OpenGLDemos/src/Application.cpp", "MU", null ],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/BezierCurve.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/BezierSurface.cpp",
+			"MU",
+			null
+		],
+		[ "/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Cube.cpp", "MU", null ],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Light.cpp",
+			"MU",
+			null
+		],
+		[ "/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Mesh.cpp", "MU", null ],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Geometry/Utils.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Buffer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Material.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/RenderObject.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Renderer.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Shader.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/Texture.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/Rendering/VertexArray.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_bezier/camera.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_bezier/hellocamera.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_spheres/hellospheres.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_spheres/spheres.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/hello_triangles/hellotriangles.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/demos/opengldemo.cpp",
+			"MU",
+			null
+		],
+		[ "/home/mafo/ups/M2/IG3/OpenGLDemos/src/mainwindow.cpp", "MU", null ],
+		[
+			"/home/mafo/ups/M2/IG3/OpenGLDemos/src/myopenglwidget.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}
