@@ -35,6 +35,8 @@
 build/
 build-Debug/
 bin/
+build*/
+build-*/
 
 # LSP configuration
 compile_commands.json

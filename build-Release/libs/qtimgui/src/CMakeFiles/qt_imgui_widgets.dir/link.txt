@@ -1,2 +1,0 @@
-/usr/bin/ar qc libqt_imgui_widgets.a CMakeFiles/qt_imgui_widgets.dir/qt_imgui_widgets_autogen/mocs_compilation.cpp.o CMakeFiles/qt_imgui_widgets.dir/ImGuiRenderer.cpp.o CMakeFiles/qt_imgui_widgets.dir/QtImGui.cpp.o
-/usr/bin/ranlib libqt_imgui_widgets.a
