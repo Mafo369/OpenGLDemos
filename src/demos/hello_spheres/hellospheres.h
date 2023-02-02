@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include "../opengldemo.h"
 
-#include "../hello_bezier/camera.h"
+#include "../camera.h"
 
 #include <memory>
 

@@ -32,6 +32,7 @@ void Renderer::draw(Mesh* mesh, Shader* shader){
     //    glBindTexture(GL_TEXTURE_2D, mesh->m_textures[i].m_rendererId);
     //}
     //glActiveTexture(GL_TEXTURE0);
+
     draw(mesh->m_vao, mesh->m_ebo, shader);
 }
 

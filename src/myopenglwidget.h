@@ -53,7 +53,8 @@ private :
     // for event management
     std::int64_t _lastime;
 
-    ImVec4 m_clear_color = ImColor(114, 144, 154);
+    //ImVec4 m_clear_color = ImColor(114, 144, 154);
+    ImVec4 m_clear_color = ImColor(0, 0, 0);
     glm::vec3 m_translation = glm::vec3(0.f);
     bool m_displayCtrlPts = false;
 

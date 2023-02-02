@@ -1,5 +1,5 @@
-#ifndef SIMPLECAMERA_H
-#define SIMPLECAMERA_H
+#ifndef HELLOBLOOM_H
+#define HELLOBLOOM_H
 
 #include "../../Rendering/Renderer.h"
 
@@ -15,10 +15,10 @@
 
 /** Simple drawing demonstration
  */
-class SimpleCamera : public OpenGLDemo {
+class BloomDemo : public OpenGLDemo {
 public:
-    explicit SimpleCamera(int width, int height, ImVec4 clearColor);
-    ~SimpleCamera() override;
+    explicit BloomDemo(int width, int height, ImVec4 clearColor);
+    ~BloomDemo() override;
 
     void resize(int width, int height) override;
     void draw() override;
@@ -42,7 +42,17 @@ private:
     std::shared_ptr<Material> m_materialNormal;
     std::shared_ptr<Material> m_materialParametric;
     std::shared_ptr<Material> m_materialTexture;
+    std::shared_ptr<Material> m_materialQuad;
 
+
+    unsigned int m_fbo;
+    unsigned int m_fboTexture;
+    unsigned int m_quadVAO;
+    unsigned int m_quadVBO;
+    unsigned int m_rbo;
+
+    Mesh* m_mesh;
+    Shader* m_program;
     Renderer* m_renderer;
     bool m_first = true;
     bool m_displayCtrlPts = false;
@@ -71,4 +81,4 @@ private:
 /*------------------------------------------------------------------------------------------------------------------------*/
 
 
-#endif // SIMPLECAMERA_H
+#endif // HELLOBLOOM_H

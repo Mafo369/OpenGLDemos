@@ -17,6 +17,7 @@
 #include "demos/hello_triangles/hellotriangles.h"
 #include "demos/hello_bezier/hellocamera.h"
 #include "demos/hello_spheres/hellospheres.h"
+#include "demos/hello_bloom/hellobloom.h"
 
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
@@ -28,6 +29,9 @@ MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenG
         } );
     _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
         std::cout << "Hello spheres ..." << std::endl; return new SimpleSpheres(width, height, clearColor);
+        } );
+    _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
+        std::cout << "Hello bloom ..." << std::endl; return new BloomDemo(width, height, clearColor);
         } );
 }
 

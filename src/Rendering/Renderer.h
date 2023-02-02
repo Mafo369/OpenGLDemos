@@ -23,7 +23,7 @@ public:
     void setLight(Light* light, unsigned int id);
     void setCameraPosition(glm::vec3 position);
     void clearRenderObjects(); 
-    std::shared_ptr<Material> getCurrentMaterial() { return m_roList[0]->getMaterial(); }
+    std::shared_ptr<Material> getCurrentMaterial() { if(!m_roList.empty()) return m_roList[0]->getMaterial(); else return nullptr; }
 
 
     void draw(VertexArray* vao, IndexBuffer* ebo, Shader* shader) const;
