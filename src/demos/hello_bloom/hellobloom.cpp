@@ -8,6 +8,7 @@
 #include "Geometry/Cube.h"
 #include "Geometry/Mesh.h"
 #include "../../Rendering/RenderObject.h"
+#include "../../../libs/stb_image.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
@@ -42,16 +43,24 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     Shader* programLambert = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Lambert.frag.glsl");
     Shader* programNormal = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/Camera.frag.glsl");
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/Normals.frag.glsl");
     Shader* programParametric = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Parametric.frag.glsl");
     Shader* programTexture = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
     Shader* programQuad = 
-        new Shader("Shaders/Basic.vert.glsl", "Shaders/Quad.frag.glsl");
+        new Shader("Shaders/Quad.vert.glsl", "Shaders/Quad.frag.glsl");
+    Shader* programTh = 
+        new Shader("Shaders/Quad.vert.glsl", "Shaders/Threshold.frag.glsl");
 
     programQuad->bind();
     programQuad->setUniform1i("screenTexture", 0);
+    programQuad->setUniform1i("exposure", m_exposure);
+    programQuad->unbind();
+
+    programQuad->bind();
+    programQuad->setUniform1i("screenTexture", 0);
+    programQuad->setUniform1i("threshold", m_threshold);
     programQuad->unbind();
 
     // Materials
@@ -67,8 +76,9 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_materialParametric = std::make_shared<Material>(programParametric);
     m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular);
     m_materialQuad = std::make_shared<Material>(programQuad);
+    m_materialTh = std::make_shared<Material>(programTh);
     
-    m_currentMaterial = m_material;
+    m_currentMaterial = m_materialQuad;
     
     // Render objects
     compute();
@@ -86,7 +96,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     /*** Create lights ***/
     LightParams lightParams;
     lightParams.position = glm::vec3(0.f, 0.f, 0.f);
-    lightParams.color = glm::vec3(1.0f);
+    lightParams.color = glm::vec3(1.1f);
     Light* light = new Light(lightParams);
     
     /*** Attach lights to renderer ***/
@@ -96,12 +106,22 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
+    stbi_set_flip_vertically_on_load(true);
+    int hdrWidth, hdrHeight, nrComponents;
+    float *data = stbi_loadf("/home/mafo/dev/Raytracer/assets/rainforest_trail_4k.hdr", &hdrWidth, &hdrHeight, &nrComponents, 0);
+    if (!data)
+    {
+        std::cout << "Failed to load HDR image." << std::endl;
+    }  
+
     // generate texture
     glGenTextures(1, &m_fboTexture);
     glBindTexture(GL_TEXTURE_2D, m_fboTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _width, _height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, hdrWidth, hdrHeight, 0, GL_RGB, GL_FLOAT, data);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // attach it to currently bound framebuffer object
@@ -109,7 +129,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     glGenRenderbuffers(1, &m_rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, m_rbo); 
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, _width, _height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, hdrWidth, hdrHeight);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
@@ -132,6 +152,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
  
     m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
 
+    stbi_image_free(data);
 }
 
 BloomDemo::~BloomDemo() {
@@ -141,9 +162,13 @@ BloomDemo::~BloomDemo() {
 }
 
 void BloomDemo::compute() {
-    /*** Create control points render objects if needed ***/
-    /*** Delete old render objects and add new ones ***/
-    m_renderer->clearRenderObjects();
+    m_materialQuad->getShader()->bind();
+    m_materialQuad->getShader()->setUniform1f("exposure", m_exposure);
+    m_materialQuad->getShader()->unbind();
+
+    m_materialTh->getShader()->bind();
+    m_materialTh->getShader()->setUniform1f("threshold", m_threshold);
+    m_materialTh->getShader()->unbind();
 }
 
 void BloomDemo::resize(int width, int height){
@@ -168,11 +193,11 @@ void BloomDemo::draw() {
     OpenGLDemo::draw();
 
     // first pass
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
-    glEnable(GL_DEPTH_TEST);
-    m_renderer->draw();	
+    //glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+    //glEnable(GL_DEPTH_TEST);
+    //m_renderer->draw();	
       
     // second pass
     glBindFramebuffer(GL_FRAMEBUFFER, 1); // back to default
@@ -181,7 +206,8 @@ void BloomDemo::draw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
     glBindTexture(GL_TEXTURE_2D, m_fboTexture);
-    m_renderer->draw(m_mesh, m_materialQuad->getShader());
+
+    m_renderer->draw(m_mesh, m_currentMaterial->getShader());
 
     /*** Compute new camera transform ***/
     _model = glm::translate(glm::mat4(1.0), m_translation);
@@ -248,6 +274,12 @@ bool BloomDemo::keyboard(unsigned char k) {
             return true;
         case 't' :
             m_renderer->setMaterial(m_materialTexture);
+            return true;
+        case 'h' :
+            m_currentMaterial = m_materialTh;
+            return true;
+        case 'q' :
+            m_currentMaterial = m_materialQuad;
             return true;
         default:
             return false;

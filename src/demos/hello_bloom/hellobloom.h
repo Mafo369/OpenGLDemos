@@ -34,6 +34,9 @@ public:
     glm::vec4& getColor() override { return m_color; }
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
 
+    float m_exposure = 5.0f;
+    float m_threshold = 1.0f;
+
 private:
     // Shader program for rendering
     std::shared_ptr<Material> m_material;
@@ -43,6 +46,7 @@ private:
     std::shared_ptr<Material> m_materialParametric;
     std::shared_ptr<Material> m_materialTexture;
     std::shared_ptr<Material> m_materialQuad;
+    std::shared_ptr<Material> m_materialTh;
 
 
     unsigned int m_fbo;

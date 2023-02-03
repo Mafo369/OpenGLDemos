@@ -13,5 +13,5 @@ void main(){
   out_normal=inormal;
   out_color = in_color;
   out_texCoords = itexCoords;
-  gl_Position = vec4(position.x, position.y, 0, 1.0);
+  gl_Position = vec4(position.x*2, position.y*2, 0, 1.0);
 };

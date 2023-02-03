@@ -7,10 +7,11 @@ layout (location = 3) in vec4 in_color;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-layout (location = 0) out vec4 out_position;
-layout (location = 1) out vec3 out_normal;
-layout (location = 2) out vec2 out_texCoords;
-layout (location = 3) out vec4 out_color;
+
+out vec4 out_position;
+out vec3 out_normal;
+out vec2 out_texCoords;
+out vec4 out_color;
 
 void main()
 {

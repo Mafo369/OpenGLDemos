@@ -1,7 +1,11 @@
 #version 410 core
 out vec4 FragColor;
 
+in vec3 out_normal;
+in vec4 out_color;
+in vec2 out_texCoords;
+
 void main()
 {
-    FragColor = vec4(1.0); // set all 4 vector values to 1.0
+    FragColor = out_color;
 }

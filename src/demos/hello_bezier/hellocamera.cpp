@@ -66,7 +66,7 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     Shader* programLambert = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Lambert.frag.glsl");
     Shader* programNormal = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/Camera.frag.glsl");
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/Normals.frag.glsl");
     Shader* programParametric = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Parametric.frag.glsl");
     Shader* programTexture = 

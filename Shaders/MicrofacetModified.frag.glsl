@@ -2,10 +2,10 @@
 
 #define PI 3.1415926535897932384626433832795
 
-layout (location = 0) in vec4 in_position;
-layout (location = 1) in vec3 in_normal;
-layout (location = 2) in vec2 in_texCoords;
-layout (location = 3) in vec4 in_color;
+in vec4 out_position;
+in vec3 out_normal;
+in vec2 out_texCoords;
+in vec4 out_color;
 
 uniform vec3 eyePosition;
 
@@ -53,19 +53,19 @@ void main(){
   const vec3 black = vec3(0);
   float ior = 0.04;
   vec3 iorV = vec3(ior);
-  vec3 baseColor = in_color.rgb;
+  vec3 baseColor = out_color.rgb;
   float metallic = material.metallic;
   float roughness = material.roughness;
-  vec3 n = gl_FrontFacing ? in_normal : -in_normal;
+  vec3 n = gl_FrontFacing ? out_normal : -out_normal;
   vec3 c_diff = mix(baseColor.rgb, black, metallic);
   vec3 f0 = mix(iorV, baseColor.rgb, metallic);
   float alpha = roughness * roughness;
   float alpha2 = alpha * alpha;
 
-  vec3 v = normalize(eyePosition - in_position.xyz);
+  vec3 v = normalize(eyePosition - out_position.xyz);
   vec3 material = vec3(0.0);
   for(int i =0; i < 3; i++){
-    vec3 l = normalize(light[i].position - in_position.xyz);
+    vec3 l = normalize(light[i].position - out_position.xyz);
     vec3 h = normalize(l + v);
     float VdotH = clamp(dot(v, h), 0.0, 1.0);
     float NdotH = clamp(dot(n, h), 0.0, 1.0);

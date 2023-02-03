@@ -8,7 +8,7 @@ Light::Light(LightParams lightParams) : RenderObject(){
     Shader* programLight = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Light.frag.glsl");
     std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(programLight);
-    m_mesh = new Cube(lightParams.position);
+    m_mesh = new Cube(lightParams.position, glm::vec4(lightParams.color, 1.f));
     m_material = lightMaterial;
 }
 

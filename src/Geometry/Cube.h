@@ -5,7 +5,7 @@
 
 class Cube : public Mesh {
 public:
-    Cube(glm::vec3 position);
+    Cube(glm::vec3 position, glm::vec4 color);
     ~Cube();
 
 private:

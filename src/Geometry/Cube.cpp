@@ -1,9 +1,9 @@
 #include "Cube.h"
 #include <GL/gl.h>
 
-Cube::Cube(glm::vec3 position) : Mesh() {
+Cube::Cube(glm::vec3 position, glm::vec4 color) : Mesh() {
     m_position = position;
-    m_color = glm::vec4(1.0f);
+    m_color = color;
     m_vertices.push_back({glm::vec3(0.5, 0, 0.5 ), glm::vec3(0.f), glm::vec2(0.f, 0.f), m_color});
     m_vertices.push_back({glm::vec3(0.5, 0, -0.5), glm::vec3(0.f), glm::vec2(0.f, 0.f), m_color});
     m_vertices.push_back({glm::vec3(-0.5, 0, -0.5), glm::vec3(0.f), glm::vec2(0.f, 0.f), m_color});

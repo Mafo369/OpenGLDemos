@@ -1,10 +1,11 @@
 #version 410 core
 
-layout (location = 1) in vec3 normal;
-layout (location = 3) in vec4 in_color;
-
 out vec4 color;
+
+in vec3 out_normal;
+in vec4 out_color;
+in vec2 out_texCoords;
         
 void main(){
-  color = in_color.rgba;
+  color = out_color.rgba;
 };

@@ -109,6 +109,14 @@ void MyOpenGLWidget::paintGL() {
                 }
             }
         }
+        if ( auto demo = dynamic_cast<BloomDemo*>( _openglDemo.get() ) ) {
+            if(ImGui::SliderFloat("exposure", &demo->m_exposure, 0, 20)){
+              _openglDemo->compute();
+            }
+            if(ImGui::SliderFloat("threshold", &demo->m_threshold, 0, 20)){
+              _openglDemo->compute();
+            }
+        }
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Keybinds:");
         ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "  Shaders:");
         ImGui::Text("    'c' : glTF2.0 microfacets");
