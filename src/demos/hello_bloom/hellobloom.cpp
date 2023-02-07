@@ -22,6 +22,79 @@
 
 #define deg2rad(x) float(M_PI)*(x)/180.f
 
+void addObjectsFromFile( const char* filename, std::vector<Vertex>& vector, std::vector<unsigned int>& indices ) {
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+
+    readObjToTriangleMesh( filename, attrib, shapes, materials );
+
+    unsigned int curr_idx = 0;
+    for ( size_t s = 0; s < shapes.size(); s++ ) {
+        size_t index_offset = 0;
+        for ( size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++ ) {
+            int fv = shapes[s].mesh.num_face_vertices[f];
+
+            std::vector<glm::vec3> normals;
+            std::vector<glm::vec2> texture;
+            glm::vec2 textures[fv];
+
+            // Loop over vertices in the face.
+            for ( int v = 0; v < fv; v++ ) {
+                // access to vertex
+                tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+                tinyobj::real_t vx   = attrib.vertices[3 * idx.vertex_index + 0];
+                tinyobj::real_t vy   = attrib.vertices[3 * idx.vertex_index + 1];
+                tinyobj::real_t vz   = attrib.vertices[3 * idx.vertex_index + 2];
+                glm::vec3 n;
+                if ( !attrib.normals.empty() ) {
+                    tinyobj::real_t nx = attrib.normals[3 * idx.normal_index + 0];
+                    tinyobj::real_t ny = attrib.normals[3 * idx.normal_index + 1];
+                    tinyobj::real_t nz = attrib.normals[3 * idx.normal_index + 2];
+                    n             = glm::vec3( nx, ny, nz );
+                    normals.push_back( n );
+                }
+                if ( !attrib.texcoords.empty() ) {
+                    tinyobj::real_t tx = attrib.texcoords[2 * idx.texcoord_index + 0];
+                    tinyobj::real_t ty = attrib.texcoords[2 * idx.texcoord_index + 1];
+                    textures[v]        = glm::vec2( tx, ty );
+                }
+                // Optional: vertex colors
+                // tinyobj::real_t red = attrib.colors[3*idx.vertex_index+0];
+                // tinyobj::real_t green = attrib.colors[3*idx.vertex_index+1];
+                // tinyobj::real_t blue = attrib.colors[3*idx.vertex_index+2];
+                glm::vec3 v0 = glm::vec3( vx, vy, vz );
+                Vertex vertex = {v0, n, textures[v], {1,0,0,1}};
+                vector.push_back( vertex );
+                indices.push_back(curr_idx++);
+            }
+
+            index_offset += fv;
+
+            //glm::vec3 v0 = vector[0];
+            //glm::vec3 v1 = vector[1];
+            //glm::vec3 v2 = vector[2];
+            //glm::vec3 n;
+            //if ( normals.empty() ) {
+            //    glm::vec3 v2v0 = v2 - v0;
+            //    glm::vec3 v1v0 = v1 - v0;
+            //    n         = normalize( cross( v1v0, v2v0 ) );
+            //    normals   = { n, n, n };
+            //}
+            //else {
+            //    n = normalize( normals[0] + normals[1] + normals[2] );
+            //}
+
+            //if ( !materials.empty() ) {
+            //    // do something
+            //}
+            //else {
+            //    // do something
+            //}
+        }
+    }
+}
+
 BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     /*** Initialise geometric data ***/
     m_color = glm::vec4(1.0f, 0.5f, 0.2f, 1.f);
@@ -48,20 +121,33 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Parametric.frag.glsl");
     Shader* programTexture = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
-    Shader* programQuad = 
-        new Shader("Shaders/Quad.vert.glsl", "Shaders/Quad.frag.glsl");
-    Shader* programTh = 
-        new Shader("Shaders/Quad.vert.glsl", "Shaders/Threshold.frag.glsl");
 
-    programQuad->bind();
-    programQuad->setUniform1i("screenTexture", 0);
-    programQuad->setUniform1i("exposure", m_exposure);
-    programQuad->unbind();
+    m_programQuad = 
+        new Shader("Shaders/Sample.vert.glsl", "Shaders/Quad.frag.glsl");
+    m_programTh = 
+        new Shader("Shaders/Sample.vert.glsl", "Shaders/Threshold.frag.glsl");
+    m_programDown = 
+        new Shader("Shaders/Sample.vert.glsl", "Shaders/Downsample.frag.glsl");
+    m_programUp = 
+        new Shader("Shaders/Sample.vert.glsl", "Shaders/Upsample.frag.glsl");
 
-    programQuad->bind();
-    programQuad->setUniform1i("screenTexture", 0);
-    programQuad->setUniform1i("threshold", m_threshold);
-    programQuad->unbind();
+    m_programQuad->bind();
+    m_programQuad->setUniform1i("screenTexture", 0);
+    m_programQuad->setUniform1i("exposure", m_exposure);
+    m_programQuad->unbind();
+
+    m_programTh->bind();
+    m_programTh->setUniform1i("screenTexture", 0);
+    m_programTh->setUniform1i("threshold", m_threshold);
+    m_programTh->unbind();
+
+    m_programDown->bind();
+    m_programDown->setUniform1i("srcTexture", 0);
+    m_programDown->unbind();
+
+    m_programUp->bind();
+    m_programUp->setUniform1i("srcTexture", 0);
+    m_programUp->unbind();
 
     // Materials
     MaterialParams matParams;
@@ -75,10 +161,9 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_materialNormal = std::make_shared<Material>(programNormal);
     m_materialParametric = std::make_shared<Material>(programParametric);
     m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular);
-    m_materialQuad = std::make_shared<Material>(programQuad);
-    m_materialTh = std::make_shared<Material>(programTh);
     
-    m_currentMaterial = m_materialQuad;
+    m_currentMaterial = m_material;
+    m_currentBloomShader = m_programQuad;
     
     // Render objects
     compute();
@@ -95,80 +180,143 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     /*** Create lights ***/
     LightParams lightParams;
-    lightParams.position = glm::vec3(0.f, 0.f, 0.f);
+    lightParams.position = glm::vec3(0.f, 13.f, 0.f);
     lightParams.color = glm::vec3(1.1f);
     Light* light = new Light(lightParams);
     
+    lightParams.position = glm::vec3(1.f, 13.f, 0.f);
+    lightParams.color = glm::vec3(0.1f);
+    Light* light1 = new Light(lightParams);
+
+    lightParams.position = glm::vec3(-1.f, 13.f, 0.0f);
+    lightParams.color = glm::vec3(10.0f);
+    Light* light2 = new Light(lightParams);
+
     /*** Attach lights to renderer ***/
     m_renderer->addLightRo(light);
+    m_renderer->addLightRo(light1);
+    m_renderer->addLightRo(light2);
     m_lights.push_back(light);
+    m_lights.push_back(light1);
+    m_lights.push_back(light2);
 
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    stbi_set_flip_vertically_on_load(true);
+    //stbi_set_flip_vertically_on_load(true);
     int hdrWidth, hdrHeight, nrComponents;
-    float *data = stbi_loadf("/home/mafo/dev/Raytracer/assets/rainforest_trail_4k.hdr", &hdrWidth, &hdrHeight, &nrComponents, 0);
-    if (!data)
-    {
-        std::cout << "Failed to load HDR image." << std::endl;
-    }  
+    //float *data = stbi_loadf("/home/mafo/dev/Raytracer/assets/rainforest_trail_4k.hdr", &hdrWidth, &hdrHeight, &nrComponents, 0);
+    //if (!data)
+    //{
+    //    std::cout << "Failed to load HDR image." << std::endl;
+    //}  
+    
+    hdrWidth = _width;
+    hdrHeight = _height;
 
-    // generate texture
     glGenTextures(1, &m_fboTexture);
     glBindTexture(GL_TEXTURE_2D, m_fboTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, hdrWidth, hdrHeight, 0, GL_RGB, GL_FLOAT, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, hdrWidth, hdrHeight, 0, GL_RGB, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+    glBindTexture(GL_TEXTURE_2D, 0);
     // attach it to currently bound framebuffer object
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fboTexture, 0);
-
-    glGenRenderbuffers(1, &m_rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_rbo); 
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, hdrWidth, hdrHeight);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_rbo);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);  
 
-    Vertex v0 = {normalize(glm::vec3(-1.0f,  1.0f, 0.0f)), glm::vec3(0), glm::vec2(0.f, 1.f), m_color};
-    Vertex v1 = {normalize(glm::vec3(-1.0f, -1.0f, 0.0f)), glm::vec3(0), glm::vec2(0.f, 0.f), m_color};
-    Vertex v2 = {normalize(glm::vec3(1.0f, -1.0f, 0.0f)), glm::vec3(0), glm::vec2(1.f, 0.f), m_color};
-    Vertex v3 = {normalize(glm::vec3(-1.0f, 1.0f, 0.0f)), glm::vec3(0), glm::vec2(0.f, 1.f), m_color};
-    Vertex v4 = {normalize(glm::vec3(1.0f, -1.0f, 0.0f)), glm::vec3(0), glm::vec2(1.f, 0.f), m_color};
-    Vertex v5 = {normalize(glm::vec3(1.0f, 1.0f, 0.0f)), glm::vec3(0), glm::vec2(1.f, 1.f), m_color};
+    glGenFramebuffers(1, &m_mipfbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_mipfbo);
+
+    glm::vec2 mipSize((float)hdrWidth, (float)hdrHeight);
+    glm::ivec2 mipIntSize((int)hdrWidth, (int)hdrHeight);
+    // Safety check
+    if (hdrWidth > (int)INT_MAX || hdrHeight > (int)INT_MAX) {
+        std::cerr << "Window size conversion overflow - cannot build bloom FBO!\n";
+    }
+
+    for(unsigned int i = 0; i < 6; i++){
+      BloomMip mip;
+
+      mipSize *= 0.5f;
+      mipIntSize /= 2;
+      mip.size = mipSize;
+      mip.intSize = mipIntSize;
+
+      // generate texture
+      glGenTextures(1, &mip.texture);
+      glBindTexture(GL_TEXTURE_2D, mip.texture);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, (int)mipSize.x, (int)mipSize.y, 0, GL_RGB, GL_FLOAT, NULL);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+      std::cout << "Created bloom mip " << mipIntSize.x << 'x' << mipIntSize.y << std::endl;
+      m_mipChain.emplace_back(mip);
+    }
+
+    // attach it to currently bound framebuffer object
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_mipChain[0].texture, 0);
+
+    glDrawBuffers(1, m_attachments);
+
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+      std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+
+    Vertex v0 = {glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 1.f), m_color};
+    Vertex v1 = {glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 0.f), m_color};
+    Vertex v2 = {glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(1.f, 0.f), m_color};
+    Vertex v3 = {glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 1.f), m_color};
+    Vertex v4 = {glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(1.f, 0.f), m_color};
+    Vertex v5 = {glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0), glm::vec2(1.f, 1.f), m_color};
     std::vector<Vertex> vertices = { v0, v1, v2, v3, v4, v5 };
     std::vector<unsigned int> indices = {
         0, 1, 2,   // First Triangle
         3, 4, 5    // Second Triangle
     };
+    
+
+    std::vector<Vertex> verticesObj;
+    std::vector<unsigned int> indicesObj;
+
+    addObjectsFromFile("/home/mafo/Downloads/uploads_files_3783485_OM.obj", verticesObj, indicesObj);
+
+    auto obj = new Mesh(verticesObj, indicesObj, GL_TRIANGLES);
+    auto ro = new RenderObject(obj, m_material);
+    m_renderer->addRenderObject(ro);
  
     m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
-
-    stbi_image_free(data);
 }
 
 BloomDemo::~BloomDemo() {
+    for (unsigned int i = 0; i < m_mipChain.size(); i++) {
+        glDeleteTextures(1, &m_mipChain[i].texture);
+        m_mipChain[i].texture = 0;
+    }
+    glDeleteFramebuffers(1, &m_fbo);
+    m_fbo = 0;
     delete m_renderer;
     for(auto& l : m_lights)
         delete l;
 }
 
 void BloomDemo::compute() {
-    m_materialQuad->getShader()->bind();
-    m_materialQuad->getShader()->setUniform1f("exposure", m_exposure);
-    m_materialQuad->getShader()->unbind();
+    m_programQuad->bind();
+    m_programQuad->setUniform1f("exposure", m_exposure);
+    m_programQuad->unbind();
 
-    m_materialTh->getShader()->bind();
-    m_materialTh->getShader()->setUniform1f("threshold", m_threshold);
-    m_materialTh->getShader()->unbind();
+    m_programTh->bind();
+    m_programTh->setUniform1f("threshold", m_threshold);
+    m_programTh->unbind();
 }
 
 void BloomDemo::resize(int width, int height){
@@ -190,27 +338,11 @@ void printmatrix(T * ptr) {
 }
 
 void BloomDemo::draw() {
-    OpenGLDemo::draw();
-
-    // first pass
-    //glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
-    //glEnable(GL_DEPTH_TEST);
-    //m_renderer->draw();	
-      
-    // second pass
-    glBindFramebuffer(GL_FRAMEBUFFER, 1); // back to default
-    glDisable(GL_DEPTH_TEST);
-    glClearColor(0.2f, 0.2f, 0.9f, 1.0f); 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
-
-    glBindTexture(GL_TEXTURE_2D, m_fboTexture);
-
-    m_renderer->draw(m_mesh, m_currentMaterial->getShader());
+    //OpenGLDemo::draw();
 
     /*** Compute new camera transform ***/
-    _model = glm::translate(glm::mat4(1.0), m_translation);
+    _model = glm::scale(glm::mat4(1.f), glm::vec3(0.28f));
+    _model = _model * glm::translate(glm::mat4(1.0), m_translation);
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 
@@ -228,6 +360,86 @@ void BloomDemo::draw() {
         m_renderer->setLightMVP(l->getModel(), _view, _projection , i);
         m_renderer->setLight(l, i);
     }
+
+    //glDrawBuffer(m_attachments[0]);
+    // first pass
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+    glEnable(GL_DEPTH_TEST);
+    m_renderer->draw();	
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_mipfbo);
+    glDisable(GL_DEPTH_TEST);
+
+    //glDrawBuffer(m_attachments[1]);
+    
+    m_programDown->bind();
+    m_programDown->setUniform1f("srcResolutionX", (float)_width);
+    m_programDown->setUniform1f("srcResolutionY", (float)_height);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_fboTexture);
+
+    for(int i = 0; i < (int)m_mipChain.size(); i++){
+        const BloomMip& mip = m_mipChain[i];
+        glViewport(0, 0, mip.size.x, mip.size.y);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_2D, mip.texture, 0);
+
+        // Render screen-filled quad of resolution of current mip
+        m_renderer->draw(m_mesh, m_programDown);
+
+        // Set current mip resolution as srcResolution for next iteration
+        m_programDown->bind();
+        m_programDown->setUniform1f("srcResolutionX", mip.size.x);
+        m_programDown->setUniform1f("srcResolutionY", mip.size.y);
+        glBindTexture(GL_TEXTURE_2D, mip.texture);
+        m_programDown->unbind();
+
+    }
+
+    m_programUp->bind();
+    m_programUp->setUniform1f("filterRadius", 0.005f);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
+
+    for (int i = (int)m_mipChain.size() - 1; i > 0; i--)
+    {
+        const BloomMip& mip = m_mipChain[i];
+        const BloomMip& nextMip = m_mipChain[i-1];
+
+        // Bind viewport and texture from where to read
+        m_programUp->bind();
+        glBindTexture(GL_TEXTURE_2D, mip.texture);
+        m_programUp->unbind();
+
+        // Set framebuffer render target (we write to this texture)
+        glViewport(0, 0, nextMip.size.x, nextMip.size.y);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_2D, nextMip.texture, 0);
+
+        m_renderer->draw(m_mesh, m_programUp);
+    }
+
+    // Disable additive blending
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // Restore if this was default
+    glDisable(GL_BLEND);
+
+    // second pass
+    glBindFramebuffer(GL_FRAMEBUFFER, 1); // back to default
+    glViewport(0,0, _width, _height);
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(0.9f, 0.2f, 0.2f, 1.0f); 
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    m_programQuad->bind();
+    //glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_mipChain[0].texture);
+    m_programQuad->unbind();
+    m_renderer->draw(m_mesh, m_programQuad);
 
 }
 
@@ -276,10 +488,10 @@ bool BloomDemo::keyboard(unsigned char k) {
             m_renderer->setMaterial(m_materialTexture);
             return true;
         case 'h' :
-            m_currentMaterial = m_materialTh;
+            m_currentBloomShader = m_programTh;
             return true;
         case 'q' :
-            m_currentMaterial = m_materialQuad;
+            m_currentBloomShader = m_programQuad;
             return true;
         default:
             return false;

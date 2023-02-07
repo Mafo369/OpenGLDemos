@@ -12,6 +12,13 @@
 #include <imgui.h>
 #include <vector>
 
+typedef struct s_BloomMip
+{
+    glm::vec2 size;
+    glm::ivec2 intSize;
+    unsigned int texture;
+}BloomMip;
+
 
 /** Simple drawing demonstration
  */
@@ -48,12 +55,21 @@ private:
     std::shared_ptr<Material> m_materialQuad;
     std::shared_ptr<Material> m_materialTh;
 
+    std::vector<BloomMip> m_mipChain;
 
     unsigned int m_fbo;
+    unsigned int m_mipfbo;
     unsigned int m_fboTexture;
     unsigned int m_quadVAO;
     unsigned int m_quadVBO;
     unsigned int m_rbo;
+    unsigned int m_attachments[1] = { GL_COLOR_ATTACHMENT0 };
+
+    Shader* m_programQuad;
+    Shader* m_programTh;
+    Shader* m_programDown;
+    Shader* m_programUp;
+    Shader* m_currentBloomShader;
 
     Mesh* m_mesh;
     Shader* m_program;

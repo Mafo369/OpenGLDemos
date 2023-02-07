@@ -10,6 +10,10 @@
 #include <imgui.h>
 #include "Geometry/Light.h"
 
+#include "../libs/tiny_obj_loader.h"
+
+void readObjToTriangleMesh(const char *file, tinyobj::attrib_t &attrib, std::vector<tinyobj::shape_t> &shapes, std::vector<tinyobj::material_t> &materials);
+
 /** Simple class for managing an OpenGL demo
  */
 class OpenGLDemo : public QOpenGLFunctions_4_1_Core {

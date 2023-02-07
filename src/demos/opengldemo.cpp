@@ -1,3 +1,5 @@
+
+#define TINYOBJLOADER_IMPLEMENTATION
 #include "opengldemo.h"
 #include <iostream>
 
@@ -56,3 +58,21 @@ void OpenGLDemo::toggledrawmode() {
     _drawfill = !_drawfill;
 }
 
+
+// https://github.com/tinyobjloader/tinyobjloader
+void readObjToTriangleMesh( const char* file,
+                            tinyobj::attrib_t& attrib,
+                            std::vector<tinyobj::shape_t>& shapes,
+                            std::vector<tinyobj::material_t>& materials ) {
+    std::string inputfile = file;
+    std::string err, warn;
+
+    bool ret =
+        tinyobj::LoadObj( &attrib, &shapes, &materials, &warn,&err, inputfile.c_str(), "../assets/" );
+
+    if ( !err.empty() ) { std::cout << err << std::endl; }
+
+    if ( !ret ) exit( 1 );
+
+    std::cout << "Model vertices: " << attrib.vertices.size() << std::endl;
+}
