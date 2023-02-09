@@ -15,6 +15,13 @@ Mesh::~Mesh(){
     delete m_vbo;
 }
 
+void Mesh::setColor(const glm::vec4& color){
+  for(auto& v : m_vertices){
+    v.m_color = color;
+  }
+  setupMesh(GL_TRIANGLES);
+}
+
 void Mesh::setupMesh(unsigned int mode){
     m_vao = new VertexArray();
     m_vao->bind();

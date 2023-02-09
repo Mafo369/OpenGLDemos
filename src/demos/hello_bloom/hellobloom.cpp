@@ -97,7 +97,7 @@ void addObjectsFromFile( const char* filename, std::vector<Vertex>& vector, std:
 
 BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     /*** Initialise geometric data ***/
-    m_color = glm::vec4(1.0f, 0.5f, 0.2f, 1.f);
+    m_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.f);
 
     /*** Initialise renderer ***/
     m_renderer = new Renderer();
@@ -121,6 +121,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Parametric.frag.glsl");
     Shader* programTexture = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
+    Shader* programBasic = 
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/Basic.frag.glsl");
 
     m_programQuad = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Quad.frag.glsl");
@@ -133,13 +135,13 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     m_programQuad->bind();
     m_programQuad->setUniform1i("screenTexture", 0);
-    m_programQuad->setUniform1i("exposure", m_exposure);
+    m_programQuad->setUniform1f("exposure", m_exposure);
     m_programQuad->unbind();
 
-    m_programTh->bind();
-    m_programTh->setUniform1i("screenTexture", 0);
-    m_programTh->setUniform1i("threshold", m_threshold);
-    m_programTh->unbind();
+    //m_programTh->bind();
+    //m_programTh->setUniform1i("screenTexture", 0);
+    //m_programTh->setUniform1i("threshold", m_threshold);
+    //m_programTh->unbind();
 
     m_programDown->bind();
     m_programDown->setUniform1i("srcTexture", 0);
@@ -156,6 +158,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     matParams.metallic = 0.6;
     matParams.roughness = 0.6;
     m_material = std::make_shared<Material>(program, matParams);
+    m_materialBasic = std::make_shared<Material>(programBasic, matParams);
     m_materialModified = std::make_shared<Material>(programModified, matParams);
     m_materialLambert = std::make_shared<Material>(programLambert);
     m_materialNormal = std::make_shared<Material>(programNormal);
@@ -166,7 +169,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_currentBloomShader = m_programQuad;
     
     // Render objects
-    compute();
+    //compute();
     m_first = false;
 
     /*** Create Camera ***/
@@ -226,6 +229,12 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glBindTexture(GL_TEXTURE_2D, 0);
     // attach it to currently bound framebuffer object
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fboTexture, 0);
+    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, hdrWidth, hdrHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
@@ -272,6 +281,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);  
 
+    m_currentFbo = m_fboTexture;
+
     Vertex v0 = {glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 1.f), m_color};
     Vertex v1 = {glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 0.f), m_color};
     Vertex v2 = {glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(1.f, 0.f), m_color};
@@ -291,10 +302,26 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     addObjectsFromFile("/home/mafo/Downloads/uploads_files_3783485_OM.obj", verticesObj, indicesObj);
 
     auto obj = new Mesh(verticesObj, indicesObj, GL_TRIANGLES);
-    auto ro = new RenderObject(obj, m_material);
-    m_renderer->addRenderObject(ro);
+    m_currentRo = new RenderObject(obj, m_material);
+    m_renderer->addRenderObject(m_currentRo);
  
     m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
+
+    //glm::vec4 planeColor = {0.5,0.5,0.5,1};
+    //Vertex v0P = {glm::vec3(-5., -1.2f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    //Vertex v1P = {glm::vec3(-5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
+    //Vertex v2P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    //Vertex v3P = {glm::vec3(-5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    //Vertex v4P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    //Vertex v5P = {glm::vec3(5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
+    //std::vector<Vertex> verticesPlane = { v0P, v1P, v2P, v3P, v4P, v5P };
+    //std::vector<unsigned int> indicesPlane = {
+    //    0, 1, 2,   // First Triangle
+    //    3, 4, 5    // Second Triangle
+    //};
+    //auto planeMesh = new Mesh(verticesPlane, indicesPlane, GL_TRIANGLES);
+    //auto planeRo = new RenderObject(planeMesh, m_material);
+    //m_renderer->addRenderObject(planeRo);
 }
 
 BloomDemo::~BloomDemo() {
@@ -317,6 +344,8 @@ void BloomDemo::compute() {
     m_programTh->bind();
     m_programTh->setUniform1f("threshold", m_threshold);
     m_programTh->unbind();
+
+    m_currentRo->getMesh()->setColor(m_color);
 }
 
 void BloomDemo::resize(int width, int height){
@@ -338,7 +367,7 @@ void printmatrix(T * ptr) {
 }
 
 void BloomDemo::draw() {
-    //OpenGLDemo::draw();
+    OpenGLDemo::draw();
 
     /*** Compute new camera transform ***/
     _model = glm::scale(glm::mat4(1.f), glm::vec3(0.28f));
@@ -361,16 +390,20 @@ void BloomDemo::draw() {
         m_renderer->setLight(l, i);
     }
 
-    //glDrawBuffer(m_attachments[0]);
     // first pass
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
     glEnable(GL_DEPTH_TEST);
+    if (_drawfill)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     m_renderer->draw();	
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_mipfbo);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_DEPTH_TEST);
 
     //glDrawBuffer(m_attachments[1]);
@@ -437,7 +470,8 @@ void BloomDemo::draw() {
 
     m_programQuad->bind();
     //glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_mipChain[0].texture);
+    //glBindTexture(GL_TEXTURE_2D, m_mipChain[0].texture);
+    glBindTexture(GL_TEXTURE_2D, m_currentFbo);
     m_programQuad->unbind();
     m_renderer->draw(m_mesh, m_programQuad);
 
@@ -486,6 +520,15 @@ bool BloomDemo::keyboard(unsigned char k) {
             return true;
         case 't' :
             m_renderer->setMaterial(m_materialTexture);
+            return true;
+        case 'b' :
+            m_renderer->setMaterial(m_materialBasic);
+            return true;
+        case 'a' :
+            if(m_currentFbo == m_fboTexture)
+              m_currentFbo = m_mipChain[0].texture;
+            else
+              m_currentFbo = m_fboTexture;
             return true;
         case 'h' :
             m_currentBloomShader = m_programTh;

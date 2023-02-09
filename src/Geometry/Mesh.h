@@ -32,6 +32,7 @@ public:
 
     void setVertices(std::vector<Vertex> vertices) { m_vertices = vertices; }
     void setIndices(std::vector<unsigned int> indices) { m_indices = indices; }
+    void setColor(const glm::vec4& color);
 private:
     VertexArray* m_vao;
     VertexBuffer* m_vbo;

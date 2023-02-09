@@ -47,6 +47,7 @@ public:
 private:
     // Shader program for rendering
     std::shared_ptr<Material> m_material;
+    std::shared_ptr<Material> m_materialBasic;
     std::shared_ptr<Material> m_materialModified;
     std::shared_ptr<Material> m_materialLambert;
     std::shared_ptr<Material> m_materialNormal;
@@ -60,6 +61,7 @@ private:
     unsigned int m_fbo;
     unsigned int m_mipfbo;
     unsigned int m_fboTexture;
+    unsigned int m_currentFbo;
     unsigned int m_quadVAO;
     unsigned int m_quadVBO;
     unsigned int m_rbo;
@@ -74,6 +76,7 @@ private:
     Mesh* m_mesh;
     Shader* m_program;
     Renderer* m_renderer;
+    RenderObject* m_currentRo;
     bool m_first = true;
     bool m_displayCtrlPts = false;
 

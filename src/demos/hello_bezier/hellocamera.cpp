@@ -172,6 +172,21 @@ void SimpleCamera::compute() {
     m_renderer->addRenderObject(ro);
     if(m_displayCtrlPts)
         m_renderer->addRenderObject(roCPM);
+    glm::vec4 planeColor = {0.5,0.5,0.5,1};
+    Vertex v0P = {glm::vec3(-5., -2.f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    Vertex v1P = {glm::vec3(-5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
+    Vertex v2P = {glm::vec3(5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    Vertex v3P = {glm::vec3(-5., -2.f, 5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    Vertex v4P = {glm::vec3(5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    Vertex v5P = {glm::vec3(5., -2.f, 5.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
+    std::vector<Vertex> verticesPlane = { v0P, v1P, v2P, v3P, v4P, v5P };
+    std::vector<unsigned int> indicesPlane = {
+        0, 1, 2,   // First Triangle
+        3, 4, 5    // Second Triangle
+    };
+    auto planeMesh = new Mesh(verticesPlane, indicesPlane, GL_TRIANGLES);
+    auto planeRo = new RenderObject(planeMesh, m_material);
+    m_renderer->addRenderObject(planeRo);
 }
 
 void SimpleCamera::resize(int width, int height){

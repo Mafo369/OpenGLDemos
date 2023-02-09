@@ -110,6 +110,11 @@ void MyOpenGLWidget::paintGL() {
             }
         }
         if ( auto demo = dynamic_cast<BloomDemo*>( _openglDemo.get() ) ) {
+            ImGui::Text("Surface:");
+            auto& color = _openglDemo->getColor();
+            if(ImGui::DragFloat3("surface color", (float*)glm::value_ptr(color), 0.01, 0, 200)){
+                _openglDemo->compute();
+            }
             if(ImGui::SliderFloat("exposure", &demo->m_exposure, 0, 20)){
               _openglDemo->compute();
             }

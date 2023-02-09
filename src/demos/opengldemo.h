@@ -53,10 +53,10 @@ protected:
     std::vector<std::vector<glm::vec3>> m_controlPoints;
     std::vector<Light*> m_lights;
     std::shared_ptr<Material> m_currentMaterial;
+    bool _drawfill;
 
 private:
     // Rendering mode (true is filled, false is wireframed
-    bool _drawfill;
 };
 
 
