@@ -97,7 +97,7 @@ void addObjectsFromFile( const char* filename, std::vector<Vertex>& vector, std:
 
 BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     /*** Initialise geometric data ***/
-    m_color = glm::vec4(1.0f, 0.0f, 0.0f, 1.f);
+    m_color = glm::vec4(120.0f, 0.1f, 0.1f, 1.f);
 
     /*** Initialise renderer ***/
     m_renderer = new Renderer();
@@ -135,13 +135,14 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     m_programQuad->bind();
     m_programQuad->setUniform1i("screenTexture", 0);
+    m_programQuad->setUniform1i("origTexture", 1);
     m_programQuad->setUniform1f("exposure", m_exposure);
     m_programQuad->unbind();
 
-    //m_programTh->bind();
-    //m_programTh->setUniform1i("screenTexture", 0);
-    //m_programTh->setUniform1i("threshold", m_threshold);
-    //m_programTh->unbind();
+    m_programTh->bind();
+    m_programTh->setUniform1i("screenTexture", 0);
+    m_programTh->setUniform1i("threshold", m_threshold);
+    m_programTh->unbind();
 
     m_programDown->bind();
     m_programDown->setUniform1i("srcTexture", 0);
@@ -225,10 +226,24 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
     glBindTexture(GL_TEXTURE_2D, 0);
+
     // attach it to currently bound framebuffer object
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fboTexture, 0);
+
+    glGenTextures(1, &m_fboThTexture);
+    glBindTexture(GL_TEXTURE_2D, m_fboThTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, hdrWidth, hdrHeight, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // attach it to currently bound framebuffer object
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_fboThTexture, 0);
+
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
@@ -275,7 +290,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     // attach it to currently bound framebuffer object
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_mipChain[0].texture, 0);
 
-    glDrawBuffers(1, m_attachments);
+    //glDrawBuffers(1, m_attachments);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
@@ -307,21 +322,21 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
  
     m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
 
-    //glm::vec4 planeColor = {0.5,0.5,0.5,1};
-    //Vertex v0P = {glm::vec3(-5., -1.2f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    //Vertex v1P = {glm::vec3(-5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
-    //Vertex v2P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    //Vertex v3P = {glm::vec3(-5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    //Vertex v4P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    //Vertex v5P = {glm::vec3(5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
-    //std::vector<Vertex> verticesPlane = { v0P, v1P, v2P, v3P, v4P, v5P };
-    //std::vector<unsigned int> indicesPlane = {
-    //    0, 1, 2,   // First Triangle
-    //    3, 4, 5    // Second Triangle
-    //};
-    //auto planeMesh = new Mesh(verticesPlane, indicesPlane, GL_TRIANGLES);
-    //auto planeRo = new RenderObject(planeMesh, m_material);
-    //m_renderer->addRenderObject(planeRo);
+    glm::vec4 planeColor = {0.5,0.5,0.5,1};
+    Vertex v0P = {glm::vec3(-5., -1.2f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    Vertex v1P = {glm::vec3(-5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
+    Vertex v2P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    Vertex v3P = {glm::vec3(-5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    Vertex v4P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    Vertex v5P = {glm::vec3(5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
+    std::vector<Vertex> verticesPlane = { v0P, v1P, v2P, v3P, v4P, v5P };
+    std::vector<unsigned int> indicesPlane = {
+        0, 1, 2,   // First Triangle
+        3, 4, 5    // Second Triangle
+    };
+    auto planeMesh = new Mesh(verticesPlane, indicesPlane, GL_TRIANGLES);
+    auto planeRo = new RenderObject(planeMesh, m_material);
+    m_renderer->addRenderObject(planeRo);
 }
 
 BloomDemo::~BloomDemo() {
@@ -393,6 +408,7 @@ void BloomDemo::draw() {
     // first pass
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
+    glDrawBuffers(2, m_attachments);
     glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
     glEnable(GL_DEPTH_TEST);
@@ -402,17 +418,25 @@ void BloomDemo::draw() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     m_renderer->draw();	
 
+    //glDrawBuffer(GL_COLOR_ATTACHMENT1);
+
+    m_programTh->bind();
+    //glActiveTexture(GL_TEXTURE0);
+    m_programTh->setUniform1f("threshold", m_threshold);
+    glBindTexture(GL_TEXTURE_2D, m_fboTexture);
+    m_renderer->draw(m_mesh, m_programTh);
+    m_programTh->unbind();
+
     glBindFramebuffer(GL_FRAMEBUFFER, m_mipfbo);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_DEPTH_TEST);
 
-    //glDrawBuffer(m_attachments[1]);
     
     m_programDown->bind();
     m_programDown->setUniform1f("srcResolutionX", (float)_width);
     m_programDown->setUniform1f("srcResolutionY", (float)_height);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_fboTexture);
+    glBindTexture(GL_TEXTURE_2D, m_fboThTexture);
 
     for(int i = 0; i < (int)m_mipChain.size(); i++){
         const BloomMip& mip = m_mipChain[i];
@@ -430,7 +454,6 @@ void BloomDemo::draw() {
         m_programDown->setUniform1f("srcResolutionY", mip.size.y);
         glBindTexture(GL_TEXTURE_2D, mip.texture);
         m_programDown->unbind();
-
     }
 
     m_programUp->bind();
@@ -462,16 +485,17 @@ void BloomDemo::draw() {
     glDisable(GL_BLEND);
 
     // second pass
-    glBindFramebuffer(GL_FRAMEBUFFER, 1); // back to default
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
     glViewport(0,0, _width, _height);
     glDisable(GL_DEPTH_TEST);
     glClearColor(0.9f, 0.2f, 0.2f, 1.0f); 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     m_programQuad->bind();
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, m_mipChain[0].texture);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_currentFbo);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_fboTexture);
     m_programQuad->unbind();
     m_renderer->draw(m_mesh, m_programQuad);
 
