@@ -42,7 +42,7 @@ public:
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
 
     float m_exposure = 5.0f;
-    float m_threshold = 1.0f;
+    float m_threshold = 0.5f;
 
 private:
     // Shader program for rendering
@@ -61,11 +61,12 @@ private:
     unsigned int m_fbo;
     unsigned int m_mipfbo;
     unsigned int m_fboTexture;
+    unsigned int m_fboThTexture;
     unsigned int m_currentFbo;
     unsigned int m_quadVAO;
     unsigned int m_quadVBO;
     unsigned int m_rbo;
-    unsigned int m_attachments[1] = { GL_COLOR_ATTACHMENT0 };
+    unsigned int m_attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
     Shader* m_programQuad;
     Shader* m_programTh;
