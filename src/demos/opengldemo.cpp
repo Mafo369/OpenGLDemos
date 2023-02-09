@@ -25,7 +25,7 @@ void OpenGLDemo::resize(int width, int height) {
 
 void OpenGLDemo::draw() {
     glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, m_clearColor.w);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
     if (_drawfill)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

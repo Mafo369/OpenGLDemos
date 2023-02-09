@@ -41,8 +41,8 @@ public:
     glm::vec4& getColor() override { return m_color; }
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
 
-    float m_exposure = 5.0f;
-    float m_threshold = 0.5f;
+    float m_exposure = 1.0f;
+    float m_threshold = 0.1f;
 
 private:
     // Shader program for rendering
@@ -62,7 +62,6 @@ private:
     unsigned int m_mipfbo;
     unsigned int m_fboTexture;
     unsigned int m_fboThTexture;
-    unsigned int m_currentFbo;
     unsigned int m_quadVAO;
     unsigned int m_quadVBO;
     unsigned int m_rbo;
@@ -72,7 +71,6 @@ private:
     Shader* m_programTh;
     Shader* m_programDown;
     Shader* m_programUp;
-    Shader* m_currentBloomShader;
 
     Mesh* m_mesh;
     Shader* m_program;

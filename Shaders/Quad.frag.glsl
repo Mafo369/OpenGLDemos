@@ -5,6 +5,7 @@ in vec4 out_position;
 in vec3 out_normal;
 in vec2 out_texCoords;
 in vec4 out_color;
+
 uniform sampler2D screenTexture;
 uniform sampler2D origTexture;
 uniform float exposure;
@@ -13,7 +14,7 @@ void main()
 { 
     const float gamma = 2.2;
     vec3 hdrColor = texture(screenTexture, out_texCoords).rgb;
-    //hdrColor = hdrColor + texture(origTexture, out_texCoords).rgb;
+    hdrColor = hdrColor + texture(origTexture, out_texCoords).rgb;
   
     // exposure tone mapping
     vec3 mapped = vec3(1.0) - exp(-hdrColor * exposure);
