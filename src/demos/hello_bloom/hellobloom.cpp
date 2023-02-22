@@ -102,6 +102,31 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
     Shader* programBasic = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Basic.frag.glsl");
+    m_programCube =
+        new Shader("Shaders/Cubemap.vert.glsl", "Shaders/Cubemap.frag.glsl");
+    m_programBg =
+        new Shader("Shaders/Background.vert.glsl", "Shaders/Background.frag.glsl");
+
+    stbi_set_flip_vertically_on_load(true);
+    int cmWidth, cmHeight, nrComponents;
+    float *data = stbi_loadf("/home/mafo/dev/Raytracer/assets/Alexs_Apt_2k.hdr", &cmWidth, &cmHeight, &nrComponents, 0);
+    if (data)
+    {
+        glGenTextures(1, &m_CMTexture);
+        glBindTexture(GL_TEXTURE_2D, m_CMTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, cmWidth, cmHeight, 0, GL_RGB, GL_FLOAT, data); 
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Failed to load HDR image." << std::endl;
+    }  
 
     m_programQuad = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Quad.frag.glsl");
@@ -130,6 +155,14 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_programUp->bind();
     m_programUp->setUniform1i("srcTexture", 0);
     m_programUp->unbind();
+
+    m_programCube->bind();
+    m_programCube->setUniform1i("equirectangularMap", 0);
+    m_programCube->unbind();
+
+    m_programBg->bind();
+    m_programBg->setUniform1i("environmentMap", 0);
+    m_programBg->unbind();
 
     // Materials
     MaterialParams matParams;
@@ -273,18 +306,69 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         0, 1, 2,   // First Triangle
         3, 4, 5    // Second Triangle
     };
-    
 
     std::vector<Vertex> verticesObj;
     std::vector<unsigned int> indicesObj;
 
-    addObjectsFromFile("/home/mafo/Downloads/uploads_files_3783485_OM.obj", verticesObj, indicesObj, m_color);
+    //addObjectsFromFile("/home/mafo/Downloads/uploads_files_3783485_OM.obj", verticesObj, indicesObj, m_color);
+    addObjectsFromFile("/home/mafo/dev/Raytracer/assets/Suzanne.obj", verticesObj, indicesObj, m_color);
 
     auto obj = new Mesh(verticesObj, indicesObj, GL_TRIANGLES);
     m_currentRo = new RenderObject(obj, m_materialBasic);
     m_renderer->addRenderObject(m_currentRo);
  
     m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
+
+    glm::vec4 cubeColor = {0.1,0.1,0.1,1};
+    std::vector<Vertex> verticesCube = {
+        // back face
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
+      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
+      {    { 1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right         
+      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
+      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
+          // front face                                       
+      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
+      {    { 1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right
+      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
+      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
+      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
+      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
+          // left face                                      
+      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-right
+      {    {-1.0f,  1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-left
+      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-left
+      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-left
+      {    {-1.0f, -1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-right
+      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-right
+          // right face                                     
+      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-left
+      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-right
+      {     {1.0f,  1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-right         
+      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-right
+      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-left
+      {     {1.0f, -1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left     
+          // bottom face                                   
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-right
+      {    { 1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-left
+      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-left
+      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-left
+      {    {-1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-right
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-right
+          // top face                                     
+      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
+      {    { 1.0f,  1.0f , 1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right
+      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-right     
+      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right
+      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
+      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}  // bottom-left        
+    };  
+    std::vector<unsigned int> indicesCube;
+    for(int i = 0; i < 6*6; i++){
+      indicesCube.push_back(i);
+    }
+    m_cubeMesh = new Mesh(verticesCube, indicesCube, GL_TRIANGLES);
 
     glm::vec4 planeColor = {0.1,0.1,0.1,1};
     Vertex v0P = {glm::vec3(-5., -1.2f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
@@ -301,6 +385,59 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     auto planeMesh = new Mesh(verticesPlane, indicesPlane, GL_TRIANGLES);
     auto planeRo = new RenderObject(planeMesh, m_material);
     m_renderer->addRenderObject(planeRo);
+
+    glGenFramebuffers(1, &captureFBO);
+    glGenRenderbuffers(1, &captureRBO);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);   
+
+    glGenTextures(1, &envCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+        // note that we store each face with 16 bit floating point values
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 
+                     512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+    glm::mat4 captureViews[] = 
+    {
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
+       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+    };
+
+    // convert HDR equirectangular environment map to cubemap equivalent
+    m_programCube->bind();
+    m_programCube->setUniform1i("equirectangularMap", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_CMTexture);
+
+    glViewport(0, 0, 512, 512); // don't forget to configure the viewport to the capture dimensions.
+    glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+    for (unsigned int i = 0; i < 6; ++i)
+    {
+        m_programCube->setMVP(glm::mat4(1.f), captureViews[i], captureProjection);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
+                               GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        m_renderer->draw(m_cubeMesh, m_programCube);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 }
 
 BloomDemo::~BloomDemo() {
@@ -376,11 +513,18 @@ void BloomDemo::draw() {
     glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
     if (_drawfill)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     m_renderer->draw();	
+    m_programBg->bind();
+    m_programBg->setMVP(_model, _view, _projection);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    m_renderer->draw(m_cubeMesh, m_programBg);
 
     glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
@@ -444,7 +588,7 @@ void BloomDemo::draw() {
     }
 
     // Disable additive blending
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // Restore if this was default
+    //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // Restore if this was default
     glDisable(GL_BLEND);
 
     // second pass

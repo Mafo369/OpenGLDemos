@@ -118,7 +118,7 @@ void MyOpenGLWidget::paintGL() {
             if(ImGui::SliderFloat("exposure", &demo->m_exposure, 0, 20)){
               _openglDemo->compute();
             }
-            if(ImGui::SliderFloat("threshold", &demo->m_threshold, 0, 20)){
+            if(ImGui::SliderFloat("threshold", &demo->m_threshold, 0, 100)){
               _openglDemo->compute();
             }
         }

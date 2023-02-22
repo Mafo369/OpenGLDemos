@@ -41,8 +41,8 @@ public:
     glm::vec4& getColor() override { return m_color; }
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
 
-    float m_exposure = 1.0f;
-    float m_threshold = 0.1f;
+    float m_exposure = 0.358f;
+    float m_threshold = 0.717f;
 
 private:
     // Shader program for rendering
@@ -67,12 +67,20 @@ private:
     unsigned int m_rbo;
     unsigned int m_attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
+    unsigned int m_CMTexture;
+
+    unsigned int captureFBO, captureRBO;
+    unsigned int envCubemap;
+
     Shader* m_programQuad;
     Shader* m_programTh;
     Shader* m_programDown;
     Shader* m_programUp;
+    Shader* m_programCube;
+    Shader* m_programBg;
 
     Mesh* m_mesh;
+    Mesh* m_cubeMesh;
     Shader* m_program;
     Renderer* m_renderer;
     RenderObject* m_currentRo;
