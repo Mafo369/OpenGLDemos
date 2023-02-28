@@ -391,7 +391,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cmWidth, cmWidth);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);   
 
     glGenTextures(1, &envCubemap);
@@ -400,7 +400,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     {
         // note that we store each face with 16 bit floating point values
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 
-                     512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+                     cmWidth, cmWidth, 0, GL_RGB, GL_FLOAT, nullptr);
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -425,7 +425,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_CMTexture);
 
-    glViewport(0, 0, 512, 512); // don't forget to configure the viewport to the capture dimensions.
+    glViewport(0, 0, cmWidth, cmWidth); // don't forget to configure the viewport to the capture dimensions.
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     for (unsigned int i = 0; i < 6; ++i)
     {
