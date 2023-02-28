@@ -23,6 +23,7 @@ private:
 public:
     // constructor reads and builds the shader
     Shader(const std::string& vertexFilepath, const std::string& fragmentFilepath); 
+    Shader(const std::string& vertexFilepath, const std::string& fragmentFilepath, const std::string& geometryFilepath); 
     ~Shader();
 
     void bind() const;
@@ -43,6 +44,7 @@ private:
     ShaderProgramSource parseShader(const std::string& vertexFilepath, const std::string& fragmentFilepath);
     unsigned int compileShader(unsigned int type, const std::string& source);
     unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader);
+    unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader);
     int getUniformLocation(const std::string& name);
 };
 

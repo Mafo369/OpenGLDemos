@@ -110,6 +110,10 @@ void MyOpenGLWidget::paintGL() {
             }
         }
         if ( auto demo = dynamic_cast<BloomDemo*>( _openglDemo.get() ) ) {
+            ImGui::Text("Light Direction:");
+            if(ImGui::SliderFloat3("light dir", glm::value_ptr(demo->lightDir), -10.f, 10.0)){
+                _openglDemo->compute();
+            }
             ImGui::Text("Surface:");
             auto& color = _openglDemo->getColor();
             if(ImGui::DragFloat3("surface color", (float*)glm::value_ptr(color), 0.01, 0, 200)){

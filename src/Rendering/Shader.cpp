@@ -12,6 +12,16 @@ Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFil
     m_rendererId = createShader( source.vertexSource, source.fragmentSource );
 }
 
+Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFilepath, const std::string& geometryFilepath) 
+{
+    ShaderProgramSource source = parseShader(vertexFilepath, fragmentFilepath);
+    if(source.vertexSource.empty())
+        std::cout << "Error: Invalid vertex shader!" << vertexFilepath << std::endl;
+    if(source.fragmentSource.empty())
+        std::cout << "Error: Invalid fragment shader!" << fragmentFilepath << std::endl;
+    m_rendererId = createShader( source.vertexSource, source.fragmentSource, readShader(geometryFilepath).str() );
+}
+
 Shader::~Shader(){
     glAssert(glDeleteProgram(m_rendererId));
 }
@@ -143,6 +153,37 @@ unsigned int Shader::createShader(const std::string& vertexShader, const std::st
 
     glAssert(glDeleteShader(vs));
     glAssert(glDeleteShader(fs));
+
+    return program;
+}
+
+unsigned int Shader::createShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader){
+    glAssert(unsigned int program = glCreateProgram());
+    unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
+    unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
+    unsigned int gs = compileShader(GL_GEOMETRY_SHADER, geometryShader);
+
+    glAssert(glAttachShader(program, vs));
+    glAssert(glAttachShader(program, fs));
+    glAssert(glAttachShader(program, gs));
+    glAssert(glLinkProgram(program));
+    int result;
+    glAssert(glGetProgramiv(program, GL_LINK_STATUS, &result));
+    if(result == GL_FALSE){
+        int length;
+        glAssert(glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length));
+        char* msg = (char*)alloca(length * sizeof(char));
+        glAssert(glGetProgramInfoLog(program, length, &length, msg));
+        std::cout << "Failed to link program!" << std::endl;
+        std::cout << msg << std::endl;
+        glDeleteProgram(program);
+        return 0;
+    }
+    glAssert(glValidateProgram(program));
+
+    glAssert(glDeleteShader(vs));
+    glAssert(glDeleteShader(fs));
+    glAssert(glDeleteShader(gs));
 
     return program;
 }

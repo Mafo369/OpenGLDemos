@@ -22,6 +22,7 @@
 
 #define deg2rad(x) float(M_PI)*(x)/180.f
 
+
 void addObjectsFromFile( const char* filename, std::vector<Vertex>& vector, std::vector<unsigned int>& indices, glm::vec4 color ) {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -74,9 +75,112 @@ void addObjectsFromFile( const char* filename, std::vector<Vertex>& vector, std:
     }
 }
 
+std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview)
+{
+    const auto inv = glm::inverse(projview);
+
+    std::vector<glm::vec4> frustumCorners;
+    for (unsigned int x = 0; x < 2; ++x)
+    {
+        for (unsigned int y = 0; y < 2; ++y)
+        {
+            for (unsigned int z = 0; z < 2; ++z)
+            {
+                const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+                frustumCorners.push_back(pt / pt.w);
+            }
+        }
+    }
+
+    return frustumCorners;
+}
+
+std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
+{
+    return getFrustumCornersWorldSpace(proj * view);
+}
+
+glm::mat4 getLightSpaceMatrix(Camera* camera, const float nearPlane, const float farPlane, float width, float height, glm::vec3 lightDir)
+{
+    const auto proj = glm::perspective(
+        glm::radians(camera->zoom()), width / height, nearPlane,
+        farPlane);
+    const auto corners = getFrustumCornersWorldSpace(proj, camera->viewmatrix());
+
+    glm::vec3 center = glm::vec3(0, 0, 0);
+    for (const auto& v : corners)
+    {
+        center += glm::vec3(v);
+    }
+    center /= corners.size();
+
+    const auto lightView = glm::lookAt(center + lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::lowest();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::lowest();
+    float minZ = std::numeric_limits<float>::max();
+    float maxZ = std::numeric_limits<float>::lowest();
+    for (const auto& v : corners)
+    {
+        const auto trf = lightView * v;
+        minX = std::min(minX, trf.x);
+        maxX = std::max(maxX, trf.x);
+        minY = std::min(minY, trf.y);
+        maxY = std::max(maxY, trf.y);
+        minZ = std::min(minZ, trf.z);
+        maxZ = std::max(maxZ, trf.z);
+    }
+
+    // Tune this parameter according to the scene
+    constexpr float zMult = 10.0f;
+    if (minZ < 0)
+    {
+        minZ *= zMult;
+    }
+    else
+    {
+        minZ /= zMult;
+    }
+    if (maxZ < 0)
+    {
+        maxZ /= zMult;
+    }
+    else
+    {
+        maxZ *= zMult;
+    }
+
+    const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+
+    return lightProjection * lightView;
+}
+
+std::vector<glm::mat4> getLightSpaceMatrices(Camera* camera, std::vector<float>& shadowCascadeLevels, float nearPlane, float farPlane, float width, float height, glm::vec3 lightDir)
+{
+    std::vector<glm::mat4> ret;
+    for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
+    {
+        if (i == 0)
+        {
+            ret.push_back(getLightSpaceMatrix(camera, nearPlane, shadowCascadeLevels[i], width, height, lightDir));
+        }
+        else if (i < shadowCascadeLevels.size())
+        {
+            ret.push_back(getLightSpaceMatrix(camera, shadowCascadeLevels[i - 1], shadowCascadeLevels[i], width, height, lightDir));
+        }
+        else
+        {
+            ret.push_back(getLightSpaceMatrix(camera, shadowCascadeLevels[i - 1], farPlane, width, height, lightDir));
+        }
+    }
+    return ret;
+}
+
 BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     /*** Initialise geometric data ***/
-    m_color = glm::vec4(120.0f, 0.3f, 0.3f, 1.f);
+    m_color = glm::vec4(20.0f, 0.3f, 0.3f, 1.f);
 
     /*** Initialise renderer ***/
     m_renderer = new Renderer();
@@ -89,7 +193,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     
     // Shaders
     Shader* program = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/Microfacet.frag.glsl");
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/ShadowMapTest.frag.glsl");
     Shader* programModified = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetModified.frag.glsl");
     Shader* programLambert = 
@@ -137,6 +241,9 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_programUp = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Upsample.frag.glsl");
 
+    m_programDepth = 
+        new Shader("Shaders/ShadowMap.vert.glsl", "Shaders/ShadowMap.frag.glsl", "Shaders/ShadowMap.geom.glsl");
+
     m_programQuad->bind();
     m_programQuad->setUniform1i("screenTexture", 0);
     m_programQuad->setUniform1i("origTexture", 1);
@@ -171,6 +278,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     matParams.metallic = 0.6;
     matParams.roughness = 0.6;
     m_material = std::make_shared<Material>(program, matParams);
+    m_materialDepth = std::make_shared<Material>(m_programDepth, matParams);
     m_materialBasic = std::make_shared<Material>(programBasic, matParams);
     m_materialModified = std::make_shared<Material>(programModified, matParams);
     m_materialLambert = std::make_shared<Material>(programLambert);
@@ -188,8 +296,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     _camera.reset(_cameraselector[_activecamera]());
     _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
     _view = _camera->viewmatrix();
-    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.0f, 1.0f);
-    _model = glm::translate(glm::mat4(1.0), m_translation);
+    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, cameraNearPlane, cameraFarPlane);
 
     /*** Create lights ***/
     LightParams lightParams;
@@ -315,11 +422,13 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     auto obj = new Mesh(verticesObj, indicesObj, GL_TRIANGLES);
     m_currentRo = new RenderObject(obj, m_materialBasic);
+    auto monkeyTransform = glm::scale(glm::mat4(1.f), glm::vec3(0.28f));
+    m_currentRo->setTransform(monkeyTransform);
     m_renderer->addRenderObject(m_currentRo);
  
     m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
 
-    glm::vec4 cubeColor = {0.1,0.1,0.1,1};
+    glm::vec4 cubeColor = {0.1,0.1,0.8,1};
     std::vector<Vertex> verticesCube = {
         // back face
       {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
@@ -370,13 +479,18 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     }
     m_cubeMesh = new Mesh(verticesCube, indicesCube, GL_TRIANGLES);
 
+    auto cubeRo = new RenderObject(m_cubeMesh, m_material);
+    auto cubeT = glm::scale(glm::mat4(1.f), glm::vec3(0.8f)) * glm::translate(glm::mat4(1.f), glm::vec3(3, 1, -1));
+    cubeRo->setTransform(cubeT);
+    m_renderer->addRenderObject(cubeRo);
+
     glm::vec4 planeColor = {0.1,0.1,0.1,1};
-    Vertex v0P = {glm::vec3(-5., -1.2f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    Vertex v1P = {glm::vec3(-5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
-    Vertex v2P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    Vertex v3P = {glm::vec3(-5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    Vertex v4P = {glm::vec3(5., -1.2f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    Vertex v5P = {glm::vec3(5., -1.2f, 5.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
+    Vertex v0P = {glm::vec3(-50., -1.2f,  50.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    Vertex v1P = {glm::vec3(-50., -1.2f, -50.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
+    Vertex v2P = {glm::vec3(50., -1.2f, -50.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    Vertex v3P = {glm::vec3(-50., -1.2f, 50.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
+    Vertex v4P = {glm::vec3(50., -1.2f, -50.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
+    Vertex v5P = {glm::vec3(50., -1.2f, 50.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
     std::vector<Vertex> verticesPlane = { v0P, v1P, v2P, v3P, v4P, v5P };
     std::vector<unsigned int> indicesPlane = {
         0, 1, 2,   // First Triangle
@@ -385,6 +499,54 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     auto planeMesh = new Mesh(verticesPlane, indicesPlane, GL_TRIANGLES);
     auto planeRo = new RenderObject(planeMesh, m_material);
     m_renderer->addRenderObject(planeRo);
+
+    std::vector<Vertex> sphereVertices;
+    std::vector<unsigned int> sphereIndices;
+
+    const unsigned int X_SEGMENTS = 64;
+    const unsigned int Y_SEGMENTS = 64;
+    const float PI = 3.14159265359f;
+    for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+    {
+        for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
+        {
+            float xSegment = (float)x / (float)X_SEGMENTS;
+            float ySegment = (float)y / (float)Y_SEGMENTS;
+            float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+            float yPos = std::cos(ySegment * PI);
+            float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
+
+            sphereVertices.push_back({glm::vec3(xPos, yPos, zPos), glm::vec3(xPos, yPos, zPos), glm::vec2(xSegment, ySegment), {0.1, 0.7, 0.1, 1.f}});
+        }
+    }
+
+    bool oddRow = false;
+    for (unsigned int y = 0; y < Y_SEGMENTS; ++y)
+    {
+        if (!oddRow) // even rows: y == 0, y == 2; and so on
+        {
+            for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
+            {
+                sphereIndices.push_back(y * (X_SEGMENTS + 1) + x);
+                sphereIndices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+            }
+        }
+        else
+        {
+            for (int x = X_SEGMENTS; x >= 0; --x)
+            {
+                sphereIndices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
+                sphereIndices.push_back(y * (X_SEGMENTS + 1) + x);
+            }
+        }
+        oddRow = !oddRow;
+    }
+
+    auto sphereMesh = new Mesh(sphereVertices, sphereIndices, GL_TRIANGLE_STRIP);
+    auto sphereRo = new RenderObject(sphereMesh, m_material);
+    auto sphereT = glm::translate(glm::mat4(1.f), glm::vec3(-3, 0, -3));
+    sphereRo->setTransform(sphereT);
+    m_renderer->addRenderObject(sphereRo);
 
     glGenFramebuffers(1, &captureFBO);
     glGenRenderbuffers(1, &captureRBO);
@@ -438,6 +600,45 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // configure light FBO
+    // -----------------------
+    glGenFramebuffers(1, &m_lightFBO);
+
+    glGenTextures(1, &m_lightDepthMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
+    glTexImage3D(
+        GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, depthMapResolution, depthMapResolution, int(shadowCascadeLevels.size()) + 1,
+        0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    constexpr float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_lightFBO);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_lightDepthMaps, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+        throw 0;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // configure UBO
+    // --------------------
+    glGenBuffers(1, &m_matricesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_matricesUBO);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4x4) * 3, nullptr, GL_STATIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_matricesUBO);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 BloomDemo::~BloomDemo() {
@@ -486,18 +687,28 @@ void BloomDemo::draw() {
     OpenGLDemo::draw();
 
     /*** Compute new camera transform ***/
-    _model = glm::scale(glm::mat4(1.f), glm::vec3(0.28f));
-    _model = _model * glm::translate(glm::mat4(1.0), m_translation);
     _view = _camera->viewmatrix();
-    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
+    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, cameraNearPlane, cameraFarPlane);
 
-    /*** Update Material ***/
-    if(m_renderer->getCurrentMaterial() != nullptr)
-      m_currentMaterial = m_renderer->getCurrentMaterial();
+    glEnable(GL_DEPTH_TEST);
+    // 0. UBO setup
+    const auto lightMatrices = getLightSpaceMatrices(_camera.get(), shadowCascadeLevels, cameraNearPlane, cameraFarPlane, _width, _height, lightDir);
+    glBindBuffer(GL_UNIFORM_BUFFER, m_matricesUBO);
+    for (size_t i = 0; i < lightMatrices.size(); ++i)
+    {
+        glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::mat4x4), sizeof(glm::mat4x4), &lightMatrices[i]);
+    }
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+    m_programDepth->bind();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_lightFBO);
+    glViewport(0, 0, depthMapResolution, depthMapResolution);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glCullFace(GL_FRONT);  // peter panning
+    m_renderer->setMaterial(m_materialDepth);
     m_renderer->setMaterialParams();
-   
-    /*** Update scene ***/
-    m_renderer->setMVP(_model, _view, _projection);
+    m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
     for(unsigned int i = 0; i < m_lights.size(); i++){
         auto& l = m_lights[i];
@@ -505,7 +716,17 @@ void BloomDemo::draw() {
         m_renderer->setLightMVP(l->getModel(), _view, _projection , i);
         m_renderer->setLight(l, i);
     }
+    m_renderer->draw();
 
+    glCullFace(GL_BACK);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // reset viewport
+    glViewport(0, 0, _width, _height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // 2. render scene as normal using the generated depth/shadow map  
+    // --------------------------------------------------------------
     // first pass
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
@@ -518,9 +739,42 @@ void BloomDemo::draw() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glViewport(0, 0, _width, _height);
+    m_material->getShader()->bind();
+    m_material->getShader()->setUniform1i("shadowMap", 0);
+    m_material->getShader()->setUniform1i("envMap", 1);
+    m_material->getShader()->setUniform3f("viewPos", _camera->position());
+    m_material->getShader()->setUniform3f("lightDir", lightDir);
+    m_material->getShader()->setUniform1f("farPlane", cameraFarPlane);
+    m_material->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
+    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
+      m_material->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+    }  
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    m_renderer->setMaterial(m_material);
+
+    /*** Update Material ***/
+    if(m_renderer->getCurrentMaterial() != nullptr)
+      m_currentMaterial = m_renderer->getCurrentMaterial();
+    m_renderer->setMaterialParams();
+   
+    /*** Update scene ***/
+    m_renderer->setVP(_view, _projection);
+    m_renderer->setCameraPosition(_camera->position());
+    for(unsigned int i = 0; i < m_lights.size(); i++){
+        auto& l = m_lights[i];
+        l->update(m_translation);
+        m_renderer->setLightMVP(l->getModel(), _view, _projection , i);
+        m_renderer->setLight(l, i);
+    }
+
     m_renderer->draw();	
+
     m_programBg->bind();
-    m_programBg->setMVP(_model, _view, _projection);
+    m_programBg->setMVP(glm::mat4(1.f), _view, _projection);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);

@@ -1,5 +1,8 @@
 #include "Renderer.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
 Renderer::Renderer(){
 
 }
@@ -17,33 +20,30 @@ void Renderer::draw(VertexArray *vao, IndexBuffer *ebo, Shader* shader) const{
 }
 
 void Renderer::draw(Mesh* mesh, Shader* shader){
-    //unsigned int diffuseNr = 1;
-    //unsigned int specularNr = 1;
-    //for(unsigned int i = 0; i < mesh->m_textures.size(); i++){
-    //    glActiveTexture(GL_TEXTURE0 + i);
-    //    std::string number;
-    //    std::string name = mesh->m_textures[i].m_type;
-    //    if(name == "texture_diffuse")
-    //        number = std::to_string(diffuseNr++);
-    //    else if(name == "texture_specular")
-    //        number = std::to_string(specularNr++);
-
-    //    shader->setUniform1f(("material." + name + number).c_str(), i);
-    //    glBindTexture(GL_TEXTURE_2D, mesh->m_textures[i].m_rendererId);
-    //}
-    //glActiveTexture(GL_TEXTURE0);
-
     draw(mesh->m_vao, mesh->m_ebo, shader);
 }
 
 void Renderer::draw() {
     for(auto& ro : m_roList) {
         Mesh* mesh = ro->getMesh();
+        ro->getMaterial()->getShader()->setMVP(ro->getTransform(), m_view, m_projection);
         draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
     }
     for(auto& ro : m_roLights) {
         Mesh* mesh = ro->getMesh();
         draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
+    }
+}
+
+void Renderer::draw(Shader* shader) {
+    for(auto& ro : m_roList) {
+        Mesh* mesh = ro->getMesh();
+        shader->setMVP(ro->getTransform(), m_view, m_projection);
+        draw(mesh->m_vao, mesh->m_ebo, shader);
+    }
+    for(auto& ro : m_roLights) {
+        Mesh* mesh = ro->getMesh();
+        draw(mesh->m_vao, mesh->m_ebo, shader);
     }
 }
 
@@ -91,6 +91,11 @@ void Renderer::setMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection){
     for(auto& ro: m_roLights){
         ro->getMaterial()->getShader()->setMVP(model, view, projection);
     }
+}
+
+void Renderer::setVP(glm::mat4 view, glm::mat4 projection){
+    m_view = view;
+    m_projection = projection;
 }
 
 void Renderer::setLight(Light* light, unsigned int id){

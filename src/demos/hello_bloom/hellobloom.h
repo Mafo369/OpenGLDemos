@@ -43,10 +43,12 @@ public:
 
     float m_exposure = 0.358f;
     float m_threshold = 0.717f;
+    glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 80.0f));
 
 private:
     // Shader program for rendering
     std::shared_ptr<Material> m_material;
+    std::shared_ptr<Material> m_materialDepth;
     std::shared_ptr<Material> m_materialBasic;
     std::shared_ptr<Material> m_materialModified;
     std::shared_ptr<Material> m_materialLambert;
@@ -59,6 +61,7 @@ private:
     std::vector<BloomMip> m_mipChain;
 
     unsigned int m_fbo;
+    unsigned int m_lightFBO;
     unsigned int m_mipfbo;
     unsigned int m_fboTexture;
     unsigned int m_fboThTexture;
@@ -72,12 +75,24 @@ private:
     unsigned int captureFBO, captureRBO;
     unsigned int envCubemap;
 
+    unsigned int m_matricesUBO;
+
+    float cameraNearPlane = 0.1f;
+    float cameraFarPlane = 500.0f;
+
+    std::vector<float> shadowCascadeLevels{ cameraFarPlane / 50.0f, cameraFarPlane / 25.0f, cameraFarPlane / 10.0f, cameraFarPlane / 2.0f };
+
+    unsigned int m_lightDepthMaps;
+
+    unsigned int depthMapResolution = 4096;
+
     Shader* m_programQuad;
     Shader* m_programTh;
     Shader* m_programDown;
     Shader* m_programUp;
     Shader* m_programCube;
     Shader* m_programBg;
+    Shader* m_programDepth;
 
     Mesh* m_mesh;
     Mesh* m_cubeMesh;
@@ -100,12 +115,12 @@ private:
     std::unique_ptr<Camera> _camera;
 
     // matrices
-    glm::mat4 _model;
     glm::mat4 _lightmodel;
     glm::mat4 _view;
     glm::mat4 _projection;
 
     glm::vec4 m_color;
+
 };
 
 /*------------------------------------------------------------------------------------------------------------------------*/
