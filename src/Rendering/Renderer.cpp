@@ -43,7 +43,7 @@ void Renderer::draw(Shader* shader) {
     }
     for(auto& ro : m_roLights) {
         Mesh* mesh = ro->getMesh();
-        draw(mesh->m_vao, mesh->m_ebo, shader);
+        draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
     }
 }
 

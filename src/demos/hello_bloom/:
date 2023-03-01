@@ -319,6 +319,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_lights.push_back(light1);
     m_lights.push_back(light2);
 
+    //glGenFramebuffers(1, &m_fbo);
+    //glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     m_fbo = new Framebuffer();
     m_fbo->bind();
     
@@ -336,7 +338,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // attach it to currently bound framebuffer object
-    m_fbo->attachTexture2D(GL_COLOR_ATTACHMENT0, m_fboTexture);
+    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fboTexture, 0);
+    m_fbo->attachTexture(GL_COLOR_ATTACHMENT0, m_fboTexture);
 
     glGenTextures(1, &m_fboThTexture);
     glBindTexture(GL_TEXTURE_2D, m_fboThTexture);
@@ -349,19 +352,24 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // attach it to currently bound framebuffer object
-    m_fbo->attachTexture2D(GL_COLOR_ATTACHMENT1, m_fboThTexture);
+    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_fboThTexture, 0);
+    m_fbo->attachTexture(GL_COLOR_ATTACHMENT1, m_fboThTexture);
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, hdrWidth, hdrHeight); // use a single renderbuffer object for both a depth AND stencil buffer.
+    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
     m_fbo->attachRenderbuffer(GL_DEPTH_STENCIL_ATTACHMENT, rbo);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);  
     m_fbo->unbind();
 
+    //glGenFramebuffers(1, &m_mipfbo);
+    //glBindFramebuffer(GL_FRAMEBUFFER, m_mipfbo);
     m_mipfbo = new Framebuffer();
     m_mipfbo->bind();
 
@@ -395,10 +403,12 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     }
 
     // attach it to currently bound framebuffer object
-    m_mipfbo->attachTexture2D(GL_COLOR_ATTACHMENT0, m_mipChain[0].texture);
+    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_mipChain[0].texture, 0);
+    m_mipfbo->attachTexture(GL_COLOR_ATTACHMENT0, m_mipChain[0].texture);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);  
     m_mipfbo->unbind();
 
     Vertex v0 = {glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 1.f), {0,0,0,1}};
@@ -547,12 +557,15 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     sphereRo->setTransform(sphereT);
     m_renderer->addRenderObject(sphereRo);
 
+    //glGenFramebuffers(1, &captureFBO);
     m_captureFbo = new Framebuffer();
     glGenRenderbuffers(1, &captureRBO);
 
+    //glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     m_captureFbo->bind();
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cmWidth, cmWidth);
+    //glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);   
     m_captureFbo->attachRenderbuffer(GL_DEPTH_ATTACHMENT, captureRBO);
 
     glGenTextures(1, &envCubemap);
@@ -587,19 +600,23 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glBindTexture(GL_TEXTURE_2D, m_CMTexture);
 
     glViewport(0, 0, cmWidth, cmWidth); // don't forget to configure the viewport to the capture dimensions.
+    //glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     m_captureFbo->bind();
     for (unsigned int i = 0; i < 6; ++i)
     {
         m_programCube->setMVP(glm::mat4(1.f), captureViews[i], captureProjection);
-        m_captureFbo->attachCubemapTexture2D(GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, 
+                               GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_renderer->draw(m_cubeMesh, m_programCube);
     }
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
     m_captureFbo->unbind();
 
     // configure light FBO
     // -----------------------
+    //glGenFramebuffers(1, &m_lightFBO);
     m_lightFBO = new Framebuffer();
 
     glGenTextures(1, &m_lightDepthMaps);
@@ -617,7 +634,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
 
     m_lightFBO->bind();
-    m_lightFBO->attachTexture(GL_DEPTH_ATTACHMENT, m_lightDepthMaps);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_lightDepthMaps, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
@@ -628,7 +645,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         throw 0;
     }
 
-    m_lightFBO->unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // configure UBO
     // --------------------
@@ -644,10 +661,8 @@ BloomDemo::~BloomDemo() {
         glDeleteTextures(1, &m_mipChain[i].texture);
         m_mipChain[i].texture = 0;
     }
-    delete m_fbo;
-    delete m_lightFBO;
-    delete m_captureFbo;
-    delete m_mipfbo;
+    //glDeleteFramebuffers(1, &m_fbo);
+    m_fbo = 0;
     delete m_renderer;
     for(auto& l : m_lights)
         delete l;
@@ -702,7 +717,7 @@ void BloomDemo::draw() {
 
     m_programDepth->bind();
 
-    m_lightFBO->bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_lightFBO);
     glViewport(0, 0, depthMapResolution, depthMapResolution);
     glClear(GL_DEPTH_BUFFER_BIT);
     glCullFace(GL_FRONT);  // peter panning
@@ -719,7 +734,7 @@ void BloomDemo::draw() {
     m_renderer->draw(m_programDepth);
 
     glCullFace(GL_BACK);
-    m_lightFBO->unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // reset viewport
     glViewport(0, 0, _width, _height);
@@ -728,7 +743,7 @@ void BloomDemo::draw() {
     // 2. render scene as normal using the generated depth/shadow map  
     // --------------------------------------------------------------
     // first pass
-    m_fbo->bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.0f);
@@ -789,7 +804,7 @@ void BloomDemo::draw() {
     m_renderer->draw(m_mesh, m_programTh);
     m_programTh->unbind();
 
-    m_mipfbo->bind();
+    glBindFramebuffer(GL_FRAMEBUFFER, m_mipfbo);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_DEPTH_TEST);
 
@@ -803,7 +818,8 @@ void BloomDemo::draw() {
         const BloomMip& mip = m_mipChain[i];
         glViewport(0, 0, mip.size.x, mip.size.y);
 
-        m_mipfbo->attachTexture2D(GL_COLOR_ATTACHMENT0, mip.texture);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_2D, mip.texture, 0);
 
         // Render screen-filled quad of resolution of current mip
         m_renderer->draw(m_mesh, m_programDown);
@@ -834,7 +850,8 @@ void BloomDemo::draw() {
 
         // Set framebuffer render target (we write to this texture)
         glViewport(0, 0, nextMip.size.x, nextMip.size.y);
-        m_mipfbo->attachTexture(GL_COLOR_ATTACHMENT0, nextMip.texture);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_2D, nextMip.texture, 0);
 
         m_renderer->draw(m_mesh, m_programUp);
     }
@@ -844,7 +861,7 @@ void BloomDemo::draw() {
     glDisable(GL_BLEND);
 
     // second pass
-    m_mipfbo->unbind();
+    glBindFramebuffer(GL_FRAMEBUFFER, 1); // back to default
     glViewport(0,0, _width, _height);
     glDisable(GL_DEPTH_TEST);
     glClearColor(0.9f, 0.2f, 0.2f, 1.0f); 

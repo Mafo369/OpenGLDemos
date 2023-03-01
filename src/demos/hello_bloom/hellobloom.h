@@ -4,6 +4,7 @@
 #include "../../Rendering/Renderer.h"
 
 #include "../../Rendering/Texture.h"
+#include "../../Rendering/Framebuffer.h"
 #include "../camera.h"
 #include "fwd.hpp"
 
@@ -41,8 +42,8 @@ public:
     glm::vec4& getColor() override { return m_color; }
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
 
-    float m_exposure = 0.358f;
-    float m_threshold = 0.717f;
+    float m_exposure = 0.958f;
+    float m_threshold = 9.813f;
     glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 80.0f));
 
 private:
@@ -60,9 +61,10 @@ private:
 
     std::vector<BloomMip> m_mipChain;
 
-    unsigned int m_fbo;
-    unsigned int m_lightFBO;
-    unsigned int m_mipfbo;
+    //unsigned int m_fbo;
+    Framebuffer* m_fbo;
+    Framebuffer* m_lightFBO;
+    Framebuffer* m_mipfbo;
     unsigned int m_fboTexture;
     unsigned int m_fboThTexture;
     unsigned int m_quadVAO;
@@ -72,7 +74,8 @@ private:
 
     unsigned int m_CMTexture;
 
-    unsigned int captureFBO, captureRBO;
+    Framebuffer* m_captureFbo;
+    unsigned int captureRBO;
     unsigned int envCubemap;
 
     unsigned int m_matricesUBO;
