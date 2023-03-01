@@ -74,8 +74,6 @@ private:
 
     unsigned int m_CMTexture;
 
-    Framebuffer* m_captureFbo;
-    unsigned int captureRBO;
     unsigned int envCubemap;
 
     unsigned int m_matricesUBO;

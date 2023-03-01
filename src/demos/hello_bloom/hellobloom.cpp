@@ -6,6 +6,8 @@
 #include "Geometry/BezierCurve.h"
 #include "Geometry/BezierSurface.h"
 #include "Geometry/Cube.h"
+#include "Geometry/Sphere.h"
+#include "Geometry/Plane.h"
 #include "Geometry/Mesh.h"
 #include "../../Rendering/RenderObject.h"
 #include "../../../libs/stb_image.h"
@@ -424,137 +426,36 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     auto monkeyTransform = glm::scale(glm::mat4(1.f), glm::vec3(0.48f));
     m_currentRo->setTransform(monkeyTransform);
     m_renderer->addRenderObject(m_currentRo);
- 
+
     m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
 
-    glm::vec4 cubeColor = {0.1,0.1,0.8,1};
-    std::vector<Vertex> verticesCube = {
-        // back face
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
-      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
-      {    { 1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right         
-      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
-      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
-          // front face                                       
-      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
-      {    { 1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right
-      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
-      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, cubeColor}, // top-right
-      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
-      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left
-          // left face                                      
-      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-right
-      {    {-1.0f,  1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-left
-      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-left
-      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-left
-      {    {-1.0f, -1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-right
-      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-right
-          // right face                                     
-      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-left
-      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-right
-      {     {1.0f,  1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-right         
-      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // bottom-right
-      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // top-left
-      {     {1.0f, -1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-left     
-          // bottom face                                   
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-right
-      {    { 1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-left
-      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-left
-      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-left
-      {    {-1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}, // bottom-right
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-right
-          // top face                                     
-      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
-      {    { 1.0f,  1.0f , 1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right
-      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}, cubeColor}, // top-right     
-      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, cubeColor}, // bottom-right
-      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, cubeColor}, // top-left
-      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}, cubeColor}  // bottom-left        
-    };  
-    std::vector<unsigned int> indicesCube;
-    for(int i = 0; i < 6*6; i++){
-      indicesCube.push_back(i);
-    }
-    m_cubeMesh = new Mesh(verticesCube, indicesCube, GL_TRIANGLES);
-
+    m_cubeMesh = new Cube({0.1,0.1,0.8,1});
     auto cubeRo = new RenderObject(m_cubeMesh, m_materialTexture);
     auto cubeT =  glm::scale(glm::mat4(1.f), glm::vec3(0.8f)) * glm::translate(glm::mat4(1.f), glm::vec3(3, 2, -1)) * glm::rotate(glm::mat4(1.f), 90.f, glm::vec3(1,1,0)) ;
     cubeRo->setTransform(cubeT);
     m_renderer->addRenderObject(cubeRo);
 
-    glm::vec4 planeColor = {0.1,0.1,0.1,1};
-    Vertex v0P = {glm::vec3(-50., -1.2f,  50.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    Vertex v1P = {glm::vec3(-50., -1.2f, -50.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
-    Vertex v2P = {glm::vec3(50., -1.2f, -50.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    Vertex v3P = {glm::vec3(-50., -1.2f, 50.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    Vertex v4P = {glm::vec3(50., -1.2f, -50.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    Vertex v5P = {glm::vec3(50., -1.2f, 50.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
-    std::vector<Vertex> verticesPlane = { v0P, v1P, v2P, v3P, v4P, v5P };
-    std::vector<unsigned int> indicesPlane = {
-        0, 1, 2,   // First Triangle
-        3, 4, 5    // Second Triangle
-    };
-    auto planeMesh = new Mesh(verticesPlane, indicesPlane, GL_TRIANGLES);
+    auto planeMesh = new Plane({0.1,0.1,0.1,1});
     auto planeRo = new RenderObject(planeMesh, m_material);
+    auto planeT = glm::translate(glm::mat4(1.f), glm::vec3(0,-1.2f, 0)) * glm::scale(glm::mat4(1.f), glm::vec3(50.f));
+    planeRo->setTransform(planeT);
     m_renderer->addRenderObject(planeRo);
 
-    std::vector<Vertex> sphereVertices;
-    std::vector<unsigned int> sphereIndices;
-
-    const unsigned int X_SEGMENTS = 64;
-    const unsigned int Y_SEGMENTS = 64;
-    const float PI = 3.14159265359f;
-    for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
-    {
-        for (unsigned int y = 0; y <= Y_SEGMENTS; ++y)
-        {
-            float xSegment = (float)x / (float)X_SEGMENTS;
-            float ySegment = (float)y / (float)Y_SEGMENTS;
-            float xPos = std::cos(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-            float yPos = std::cos(ySegment * PI);
-            float zPos = std::sin(xSegment * 2.0f * PI) * std::sin(ySegment * PI);
-
-            sphereVertices.push_back({glm::vec3(xPos, yPos, zPos), glm::vec3(xPos, yPos, zPos), glm::vec2(xSegment, ySegment), {0.1, 0.7, 0.1, 1.f}});
-        }
-    }
-
-    bool oddRow = false;
-    for (unsigned int y = 0; y < Y_SEGMENTS; ++y)
-    {
-        if (!oddRow) // even rows: y == 0, y == 2; and so on
-        {
-            for (unsigned int x = 0; x <= X_SEGMENTS; ++x)
-            {
-                sphereIndices.push_back(y * (X_SEGMENTS + 1) + x);
-                sphereIndices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-            }
-        }
-        else
-        {
-            for (int x = X_SEGMENTS; x >= 0; --x)
-            {
-                sphereIndices.push_back((y + 1) * (X_SEGMENTS + 1) + x);
-                sphereIndices.push_back(y * (X_SEGMENTS + 1) + x);
-            }
-        }
-        oddRow = !oddRow;
-    }
-
-    auto sphereMesh = new Mesh(sphereVertices, sphereIndices, GL_TRIANGLE_STRIP);
+    auto sphereMesh = new Sphere({0.1, 0.7, 0.1, 1.f});
     auto sphereRo = new RenderObject(sphereMesh, m_material);
     auto sphereT = glm::translate(glm::mat4(1.f), glm::vec3(-3, 0, -3));
     sphereRo->setTransform(sphereT);
     m_renderer->addRenderObject(sphereRo);
 
-    m_captureFbo = new Framebuffer();
+    Framebuffer* captureFbo = new Framebuffer();
+    unsigned int captureRBO;
     glGenRenderbuffers(1, &captureRBO);
 
-    m_captureFbo->bind();
+    captureFbo->bind();
 
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cmWidth, cmWidth);
-    m_captureFbo->attachRenderbuffer(GL_DEPTH_ATTACHMENT, captureRBO);
+    captureFbo->attachRenderbuffer(GL_DEPTH_ATTACHMENT, captureRBO);
 
     glGenTextures(1, &envCubemap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
@@ -588,16 +489,16 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glBindTexture(GL_TEXTURE_2D, m_CMTexture);
 
     glViewport(0, 0, cmWidth, cmWidth); // don't forget to configure the viewport to the capture dimensions.
-    m_captureFbo->bind();
+    captureFbo->bind();
     for (unsigned int i = 0; i < 6; ++i)
     {
         m_programCube->setMVP(glm::mat4(1.f), captureViews[i], captureProjection);
-        m_captureFbo->attachCubemapTexture2D(GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap);
+        captureFbo->attachCubemapTexture2D(GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_renderer->draw(m_cubeMesh, m_programCube);
     }
-    m_captureFbo->unbind();
+    captureFbo->unbind();
 
     // configure light FBO
     // -----------------------
@@ -647,7 +548,6 @@ BloomDemo::~BloomDemo() {
     }
     delete m_fbo;
     delete m_lightFBO;
-    delete m_captureFbo;
     delete m_mipfbo;
     delete m_renderer;
     for(auto& l : m_lights)
@@ -707,8 +607,6 @@ void BloomDemo::draw() {
     glViewport(0, 0, depthMapResolution, depthMapResolution);
     glClear(GL_DEPTH_BUFFER_BIT);
     glCullFace(GL_FRONT);  // peter panning
-    //m_renderer->setMaterial(m_materialDepth);
-    //m_renderer->setMaterialParams();
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
     for(unsigned int i = 0; i < m_lights.size(); i++){
@@ -718,7 +616,6 @@ void BloomDemo::draw() {
         m_renderer->setLight(l, i);
     }
     m_renderer->draw(m_programDepth);
-
     glCullFace(GL_BACK);
     m_lightFBO->unbind();
 
@@ -755,7 +652,6 @@ void BloomDemo::draw() {
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-    //m_renderer->setMaterial(m_material);
 
     /*** Update Material ***/
     if(m_renderer->getCurrentMaterial() != nullptr)
