@@ -551,6 +551,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glGenRenderbuffers(1, &captureRBO);
 
     m_captureFbo->bind();
+
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cmWidth, cmWidth);
     m_captureFbo->attachRenderbuffer(GL_DEPTH_ATTACHMENT, captureRBO);
