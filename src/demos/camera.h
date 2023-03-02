@@ -18,7 +18,7 @@ enum Camera_Movement {
 class Camera {
 
 public:
-    Camera(glm::vec3 position = glm::vec3(0.f, 0.f, 1.f), glm::vec3 up = glm::vec3(0.f, 1.f, 0.f), glm::vec3 look = glm::vec3(0.f, 0.f, 0.f), float zoom=45.f);
+    Camera(glm::vec3 position = glm::vec3(0.f, 0.f, 1.f), glm::vec3 up = glm::vec3(0.f, 1.f, 0.f), glm::vec3 look = glm::vec3(0.f, 0.f, 0.f), float zoom=45.f, float cameraNearPlane=0.1f, float cameraFarPlane=500.f);
     virtual ~Camera();
 
     // Returns the view matrix calculated using Eular Angles and the LookAt Matrix
@@ -37,6 +37,9 @@ public:
     // Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
     virtual void processmousescroll(GLfloat yoffset);
 
+    float getNearPlane() { return m_nearPlane; }
+    float getFarPlane() { return m_farPlane; }
+
 protected:
     glm::vec3 _position;
     glm::vec3 _front;
@@ -50,6 +53,8 @@ protected:
     GLfloat _mousestartx;
     GLfloat _mousestarty;
 
+    float m_nearPlane;
+    float m_farPlane;
 };
 
 

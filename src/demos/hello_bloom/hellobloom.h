@@ -13,14 +13,6 @@
 #include <imgui.h>
 #include <vector>
 
-typedef struct s_BloomMip
-{
-    glm::vec2 size;
-    glm::ivec2 intSize;
-    unsigned int texture;
-}BloomMip;
-
-
 /** Simple drawing demonstration
  */
 class BloomDemo : public OpenGLDemo {
@@ -51,7 +43,6 @@ private:
     // Shader program for rendering
     std::shared_ptr<Material> m_material;
     std::shared_ptr<Material> m_materialSpecular;
-    std::shared_ptr<Material> m_materialDepth;
     std::shared_ptr<Material> m_materialBasic;
     std::shared_ptr<Material> m_materialModified;
     std::shared_ptr<Material> m_materialLambert;
@@ -64,7 +55,6 @@ private:
     std::vector<BloomMip> m_mipChain;
 
     Framebuffer* m_fbo;
-    Framebuffer* m_lightFBO;
     Framebuffer* m_mipfbo;
     unsigned int m_fboTexture;
     unsigned int m_fboThTexture;
@@ -73,22 +63,10 @@ private:
     unsigned int m_rbo;
     unsigned int m_attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
-    unsigned int m_matricesUBO;
-
-    float cameraNearPlane = 0.1f;
-    float cameraFarPlane = 500.0f;
-
-    std::vector<float> shadowCascadeLevels{ cameraFarPlane / 50.0f, cameraFarPlane / 25.0f, cameraFarPlane / 10.0f, cameraFarPlane / 2.0f };
-
-    unsigned int m_lightDepthMaps;
-
-    unsigned int depthMapResolution = 4096;
-
     Shader* m_programQuad;
     Shader* m_programTh;
     Shader* m_programDown;
     Shader* m_programUp;
-    Shader* m_programDepth;
 
     Mesh* m_mesh;
     Shader* m_program;

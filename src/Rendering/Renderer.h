@@ -8,6 +8,16 @@
 #include "Shader.h"
 #include "Buffer.h"
 #include "VertexArray.h"
+#include "Framebuffer.h"
+#include "../demos/camera.h"
+
+typedef struct s_BloomMip
+{
+    glm::vec2 size;
+    glm::ivec2 intSize;
+    unsigned int texture;
+} BloomMip;
+
 
 class Renderer
 {
@@ -29,11 +39,18 @@ public:
     void setEnvMap(const std::string& path);
     bool hasCubeMap() { return m_hasCubeMap; }
     unsigned int getCubeMap() { return m_envCubeMap; }
+    void setupBloom(int width, int height);
+    void setupShadows(float cameraNearPlane, float cameraFarPlane);
+
+    void depthOnlyPass(Camera* camera, glm::vec3& lightDir, int width, int height);
 
     void draw(VertexArray* vao, IndexBuffer* ebo, Shader* shader) const;
     void draw(Mesh* mesh, Shader* shader);
     void draw(Shader* shader);
     void draw();
+
+    std::vector<float>& getShadowCascadeLevels() { return m_shadowCascadeLevels; }
+    unsigned int getLightDepthMaps() { return m_lightDepthMaps; }
 
 private:
     std::vector<RenderObject*> m_roList;
@@ -46,7 +63,42 @@ private:
 
     bool m_hasCubeMap;
 
+    Framebuffer* m_fbo;
+    Framebuffer* m_mipfbo;
+    unsigned int m_fboTexture;
+    unsigned int m_fboThTexture;
+    unsigned int m_quadVAO;
+    unsigned int m_quadVBO;
+    unsigned int m_rbo;
+    unsigned int m_attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+
+    std::vector<BloomMip> m_mipChain;
+
+    Shader* m_programDepth;
+    Framebuffer* m_lightFBO;
+    unsigned int m_matricesUBO;
+
+    float m_cameraNearPlane;
+    float m_cameraFarPlane;
+
+    std::vector<float> m_shadowCascadeLevels;
+
+    unsigned int m_lightDepthMaps;
+
+    unsigned int depthMapResolution = 4096;
+
+    std::vector<glm::mat4> m_lightMatrices;
+
     glm::mat4 m_view, m_projection;
 };
+
+std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
+
+std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
+
+glm::mat4 getLightSpaceMatrix(Camera* camera, const float nearPlane, const float farPlane, float width, float height, glm::vec3 lightDir);
+
+std::vector<glm::mat4> getLightSpaceMatrices(Camera* camera, std::vector<float>& shadowCascadeLevels, float nearPlane, float farPlane, float width, float height, glm::vec3 lightDir);
+
 
 #endif

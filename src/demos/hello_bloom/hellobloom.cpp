@@ -75,108 +75,108 @@ void addObjectsFromFile( const char* filename, std::vector<Vertex>& vector, std:
     }
 }
 
-std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview)
-{
-    const auto inv = glm::inverse(projview);
-
-    std::vector<glm::vec4> frustumCorners;
-    for (unsigned int x = 0; x < 2; ++x)
-    {
-        for (unsigned int y = 0; y < 2; ++y)
-        {
-            for (unsigned int z = 0; z < 2; ++z)
-            {
-                const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
-                frustumCorners.push_back(pt / pt.w);
-            }
-        }
-    }
-
-    return frustumCorners;
-}
-
-std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
-{
-    return getFrustumCornersWorldSpace(proj * view);
-}
-
-glm::mat4 getLightSpaceMatrix(Camera* camera, const float nearPlane, const float farPlane, float width, float height, glm::vec3 lightDir)
-{
-    const auto proj = glm::perspective(
-        glm::radians(camera->zoom()), width / height, nearPlane,
-        farPlane);
-    const auto corners = getFrustumCornersWorldSpace(proj, camera->viewmatrix());
-
-    glm::vec3 center = glm::vec3(0, 0, 0);
-    for (const auto& v : corners)
-    {
-        center += glm::vec3(v);
-    }
-    center /= corners.size();
-
-    const auto lightView = glm::lookAt(center + lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
-
-    float minX = std::numeric_limits<float>::max();
-    float maxX = std::numeric_limits<float>::lowest();
-    float minY = std::numeric_limits<float>::max();
-    float maxY = std::numeric_limits<float>::lowest();
-    float minZ = std::numeric_limits<float>::max();
-    float maxZ = std::numeric_limits<float>::lowest();
-    for (const auto& v : corners)
-    {
-        const auto trf = lightView * v;
-        minX = std::min(minX, trf.x);
-        maxX = std::max(maxX, trf.x);
-        minY = std::min(minY, trf.y);
-        maxY = std::max(maxY, trf.y);
-        minZ = std::min(minZ, trf.z);
-        maxZ = std::max(maxZ, trf.z);
-    }
-
-    // Tune this parameter according to the scene
-    constexpr float zMult = 10.0f;
-    if (minZ < 0)
-    {
-        minZ *= zMult;
-    }
-    else
-    {
-        minZ /= zMult;
-    }
-    if (maxZ < 0)
-    {
-        maxZ /= zMult;
-    }
-    else
-    {
-        maxZ *= zMult;
-    }
-
-    const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
-
-    return lightProjection * lightView;
-}
-
-std::vector<glm::mat4> getLightSpaceMatrices(Camera* camera, std::vector<float>& shadowCascadeLevels, float nearPlane, float farPlane, float width, float height, glm::vec3 lightDir)
-{
-    std::vector<glm::mat4> ret;
-    for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
-    {
-        if (i == 0)
-        {
-            ret.push_back(getLightSpaceMatrix(camera, nearPlane, shadowCascadeLevels[i], width, height, lightDir));
-        }
-        else if (i < shadowCascadeLevels.size())
-        {
-            ret.push_back(getLightSpaceMatrix(camera, shadowCascadeLevels[i - 1], shadowCascadeLevels[i], width, height, lightDir));
-        }
-        else
-        {
-            ret.push_back(getLightSpaceMatrix(camera, shadowCascadeLevels[i - 1], farPlane, width, height, lightDir));
-        }
-    }
-    return ret;
-}
+//std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview)
+//{
+//    const auto inv = glm::inverse(projview);
+//
+//    std::vector<glm::vec4> frustumCorners;
+//    for (unsigned int x = 0; x < 2; ++x)
+//    {
+//        for (unsigned int y = 0; y < 2; ++y)
+//        {
+//            for (unsigned int z = 0; z < 2; ++z)
+//            {
+//                const glm::vec4 pt = inv * glm::vec4(2.0f * x - 1.0f, 2.0f * y - 1.0f, 2.0f * z - 1.0f, 1.0f);
+//                frustumCorners.push_back(pt / pt.w);
+//            }
+//        }
+//    }
+//
+//    return frustumCorners;
+//}
+//
+//std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
+//{
+//    return getFrustumCornersWorldSpace(proj * view);
+//}
+//
+//glm::mat4 getLightSpaceMatrix(Camera* camera, const float nearPlane, const float farPlane, float width, float height, glm::vec3 lightDir)
+//{
+//    const auto proj = glm::perspective(
+//        glm::radians(camera->zoom()), width / height, nearPlane,
+//        farPlane);
+//    const auto corners = getFrustumCornersWorldSpace(proj, camera->viewmatrix());
+//
+//    glm::vec3 center = glm::vec3(0, 0, 0);
+//    for (const auto& v : corners)
+//    {
+//        center += glm::vec3(v);
+//    }
+//    center /= corners.size();
+//
+//    const auto lightView = glm::lookAt(center + lightDir, center, glm::vec3(0.0f, 1.0f, 0.0f));
+//
+//    float minX = std::numeric_limits<float>::max();
+//    float maxX = std::numeric_limits<float>::lowest();
+//    float minY = std::numeric_limits<float>::max();
+//    float maxY = std::numeric_limits<float>::lowest();
+//    float minZ = std::numeric_limits<float>::max();
+//    float maxZ = std::numeric_limits<float>::lowest();
+//    for (const auto& v : corners)
+//    {
+//        const auto trf = lightView * v;
+//        minX = std::min(minX, trf.x);
+//        maxX = std::max(maxX, trf.x);
+//        minY = std::min(minY, trf.y);
+//        maxY = std::max(maxY, trf.y);
+//        minZ = std::min(minZ, trf.z);
+//        maxZ = std::max(maxZ, trf.z);
+//    }
+//
+//    // Tune this parameter according to the scene
+//    constexpr float zMult = 10.0f;
+//    if (minZ < 0)
+//    {
+//        minZ *= zMult;
+//    }
+//    else
+//    {
+//        minZ /= zMult;
+//    }
+//    if (maxZ < 0)
+//    {
+//        maxZ /= zMult;
+//    }
+//    else
+//    {
+//        maxZ *= zMult;
+//    }
+//
+//    const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+//
+//    return lightProjection * lightView;
+//}
+//
+//std::vector<glm::mat4> getLightSpaceMatrices(Camera* camera, std::vector<float>& shadowCascadeLevels, float nearPlane, float farPlane, float width, float height, glm::vec3 lightDir)
+//{
+//    std::vector<glm::mat4> ret;
+//    for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
+//    {
+//        if (i == 0)
+//        {
+//            ret.push_back(getLightSpaceMatrix(camera, nearPlane, shadowCascadeLevels[i], width, height, lightDir));
+//        }
+//        else if (i < shadowCascadeLevels.size())
+//        {
+//            ret.push_back(getLightSpaceMatrix(camera, shadowCascadeLevels[i - 1], shadowCascadeLevels[i], width, height, lightDir));
+//        }
+//        else
+//        {
+//            ret.push_back(getLightSpaceMatrix(camera, shadowCascadeLevels[i - 1], farPlane, width, height, lightDir));
+//        }
+//    }
+//    return ret;
+//}
 
 BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
     /*** Initialise geometric data ***/
@@ -221,8 +221,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Downsample.frag.glsl");
     m_programUp = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Upsample.frag.glsl");
-    m_programDepth = 
-        new Shader("Shaders/ShadowMap.vert.glsl", "Shaders/ShadowMap.frag.glsl", "Shaders/ShadowMap.geom.glsl");
 
     m_programQuad->bind();
     m_programQuad->setUniform1i("screenTexture", 0);
@@ -252,7 +250,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_material = std::make_shared<Material>(program, matParams);
     m_materialSpecular = std::make_shared<Material>(programSpecular, matParams);
     m_materialMicrofacet = std::make_shared<Material>(programMicrofacet, matParams);
-    m_materialDepth = std::make_shared<Material>(m_programDepth, matParams);
     m_materialBasic = std::make_shared<Material>(programBasic, matParams);
     m_materialModified = std::make_shared<Material>(programModified, matParams);
     m_materialLambert = std::make_shared<Material>(programLambert);
@@ -270,7 +267,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     _camera.reset(_cameraselector[_activecamera]());
     _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
     _view = _camera->viewmatrix();
-    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, cameraNearPlane, cameraFarPlane);
+    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, _camera->getNearPlane(), _camera->getFarPlane());
 
     /*** Create lights ***/
     LightParams lightParams;
@@ -414,41 +411,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     ro->setTransform(bezierSurfaceT);
     m_renderer->addRenderObject(ro);
 
-    // configure light FBO
-    // -----------------------
-    m_lightFBO = new Framebuffer();
-
-    glGenTextures(1, &m_lightDepthMaps);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
-    glTexImage3D(
-        GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT32F, depthMapResolution, depthMapResolution, int(shadowCascadeLevels.size()) + 1,
-        0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-
-    constexpr float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
-
-    m_lightFBO->bind();
-    m_lightFBO->attachTexture(GL_DEPTH_ATTACHMENT, m_lightDepthMaps);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-      std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-
-    m_lightFBO->unbind();
-
-    // configure UBO
-    // --------------------
-    glGenBuffers(1, &m_matricesUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_matricesUBO);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4x4) * 3, nullptr, GL_STATIC_DRAW);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_matricesUBO);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    m_renderer->setupShadows(_camera->getNearPlane(), _camera->getFarPlane());
 }
 
 BloomDemo::~BloomDemo() {
@@ -457,7 +420,6 @@ BloomDemo::~BloomDemo() {
         m_mipChain[i].texture = 0;
     }
     delete m_fbo;
-    delete m_lightFBO;
     delete m_mipfbo;
     delete m_renderer;
 }
@@ -497,33 +459,10 @@ void BloomDemo::draw() {
 
     /*** Compute new camera transform ***/
     _view = _camera->viewmatrix();
-    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, cameraNearPlane, cameraFarPlane);
+    _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, _camera->getNearPlane(), _camera->getFarPlane());
 
-    glEnable(GL_DEPTH_TEST);
-    // 0. UBO setup
-    const auto lightMatrices = getLightSpaceMatrices(_camera.get(), shadowCascadeLevels, cameraNearPlane, cameraFarPlane, _width, _height, lightDir);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_matricesUBO);
-    for (size_t i = 0; i < lightMatrices.size(); ++i)
-    {
-        glBufferSubData(GL_UNIFORM_BUFFER, i * sizeof(glm::mat4x4), sizeof(glm::mat4x4), &lightMatrices[i]);
-    }
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-    m_programDepth->bind();
-
-    m_lightFBO->bind();
-    glViewport(0, 0, depthMapResolution, depthMapResolution);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    glCullFace(GL_FRONT);  // peter panning
     m_renderer->setVP(_view, _projection);
-    m_renderer->setCameraPosition(_camera->position());
-    m_renderer->draw(m_programDepth);
-    glCullFace(GL_BACK);
-    m_lightFBO->unbind();
-
-    // reset viewport
-    glViewport(0, 0, _width, _height);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_renderer->depthOnlyPass(_camera.get(), lightDir, _width, _height);
 
     // 2. render scene as normal using the generated depth/shadow map  
     // --------------------------------------------------------------
@@ -545,13 +484,14 @@ void BloomDemo::draw() {
     m_material->getShader()->setUniform1i("envMap", 1);
     m_material->getShader()->setUniform3f("viewPos", _camera->position());
     m_material->getShader()->setUniform3f("lightDir", lightDir);
-    m_material->getShader()->setUniform1f("farPlane", cameraFarPlane);
+    m_material->getShader()->setUniform1f("farPlane", _camera->getFarPlane());
+    auto& shadowCascadeLevels = m_renderer->getShadowCascadeLevels();
     m_material->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
     for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
       m_material->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
     }  
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_renderer->getLightDepthMaps());
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
 
@@ -560,13 +500,13 @@ void BloomDemo::draw() {
     m_materialSpecular->getShader()->setUniform1i("envMap", 1);
     m_materialSpecular->getShader()->setUniform3f("viewPos", _camera->position());
     m_materialSpecular->getShader()->setUniform3f("lightDir", lightDir);
-    m_materialSpecular->getShader()->setUniform1f("farPlane", cameraFarPlane);
+    m_materialSpecular->getShader()->setUniform1f("farPlane", _camera->getFarPlane());
     m_materialSpecular->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
     for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
       m_materialSpecular->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
     }  
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_renderer->getLightDepthMaps());
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
 
