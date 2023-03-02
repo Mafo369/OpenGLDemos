@@ -119,6 +119,8 @@ void MyOpenGLWidget::paintGL() {
             if(ImGui::DragFloat3("surface color", (float*)glm::value_ptr(color), 0.01, 0, 200)){
                 _openglDemo->compute();
             }
+            ImGui::SliderFloat("metallic", demo->m_materialMicrofacet->getMetallic(), 0.0, 1.0);
+            ImGui::SliderFloat("roughness", demo->m_materialMicrofacet->getRoughness(), 0.0, 1.0);
             if(ImGui::SliderFloat("exposure", &demo->m_exposure, 0, 20)){
               _openglDemo->compute();
             }

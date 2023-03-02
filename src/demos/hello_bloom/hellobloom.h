@@ -45,10 +45,12 @@ public:
     float m_exposure = 0.958f;
     float m_threshold = 9.813f;
     glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 80.0f));
+    std::shared_ptr<Material> m_materialMicrofacet;
 
 private:
     // Shader program for rendering
     std::shared_ptr<Material> m_material;
+    std::shared_ptr<Material> m_materialSpecular;
     std::shared_ptr<Material> m_materialDepth;
     std::shared_ptr<Material> m_materialBasic;
     std::shared_ptr<Material> m_materialModified;
@@ -61,7 +63,6 @@ private:
 
     std::vector<BloomMip> m_mipChain;
 
-    //unsigned int m_fbo;
     Framebuffer* m_fbo;
     Framebuffer* m_lightFBO;
     Framebuffer* m_mipfbo;
@@ -71,10 +72,6 @@ private:
     unsigned int m_quadVBO;
     unsigned int m_rbo;
     unsigned int m_attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-
-    unsigned int m_CMTexture;
-
-    unsigned int envCubemap;
 
     unsigned int m_matricesUBO;
 
@@ -91,12 +88,9 @@ private:
     Shader* m_programTh;
     Shader* m_programDown;
     Shader* m_programUp;
-    Shader* m_programCube;
-    Shader* m_programBg;
     Shader* m_programDepth;
 
     Mesh* m_mesh;
-    Mesh* m_cubeMesh;
     Shader* m_program;
     Renderer* m_renderer;
     RenderObject* m_currentRo;

@@ -93,8 +93,7 @@ void main()
     vec3 normal = out_normal;
     vec3 viewDir = normalize(viewPos - out_position.xyz);
     vec3 reflectDir = reflect(-viewDir, normal);
-    //vec3 color = texture(envMap, reflectDir).rgb;
-    vec3 color = out_color.rgb;
+    vec3 color = texture(envMap, reflectDir).rgb;
     vec3 lightColor = vec3(0.3);
     // ambient
     vec3 ambient = 0.3 * color;
@@ -113,7 +112,7 @@ void main()
     float shadow = ShadowCalculation(out_position.xyz, levelColor);                      
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
     
-    FragColor = vec4(lighting, 1.0);
+    //FragColor = vec4(lighting, 1.0);
     //FragColor = vec4(levelColor, 1.0);
-    //FragColor = vec4(color, 1.0);
+    FragColor = vec4(color, 1.0);
 }

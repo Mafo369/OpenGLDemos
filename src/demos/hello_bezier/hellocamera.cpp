@@ -220,7 +220,7 @@ void SimpleCamera::draw() {
     m_renderer->setMaterialParams();
    
     /*** Update scene ***/
-    m_renderer->setMVP(_model, _view, _projection);
+    m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
     for(unsigned int i = 0; i < m_lights.size(); i++){
         auto& l = m_lights[i];

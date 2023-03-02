@@ -1,6 +1,6 @@
 #version 410 core
 
-in vec4 out_position;
+in vec3 out_position;
 in vec3 out_normal;
 in vec2 out_texCoords;
 in vec4 out_color;
@@ -46,8 +46,6 @@ void main()
     vec3 n = gl_FrontFacing ? out_normal : -out_normal;
     result += out_color * lambert(n, light[i].position) * vec4(I, 1.0);
   }
-
-  result = clamp(result, 0.0, 1.0);
 
   color = result.rgba;
 }

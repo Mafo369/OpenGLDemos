@@ -10,7 +10,6 @@
 #include "Geometry/Plane.h"
 #include "Geometry/Mesh.h"
 #include "../../Rendering/RenderObject.h"
-#include "../../../libs/stb_image.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
@@ -195,6 +194,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     // Shaders
     Shader* program = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/ShadowMapTest.frag.glsl");
+    Shader* programMicrofacet = 
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/Microfacet.frag.glsl");
     Shader* programModified = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetModified.frag.glsl");
     Shader* programLambert = 
@@ -207,31 +208,10 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
     Shader* programBasic = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Basic.frag.glsl");
-    m_programCube =
-        new Shader("Shaders/Cubemap.vert.glsl", "Shaders/Cubemap.frag.glsl");
-    m_programBg =
-        new Shader("Shaders/Background.vert.glsl", "Shaders/Background.frag.glsl");
+    Shader* programSpecular = 
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/Specular.frag.glsl");
 
-    stbi_set_flip_vertically_on_load(true);
-    int cmWidth, cmHeight, nrComponents;
-    float *data = stbi_loadf("/home/mafo/dev/Raytracer/assets/Alexs_Apt_2k.hdr", &cmWidth, &cmHeight, &nrComponents, 0);
-    if (data)
-    {
-        glGenTextures(1, &m_CMTexture);
-        glBindTexture(GL_TEXTURE_2D, m_CMTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, cmWidth, cmHeight, 0, GL_RGB, GL_FLOAT, data); 
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Failed to load HDR image." << std::endl;
-    }  
+    m_renderer->setEnvMap("/home/mafo/dev/Raytracer/assets/Alexs_Apt_2k.hdr");
 
     m_programQuad = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Quad.frag.glsl");
@@ -264,14 +244,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_programUp->setUniform1i("srcTexture", 0);
     m_programUp->unbind();
 
-    m_programCube->bind();
-    m_programCube->setUniform1i("equirectangularMap", 0);
-    m_programCube->unbind();
-
-    m_programBg->bind();
-    m_programBg->setUniform1i("environmentMap", 0);
-    m_programBg->unbind();
-
     // Materials
     MaterialParams matParams;
     matParams.texDiffuse = 0;
@@ -279,6 +251,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     matParams.metallic = 0.6;
     matParams.roughness = 0.6;
     m_material = std::make_shared<Material>(program, matParams);
+    m_materialSpecular = std::make_shared<Material>(programSpecular, matParams);
+    m_materialMicrofacet = std::make_shared<Material>(programMicrofacet, matParams);
     m_materialDepth = std::make_shared<Material>(m_programDepth, matParams);
     m_materialBasic = std::make_shared<Material>(programBasic, matParams);
     m_materialModified = std::make_shared<Material>(programModified, matParams);
@@ -292,7 +266,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_first = false;
 
     /*** Create Camera ***/
-    _cameraselector.push_back( []()->Camera*{return new EulerCamera(glm::vec3(0.f, 0.f, 1.f));} );
+    _cameraselector.push_back( []()->Camera*{return new EulerCamera(glm::vec3(0.f, 2.f, 7.f));} );
     _cameraselector.push_back( []()->Camera*{return new TrackballCamera(glm::vec3(0.f, 0.f, 1.f));} );
     _camera.reset(_cameraselector[_activecamera]());
     _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
@@ -403,102 +377,46 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     m_mipfbo->unbind();
 
-    Vertex v0 = {glm::vec3(-1.0f,  1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 1.f), {0,0,0,1}};
-    Vertex v1 = {glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 0.f), {0,0,0,1}};
-    Vertex v2 = {glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(1.f, 0.f), {0,0,0,1}};
-    Vertex v3 = {glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(0), glm::vec2(0.f, 1.f), {0,0,0,1}};
-    Vertex v4 = {glm::vec3(1.0f, -1.0f, 0.0f), glm::vec3(0), glm::vec2(1.f, 0.f), {0,0,0,1}};
-    Vertex v5 = {glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0), glm::vec2(1.f, 1.f), {0,0,0,1}};
-    std::vector<Vertex> vertices = { v0, v1, v2, v3, v4, v5 };
-    std::vector<unsigned int> indices = {
-        0, 1, 2,   // First Triangle
-        3, 4, 5    // Second Triangle
-    };
-
     std::vector<Vertex> verticesObj;
     std::vector<unsigned int> indicesObj;
-
-    //addObjectsFromFile("/home/mafo/Downloads/uploads_files_3783485_OM.obj", verticesObj, indicesObj, m_color);
     addObjectsFromFile("/home/mafo/dev/Raytracer/assets/Suzanne.obj", verticesObj, indicesObj, m_color);
-
     auto obj = new Mesh(verticesObj, indicesObj, GL_TRIANGLES);
     m_currentRo = new RenderObject(obj, m_materialBasic);
     auto monkeyTransform = glm::scale(glm::mat4(1.f), glm::vec3(0.48f));
     m_currentRo->setTransform(monkeyTransform);
     m_renderer->addRenderObject(m_currentRo);
 
-    m_mesh = new Mesh(vertices, indices, GL_TRIANGLES);
+    m_mesh = new Plane({0,0,0,1});
 
-    m_cubeMesh = new Cube({0.1,0.1,0.8,1});
-    auto cubeRo = new RenderObject(m_cubeMesh, m_materialTexture);
+    Mesh* cubeMesh = new Cube({0.1,0.1,0.8,1});
+    auto cubeRo = new RenderObject(cubeMesh, m_materialTexture);
     auto cubeT =  glm::scale(glm::mat4(1.f), glm::vec3(0.8f)) * glm::translate(glm::mat4(1.f), glm::vec3(3, 2, -1)) * glm::rotate(glm::mat4(1.f), 90.f, glm::vec3(1,1,0)) ;
     cubeRo->setTransform(cubeT);
     m_renderer->addRenderObject(cubeRo);
 
-    auto planeMesh = new Plane({0.1,0.1,0.1,1});
+    auto planeMesh = new Plane({0.855,0.855,0.855,1});
     auto planeRo = new RenderObject(planeMesh, m_material);
-    auto planeT = glm::translate(glm::mat4(1.f), glm::vec3(0,-1.2f, 0)) * glm::scale(glm::mat4(1.f), glm::vec3(50.f));
+    auto planeT = glm::translate(glm::mat4(1.f), glm::vec3(0,-1.2f, 0)) * glm::rotate(glm::mat4(1.f), deg2rad(90.f), glm::vec3(-1,0,0)) * glm::scale(glm::mat4(1.f), glm::vec3(50.f));
     planeRo->setTransform(planeT);
     m_renderer->addRenderObject(planeRo);
 
     auto sphereMesh = new Sphere({0.1, 0.7, 0.1, 1.f});
-    auto sphereRo = new RenderObject(sphereMesh, m_material);
+    auto sphereRo = new RenderObject(sphereMesh, m_materialSpecular);
     auto sphereT = glm::translate(glm::mat4(1.f), glm::vec3(-3, 0, -3));
     sphereRo->setTransform(sphereT);
     m_renderer->addRenderObject(sphereRo);
 
-    Framebuffer* captureFbo = new Framebuffer();
-    unsigned int captureRBO;
-    glGenRenderbuffers(1, &captureRBO);
-
-    captureFbo->bind();
-
-    glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cmWidth, cmWidth);
-    captureFbo->attachRenderbuffer(GL_DEPTH_ATTACHMENT, captureRBO);
-
-    glGenTextures(1, &envCubemap);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-    for (unsigned int i = 0; i < 6; ++i)
-    {
-        // note that we store each face with 16 bit floating point values
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 
-                     cmWidth, cmWidth, 0, GL_RGB, GL_FLOAT, nullptr);
-    }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-    glm::mat4 captureViews[] = 
-    {
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
-       glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
+    std::vector<std::vector<glm::vec3>> controlPoints = {
+      {{-0.5f, -0.5f, 0.0f}, {0.f, 0.f, 0.0f}, {0.5f, 0.f, 0.0f}, {1.f, -0.5f, 0.0f}},
+      {{-0.5f, -0.5f, 0.5f}, {0.f, 0.f, 0.5f}, {0.5f, 0.5f, 0.5f}, {1.f, -0.5f, 0.5f}},
+      {{-0.5f,  -0.5f, 1.0f}, {0.f, 0.5f, 1.0f}, {0.83f, 1.3f, 1.0f}, {1.f, -0.3f, 1.0f}},
+      {{-0.5f,  0.f, 1.5f}, {0.f, 0.f, 1.5f}, {0.5f, -1.0f, 1.5f}, {1.f, 0.3f, 1.5f}}
     };
-
-    // convert HDR equirectangular environment map to cubemap equivalent
-    m_programCube->bind();
-    m_programCube->setUniform1i("equirectangularMap", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_CMTexture);
-
-    glViewport(0, 0, cmWidth, cmWidth); // don't forget to configure the viewport to the capture dimensions.
-    captureFbo->bind();
-    for (unsigned int i = 0; i < 6; ++i)
-    {
-        m_programCube->setMVP(glm::mat4(1.f), captureViews[i], captureProjection);
-        captureFbo->attachCubemapTexture2D(GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        m_renderer->draw(m_cubeMesh, m_programCube);
-    }
-    captureFbo->unbind();
+    Mesh* mesh = new BezierSurface(controlPoints, 100, 100, glm::vec4(1.0f, 0.5f, 0.2f, 1.f));
+    RenderObject* ro = new RenderObject(mesh, m_materialMicrofacet);
+    auto bezierSurfaceT = glm::scale(glm::mat4(1.f), glm::vec3(3)) * glm::translate(glm::mat4(1.f), glm::vec3(-2, 0.5, -5));
+    ro->setTransform(bezierSurfaceT);
+    m_renderer->addRenderObject(ro);
 
     // configure light FBO
     // -----------------------
@@ -523,12 +441,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
-    int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE)
-    {
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
-        throw 0;
-    }
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+      std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 
     m_lightFBO->unbind();
 
@@ -651,7 +565,22 @@ void BloomDemo::draw() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
+
+    m_materialSpecular->getShader()->bind();
+    m_materialSpecular->getShader()->setUniform1i("shadowMap", 0);
+    m_materialSpecular->getShader()->setUniform1i("envMap", 1);
+    m_materialSpecular->getShader()->setUniform3f("viewPos", _camera->position());
+    m_materialSpecular->getShader()->setUniform3f("lightDir", lightDir);
+    m_materialSpecular->getShader()->setUniform1f("farPlane", cameraFarPlane);
+    m_materialSpecular->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
+    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
+      m_materialSpecular->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+    }  
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
 
     /*** Update Material ***/
     if(m_renderer->getCurrentMaterial() != nullptr)
@@ -669,13 +598,6 @@ void BloomDemo::draw() {
     }
 
     m_renderer->draw();	
-
-    m_programBg->bind();
-    m_programBg->setMVP(glm::mat4(1.f), _view, _projection);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
-    m_renderer->draw(m_cubeMesh, m_programBg);
 
     glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
@@ -754,7 +676,6 @@ void BloomDemo::draw() {
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_fboTexture);
     m_renderer->draw(m_mesh, m_programQuad);
-
 }
 
 void BloomDemo::mouseclick(int button, float xpos, float ypos) {
