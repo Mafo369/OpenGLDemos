@@ -257,8 +257,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_materialParametric = std::make_shared<Material>(programParametric);
     m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular);
     
-    m_currentMaterial = m_material;
-    
     m_first = false;
 
     /*** Create Camera ***/
@@ -461,14 +459,12 @@ void BloomDemo::draw() {
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, _camera->getNearPlane(), _camera->getFarPlane());
 
+    // depth pass for shadow mapping
     m_renderer->setVP(_view, _projection);
     m_renderer->depthOnlyPass(_camera.get(), lightDir, _width, _height);
 
-    // 2. render scene as normal using the generated depth/shadow map  
-    // --------------------------------------------------------------
-    // first pass
+    // render scene as normal using the generated depth/shadow map  
     m_fbo->bind();
-
     glDrawBuffer(GL_COLOR_ATTACHMENT0);
     glClearColor(m_clearColor.x, m_clearColor.y, m_clearColor.z, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
@@ -511,8 +507,6 @@ void BloomDemo::draw() {
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
 
     /*** Update Material ***/
-    if(m_renderer->getCurrentMaterial() != nullptr)
-      m_currentMaterial = m_renderer->getCurrentMaterial();
     m_renderer->setMaterialParams();
    
     /*** Update scene ***/

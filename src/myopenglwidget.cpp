@@ -88,12 +88,12 @@ void MyOpenGLWidget::paintGL() {
             if(ImGui::ColorEdit3("surface color", (float*)glm::value_ptr(color))){
                 _openglDemo->compute();
             }
-            ImGui::Text("Material:");
-            auto material = _openglDemo->getCurrentMaterial();
-            if(material->hasParams()){
-                ImGui::SliderFloat("metallic", material->getMetallic(), 0.0, 1.0);
-                ImGui::SliderFloat("roughness", material->getRoughness(), 0.0, 1.0);
-            }
+            //ImGui::Text("Material:");
+            //auto material = _openglDemo->getCurrentMaterial();
+            //if(material->hasParams()){
+            //    ImGui::SliderFloat("metallic", material->getMetallic(), 0.0, 1.0);
+            //    ImGui::SliderFloat("roughness", material->getRoughness(), 0.0, 1.0);
+            //}
             ImGui::Text("Control points:");
             if(ImGui::Checkbox("Display control points: ", &m_displayCtrlPts)){
                 _openglDemo->toggleCtrlPts();

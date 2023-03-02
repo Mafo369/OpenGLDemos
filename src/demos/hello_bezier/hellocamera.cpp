@@ -85,8 +85,6 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_materialParametric = std::make_shared<Material>(programParametric);
     m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular);
     
-    m_currentMaterial = m_material;
-    
     // Render objects
     compute();
     m_first = false;
@@ -211,7 +209,6 @@ void SimpleCamera::draw() {
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
 
     /*** Update Material ***/
-    m_currentMaterial = m_renderer->getCurrentMaterial();
     m_renderer->setMaterialParams();
    
     /*** Update scene ***/
