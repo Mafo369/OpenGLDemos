@@ -221,7 +221,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Downsample.frag.glsl");
     m_programUp = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Upsample.frag.glsl");
-
     m_programDepth = 
         new Shader("Shaders/ShadowMap.vert.glsl", "Shaders/ShadowMap.frag.glsl", "Shaders/ShadowMap.geom.glsl");
 
@@ -291,9 +290,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_renderer->addLightRo(light);
     m_renderer->addLightRo(light1);
     m_renderer->addLightRo(light2);
-    m_lights.push_back(light);
-    m_lights.push_back(light1);
-    m_lights.push_back(light2);
 
     m_fbo = new Framebuffer();
     m_fbo->bind();
@@ -464,8 +460,6 @@ BloomDemo::~BloomDemo() {
     delete m_lightFBO;
     delete m_mipfbo;
     delete m_renderer;
-    for(auto& l : m_lights)
-        delete l;
 }
 
 void BloomDemo::compute() {
@@ -523,12 +517,6 @@ void BloomDemo::draw() {
     glCullFace(GL_FRONT);  // peter panning
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
-    for(unsigned int i = 0; i < m_lights.size(); i++){
-        auto& l = m_lights[i];
-        l->update(m_translation);
-        m_renderer->setLightMVP(l->getModel(), _view, _projection , i);
-        m_renderer->setLight(l, i);
-    }
     m_renderer->draw(m_programDepth);
     glCullFace(GL_BACK);
     m_lightFBO->unbind();
@@ -590,13 +578,6 @@ void BloomDemo::draw() {
     /*** Update scene ***/
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
-    for(unsigned int i = 0; i < m_lights.size(); i++){
-        auto& l = m_lights[i];
-        l->update(m_translation);
-        m_renderer->setLightMVP(l->getModel(), _view, _projection , i);
-        m_renderer->setLight(l, i);
-    }
-
     m_renderer->draw();	
 
     glDrawBuffer(GL_COLOR_ATTACHMENT1);

@@ -10,6 +10,8 @@ Light::Light(LightParams lightParams) : RenderObject(){
     std::shared_ptr<Material> lightMaterial = std::make_shared<Material>(programLight);
     m_mesh = new Cube(glm::vec4(lightParams.color, 1.f));
     m_material = lightMaterial;
+    m_lightmodel = glm::translate(glm::mat4(1.f), m_lightParams.position);
+    m_lightmodel = glm::scale(m_lightmodel, glm::vec3(0.2f));
 }
 
 Light::~Light(){

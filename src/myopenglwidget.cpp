@@ -78,11 +78,11 @@ void MyOpenGLWidget::paintGL() {
         if(!_openglDemo->getControlsPoints().empty()){
             ImGui::SliderFloat3("Translation", glm::value_ptr(m_translation), -5.f, 5.0);
             ImGui::Text("Light:");
-            auto& lights = _openglDemo->getLights();
-            for(unsigned int i = 0; i < lights.size(); i++){
-                std::string name = "light " + std::to_string(i);
-                ImGui::SliderFloat3(name.c_str(), glm::value_ptr(lights[i]->getLightPosition()), -5.f, 5.0);
-            }
+            //auto& lights = _openglDemo->getLights();
+            //for(unsigned int i = 0; i < lights.size(); i++){
+            //    std::string name = "light " + std::to_string(i);
+            //    ImGui::SliderFloat3(name.c_str(), glm::value_ptr(lights[i]->getLightPosition()), -5.f, 5.0);
+            //}
             ImGui::Text("Surface:");
             auto& color = _openglDemo->getColor();
             if(ImGui::ColorEdit3("surface color", (float*)glm::value_ptr(color))){

@@ -37,7 +37,6 @@ public:
     virtual void compute() {}
     virtual glm::vec4& getColor() { return m_color; }
     std::shared_ptr<Material> getCurrentMaterial() { return m_currentMaterial; }
-    std::vector<Light*>& getLights() { return m_lights; }
 
     void toggledrawmode();
 
@@ -51,7 +50,6 @@ protected:
     glm::vec3 m_translation = glm::vec3(0.f);
     glm::vec4 m_color;
     std::vector<std::vector<glm::vec3>> m_controlPoints;
-    std::vector<Light*> m_lights;
     std::shared_ptr<Material> m_currentMaterial;
     bool _drawfill;
 

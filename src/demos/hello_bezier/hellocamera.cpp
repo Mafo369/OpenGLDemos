@@ -116,15 +116,10 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     m_renderer->addLightRo(light);
     m_renderer->addLightRo(light1);
     m_renderer->addLightRo(light2);
-    m_lights.push_back(light);
-    m_lights.push_back(light1);
-    m_lights.push_back(light2);
 }
 
 SimpleCamera::~SimpleCamera() {
     delete m_renderer;
-    for(auto& l : m_lights)
-        delete l;
 }
 
 void SimpleCamera::compute() {
@@ -222,12 +217,6 @@ void SimpleCamera::draw() {
     /*** Update scene ***/
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
-    for(unsigned int i = 0; i < m_lights.size(); i++){
-        auto& l = m_lights[i];
-        l->update(m_translation);
-        m_renderer->setLightMVP(l->getModel(), _view, _projection , i);
-        m_renderer->setLight(l, i);
-    }
 
     /*** Draw new scene ***/
     m_renderer->draw();

@@ -11,7 +11,8 @@ Renderer::Renderer(){
 }
 
 Renderer::~Renderer(){
-
+    for(auto& l : m_roLights)
+        delete l;
 }
 
 void Renderer::setEnvMap(const std::string& path) {
@@ -126,9 +127,12 @@ void Renderer::draw() {
         ro->getMaterial()->getShader()->setMVP(ro->getTransform(), m_view, m_projection);
         draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
     }
-    for(auto& ro : m_roLights) {
-        Mesh* mesh = ro->getMesh();
-        draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
+    for(unsigned int i = 0; i < m_roLights.size(); i++) {
+        auto l = static_cast<Light*>(m_roLights[i]);
+        setLightMVP(l->getModel(), m_view, m_projection , i);
+        setLight(l, i);
+        Mesh* mesh = l->getMesh();
+        draw(mesh->m_vao, mesh->m_ebo, l->getMaterial()->getShader());
     }
 
     if(m_hasCubeMap){
