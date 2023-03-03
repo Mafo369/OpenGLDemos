@@ -1,6 +1,7 @@
 #version 410 core
 
 #define PI 3.1415926535897932384626433832795
+#define MAX_LIGHTS 6
 
 in vec4 out_position;
 in vec3 out_normal;
@@ -30,7 +31,7 @@ struct Material{
   float roughness;
 };
 
-uniform Light light[3];
+uniform Light light[MAX_LIGHTS];
 
 uniform Material material;
 
@@ -63,7 +64,7 @@ void main(){
 
   vec3 v = normalize(eyePosition - out_position.xyz);
   vec3 material = vec3(0.0);
-  for(int i =0; i < 3; i++){
+  for(int i =0; i < MAX_LIGHTS; i++){
     vec3 l = normalize(light[i].position - out_position.xyz);
     vec3 h = normalize(l + v);
     float VdotH = dot(v, h);
@@ -84,7 +85,7 @@ void main(){
     float G = smith(NdotL, HdotL, NdotV, VdotH, alpha2);
     vec3 f_specular = F * D * G / (4 * abs(NdotV) * abs(NdotL));
 
-    material += (f_diffuse + f_specular);
+    material += light[i].color * (f_diffuse + f_specular);
   }
 
   color = vec4(material, 1.0);
