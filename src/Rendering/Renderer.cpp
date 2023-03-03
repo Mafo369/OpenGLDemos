@@ -451,11 +451,15 @@ void Renderer::setMaterialParams(){
         auto material = ro->getMaterial();
         if(material->hasParams()){
             auto materialParams = material->getParams();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, getLightDepthMaps());
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, getCubeMap());
             if(material->hasTexture()){
                 auto texture = material->getTexture();
                 auto textureSpecular = material->getTextureSpecular();
-                texture->bind();
-                textureSpecular->bind(1);
+                texture->bind(2);
+                textureSpecular->bind(3);
                 material->getShader()->setMaterialParams(materialParams);
             }
             else

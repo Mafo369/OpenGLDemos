@@ -1,7 +1,7 @@
-#version 330 core
+#version 460 core
 out vec4 FragColor;
   
-in vec4 out_position;
+in vec3 out_position;
 in vec3 out_normal;
 in vec2 out_texCoords;
 in vec4 out_color;

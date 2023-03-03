@@ -133,8 +133,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     // Materials
     MaterialParams matParams;
-    matParams.texDiffuse = 0;
-    matParams.texSpecular = 1;
+    matParams.texDiffuse = 2;
+    matParams.texSpecular = 3;
     matParams.metallic = 0.6;
     matParams.roughness = 0.6;
     m_material = std::make_shared<Material>(program, matParams);
@@ -307,6 +307,15 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
       m_materialSpecular->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
     }  
+
+    m_materialLambert->getShader()->bind();
+    m_materialLambert->getShader()->setUniform1i("shadowMap", 0);
+    m_materialLambert->getShader()->setUniform1i("envMap", 1);
+    m_materialLambert->getShader()->setUniform1f("farPlane", _camera->getFarPlane());
+    m_materialLambert->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
+    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
+      m_materialLambert->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+    }  
 }
 
 BloomDemo::~BloomDemo() {
@@ -374,20 +383,6 @@ void BloomDemo::draw() {
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glViewport(0, 0, _width, _height);
-
-    m_material->getShader()->bind();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_renderer->getLightDepthMaps());
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
-    m_material->getShader()->unbind();
-
-    m_materialSpecular->getShader()->bind();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_renderer->getLightDepthMaps());
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
-    m_materialSpecular->getShader()->unbind();
 
     /*** Update Material ***/
     m_renderer->setMaterialParams();

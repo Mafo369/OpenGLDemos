@@ -1,4 +1,4 @@
-#version 410 core
+#version 460 core
 layout (location = 1) in vec3 in_normal;
 
 out vec4 color;

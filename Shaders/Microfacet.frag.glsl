@@ -1,12 +1,15 @@
-#version 410 core
+#version 460 core
 
 #define PI 3.1415926535897932384626433832795
 #define MAX_LIGHTS 6
 
-in vec4 out_position;
+in vec3 out_position;
 in vec3 out_normal;
 in vec2 out_texCoords;
 in vec4 out_color;
+
+layout (location = 0) uniform sampler2DArray shadowMap;
+layout (location = 1) uniform samplerCube envMap;
 
 uniform vec3 eyePosition;
 

@@ -1,13 +1,16 @@
-#version 410 core
+#version 460 core
 
 #define PI 3.1415926535897932384626433832795
 
-in vec4 out_position;
+in vec3 out_position;
 in vec3 out_normal;
 in vec2 out_texCoords;
 in vec4 out_color;
 
 uniform vec3 eyePosition;
+
+layout (location = 0) uniform sampler2DArray shadowMap;
+layout (location = 1) uniform samplerCube envMap;
 
 out vec4 color;
 

@@ -103,7 +103,7 @@ void main()
     vec3 lightDir = dirLight.direction;
     //vec3 color = texture(envMap, reflectDir).rgb;
     vec3 color = out_color.rgb;
-    vec3 lightColor = vec3(0.3);
+    vec3 lightColor = dirLight.color;
     // ambient
     vec3 ambient = 0.3 * color;
     // diffuse

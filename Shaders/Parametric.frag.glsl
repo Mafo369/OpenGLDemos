@@ -1,6 +1,6 @@
-#version 410 core
+#version 460 core
     
-in vec4 out_position;
+in vec3 out_position;
 in vec3 out_normal;
 in vec2 out_texCoords;
 in vec4 out_color;
