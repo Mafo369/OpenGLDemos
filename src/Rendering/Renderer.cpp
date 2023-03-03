@@ -112,6 +112,8 @@ std::vector<glm::mat4> getLightSpaceMatrices(Camera* camera, std::vector<float>&
 
 Renderer::Renderer(){
   m_hasCubeMap = false;
+  m_dirLight.direction = glm::vec3(0,-1,0);
+  m_dirLight.color = glm::vec3(0);
 }
 
 Renderer::~Renderer(){
@@ -390,7 +392,7 @@ void Renderer::draw() {
         draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
     }
     for(unsigned int i = 0; i < m_roLights.size(); i++) {
-        auto l = static_cast<Light*>(m_roLights[i]);
+        auto l = static_cast<PointLight*>(m_roLights[i]);
         setLightMVP(l->getModel(), m_view, m_projection , i);
         setLight(l, i);
         Mesh* mesh = l->getMesh();
@@ -423,8 +425,19 @@ void Renderer::addRenderObject(RenderObject* ro){
     m_roList.push_back(ro);
 }
 
-void Renderer::addLightRo(RenderObject* ro){
-    m_roLights.push_back(ro);
+void Renderer::addPointLight(glm::vec3 position, glm::vec3 color, float constant, float linear, float quadratic) {
+  PointLightParams params;
+  params.position = position;
+  params.color = color;
+  params.constant = constant;
+  params.linear = linear;
+  params.quadratic = quadratic;
+  m_roLights.push_back(new PointLight(params));
+}
+
+void Renderer::setDirLight(glm::vec3 direction, glm::vec3 color) {
+  m_dirLight.direction = direction;
+  m_dirLight.color = color;
 }
 
 void Renderer::setMaterial(std::shared_ptr<Material> material){
@@ -461,9 +474,10 @@ void Renderer::setVP(glm::mat4 view, glm::mat4 projection){
     m_projection = projection;
 }
 
-void Renderer::setLight(Light* light, unsigned int id){
+void Renderer::setLight(PointLight* light, unsigned int id){
     for(auto& ro: m_roList){
-        ro->getMaterial()->getShader()->setLight(light, id);
+        ro->getMaterial()->getShader()->setPointLight(light, id);
+        ro->getMaterial()->getShader()->setDirLight(m_dirLight.direction, m_dirLight.color);
     }
 }
 

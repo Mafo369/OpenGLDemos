@@ -9,9 +9,16 @@ in vec4 out_color;
 layout (location = 0) uniform sampler2DArray shadowMap;
 layout (location = 1) uniform samplerCube envMap;
 
-uniform vec3 lightDir;
-uniform vec3 viewPos;
+uniform vec3 eyePosition;
 uniform float farPlane;
+
+struct DirLight
+{
+  vec3 direction;
+  vec3 color;
+};
+
+uniform DirLight dirLight;
 
 uniform mat4 view;
 
@@ -61,7 +68,7 @@ float ShadowCalculation(vec3 fragPosWorldSpace, out vec3 color)
     }
     // calculate bias (based on depth map resolution and slope)
     vec3 normal = normalize(out_normal);
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = max(0.05 * (1.0 - dot(normal, dirLight.direction)), 0.005);
     const float biasModifier = 0.5f;
     if (layer == cascadeCount)
     {
@@ -91,8 +98,9 @@ float ShadowCalculation(vec3 fragPosWorldSpace, out vec3 color)
 void main()
 {           
     vec3 normal = out_normal;
-    vec3 viewDir = normalize(viewPos - out_position.xyz);
+    vec3 viewDir = normalize(eyePosition - out_position.xyz);
     vec3 reflectDir = reflect(-viewDir, normal);
+    vec3 lightDir = dirLight.direction;
     //vec3 color = texture(envMap, reflectDir).rgb;
     vec3 color = out_color.rgb;
     vec3 lightColor = vec3(0.3);
@@ -102,7 +110,7 @@ void main()
     float diff = max(dot(lightDir, normal), 0.0);
     vec3 diffuse = diff * lightColor;
     // specular
-    viewDir = normalize(viewPos - out_position.xyz);
+    viewDir = normalize(eyePosition - out_position.xyz);
     reflectDir = reflect(-lightDir, normal);
     float spec = 0.0;
     vec3 halfwayDir = normalize(lightDir + viewDir);  

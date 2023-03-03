@@ -25,12 +25,13 @@ public:
     Renderer();
     ~Renderer();
     void addRenderObject(RenderObject* ro);
-    void addLightRo(RenderObject* ro);
+    void addPointLight(glm::vec3 position, glm::vec3 color, float constant=1, float linear=0, float quadratic=0);
+    void setDirLight(glm::vec3 direction, glm::vec3 color);
     void setMaterial(std::shared_ptr<Material> material);
     void setMaterialParams();
     void setLightMVP(glm::mat4 model, glm::mat4 view, glm::mat4 projection, unsigned int id);
     void setVP(glm::mat4 view, glm::mat4 projection);
-    void setLight(Light* light, unsigned int id);
+    void setLight(PointLight* light, unsigned int id);
     void setCameraPosition(glm::vec3 position);
     void clearRenderObjects(); 
     std::shared_ptr<Material> getCurrentMaterial() { if(!m_roList.empty()) return m_roList[0]->getMaterial(); else return nullptr; }
@@ -49,12 +50,17 @@ public:
     void draw(Shader* shader);
     void draw();
 
+    DirLightParams& getDirLight() { return m_dirLight; }
+
     std::vector<float>& getShadowCascadeLevels() { return m_shadowCascadeLevels; }
     unsigned int getLightDepthMaps() { return m_lightDepthMaps; }
 
 private:
     std::vector<RenderObject*> m_roList;
     std::vector<RenderObject*> m_roLights;
+
+    DirLightParams m_dirLight;
+
     unsigned int m_envMap;
     unsigned int m_envCubeMap;
 

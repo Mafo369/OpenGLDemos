@@ -98,22 +98,10 @@ SimpleCamera::SimpleCamera(int width, int height, ImVec4 clearColor) : OpenGLDem
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, 0.1f, 100.0f);
     _model = glm::translate(glm::mat4(1.0), m_translation);
 
-    /*** Create lights ***/
-    LightParams lightParams;
-    lightParams.position = glm::vec3(2.f, 5.f, 2.9f);
-    lightParams.color = glm::vec3(1.0f);
-    Light* light = new Light(lightParams);
-    
-    lightParams.position = glm::vec3(0.95f, 1.43f, 1.28f);
-    Light* light1 = new Light(lightParams);
-
-    lightParams.position = glm::vec3(-2.f, 0.3, 0.0f);
-    Light* light2 = new Light(lightParams);
-
     /*** Attach lights to renderer ***/
-    m_renderer->addLightRo(light);
-    m_renderer->addLightRo(light1);
-    m_renderer->addLightRo(light2);
+    m_renderer->addPointLight(glm::vec3(2.f, 5.f, 2.9f), glm::vec3(1.0f));
+    m_renderer->addPointLight(glm::vec3(0.95f, 1.43f, 1.28f), glm::vec3(1.0f));
+    m_renderer->addPointLight(glm::vec3(-2.f, 0.3, 0.0f), glm::vec3(1.0f));
 }
 
 SimpleCamera::~SimpleCamera() {

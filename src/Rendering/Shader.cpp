@@ -1,6 +1,6 @@
 #include "Shader.h"
 #include "Renderer.h"
-#include "../Geometry/Light.h"
+#include "../Rendering/Light.h"
 
 Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFilepath) 
 {
@@ -58,15 +58,22 @@ void Shader::setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection){
     unbind();
 }
 
-void Shader::setLight(Light* light, unsigned int id){
+void Shader::setPointLight(PointLight* light, unsigned int id){
     bind();
-    LightParams lightParams = light->getParams();
+    PointLightParams lightParams = light->getParams();
     std::string lightname = "light[" + std::to_string(id) + "]";
     setUniform3f( lightname + ".position", lightParams.position);
     setUniform3f( lightname + ".color", lightParams.color);
-    setUniform1f( lightname + ".attenuation.constant", lightParams.attenuation.constant);
-    setUniform1f( lightname + ".attenuation.linear", lightParams.attenuation.linear);
-    setUniform1f( lightname + ".attenuation.quadratic", lightParams.attenuation.quadratic);
+    setUniform1f( lightname + ".attenuation.constant", lightParams.constant);
+    setUniform1f( lightname + ".attenuation.linear", lightParams.linear);
+    setUniform1f( lightname + ".attenuation.quadratic", lightParams.quadratic);
+    unbind();
+}
+
+void Shader::setDirLight(glm::vec3 direction, glm::vec3 color){
+    bind();
+    setUniform3f("dirLight.direction", direction);
+    setUniform3f("dirLight.color", color);
     unbind();
 }
 

@@ -8,7 +8,7 @@
 #include "../Rendering/error_handling.h"
 #include <QOpenGLFunctions_4_1_Core>
 #include <imgui.h>
-#include "Geometry/Light.h"
+#include "Rendering/Light.h"
 
 #include "../libs/tiny_obj_loader.h"
 

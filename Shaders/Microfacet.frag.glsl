@@ -12,18 +12,20 @@ uniform vec3 eyePosition;
 
 out vec4 color;
 
-struct Attenuation
+struct Light
 {
+  vec3 position;
+  vec3 color;
+
   float constant;
   float linear;
   float quadratic;
 };
 
-struct Light
+struct DirLight
 {
-  vec3 position;
-  vec3 color; // Colour
-  Attenuation attenuation;
+  vec3 direction;
+  vec3 color;
 };
 
 struct Material{
@@ -32,6 +34,8 @@ struct Material{
 };
 
 uniform Light light[MAX_LIGHTS];
+
+uniform DirLight dirLight;
 
 uniform Material material;
 

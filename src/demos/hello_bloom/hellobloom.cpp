@@ -13,13 +13,6 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
-/*------------------------------------------------------------------------------------------------------------------------*/
-/*------------------------------------------------------------------------------------------------------------------------*/
-/*------------------------------------------------------------------------------------------------------------------------*/
-/*------------------------------------------------------------------------------------------------------------------------*/
-/*------------------------------------------------------------------------------------------------------------------------*/
-/*------------------------------------------------------------------------------------------------------------------------*/
-
 
 #define deg2rad(x) float(M_PI)*(x)/180.f
 
@@ -164,24 +157,12 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     _view = _camera->viewmatrix();
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, _camera->getNearPlane(), _camera->getFarPlane());
 
-    /*** Create lights ***/
-    LightParams lightParams;
-    lightParams.position = glm::vec3(0.f, 13.f, 0.f);
-    lightParams.color = glm::vec3(1.0f);
-    Light* light = new Light(lightParams);
-    
-    lightParams.position = glm::vec3(1.f, 13.f, 0.f);
-    lightParams.color = glm::vec3(1.0f);
-    Light* light1 = new Light(lightParams);
+    /*** Add lights to renderer ***/
+    m_renderer->addPointLight(glm::vec3(0.f, 13.f, 0.f), glm::vec3(1.0f));
+    m_renderer->addPointLight(glm::vec3(1.f, 13.f, 0.f), glm::vec3(1.0f));
+    m_renderer->addPointLight(glm::vec3(-1.f, 13.f, 0.0f), glm::vec3(1.0f));
 
-    lightParams.position = glm::vec3(-1.f, 13.f, 0.0f);
-    lightParams.color = glm::vec3(1.0f);
-    Light* light2 = new Light(lightParams);
-
-    /*** Attach lights to renderer ***/
-    m_renderer->addLightRo(light);
-    m_renderer->addLightRo(light1);
-    m_renderer->addLightRo(light2);
+    m_renderer->setDirLight(lightDir, glm::vec3(1.f));
 
     m_fbo = new Framebuffer();
     m_fbo->bind();
@@ -307,6 +288,25 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_renderer->addRenderObject(ro);
 
     m_renderer->setupShadows(_camera->getNearPlane(), _camera->getFarPlane());
+
+    m_material->getShader()->bind();
+    m_material->getShader()->setUniform1i("shadowMap", 0);
+    m_material->getShader()->setUniform1i("envMap", 1);
+    m_material->getShader()->setUniform1f("farPlane", _camera->getFarPlane());
+    auto& shadowCascadeLevels = m_renderer->getShadowCascadeLevels();
+    m_material->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
+    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
+      m_material->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+    }  
+
+    m_materialSpecular->getShader()->bind();
+    m_materialSpecular->getShader()->setUniform1i("shadowMap", 0);
+    m_materialSpecular->getShader()->setUniform1i("envMap", 1);
+    m_materialSpecular->getShader()->setUniform1f("farPlane", _camera->getFarPlane());
+    m_materialSpecular->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
+    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
+      m_materialSpecular->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+    }  
 }
 
 BloomDemo::~BloomDemo() {
@@ -329,6 +329,7 @@ void BloomDemo::compute() {
     m_programTh->unbind();
 
     m_currentRo->getMesh()->setColor(m_color);
+    m_renderer->setDirLight(lightDir, glm::vec3(1));
 }
 
 void BloomDemo::resize(int width, int height){
@@ -357,6 +358,7 @@ void BloomDemo::draw() {
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, _camera->getNearPlane(), _camera->getFarPlane());
 
     // depth pass for shadow mapping
+    m_renderer->setCameraPosition(_camera->position());
     m_renderer->setVP(_view, _projection);
     m_renderer->depthOnlyPass(_camera.get(), lightDir, _width, _height);
 
@@ -372,36 +374,20 @@ void BloomDemo::draw() {
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glViewport(0, 0, _width, _height);
+
     m_material->getShader()->bind();
-    m_material->getShader()->setUniform1i("shadowMap", 0);
-    m_material->getShader()->setUniform1i("envMap", 1);
-    m_material->getShader()->setUniform3f("viewPos", _camera->position());
-    m_material->getShader()->setUniform3f("lightDir", lightDir);
-    m_material->getShader()->setUniform1f("farPlane", _camera->getFarPlane());
-    auto& shadowCascadeLevels = m_renderer->getShadowCascadeLevels();
-    m_material->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
-    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
-      m_material->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
-    }  
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_renderer->getLightDepthMaps());
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
+    m_material->getShader()->unbind();
 
     m_materialSpecular->getShader()->bind();
-    m_materialSpecular->getShader()->setUniform1i("shadowMap", 0);
-    m_materialSpecular->getShader()->setUniform1i("envMap", 1);
-    m_materialSpecular->getShader()->setUniform3f("viewPos", _camera->position());
-    m_materialSpecular->getShader()->setUniform3f("lightDir", lightDir);
-    m_materialSpecular->getShader()->setUniform1f("farPlane", _camera->getFarPlane());
-    m_materialSpecular->getShader()->setUniform1i("cascadeCount", shadowCascadeLevels.size());
-    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
-      m_materialSpecular->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
-    }  
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_renderer->getLightDepthMaps());
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer->getCubeMap());
+    m_materialSpecular->getShader()->unbind();
 
     /*** Update Material ***/
     m_renderer->setMaterialParams();

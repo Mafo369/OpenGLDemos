@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 #include "Material.h"
 
-class Light;
+class PointLight;
   
 struct ShaderProgramSource{
     std::string vertexSource;
@@ -36,7 +36,8 @@ public:
     void setUniform1i(const std::string& name, int value);
 
     void setMVP(glm::mat4 _model, glm::mat4 _view, glm::mat4 _projection);
-    void setLight(Light* light, unsigned int id);
+    void setPointLight(PointLight* light, unsigned int id);
+    void setDirLight(glm::vec3 direction, glm::vec3 color);
     void setCameraPosition(glm::vec3 position);
     void setMaterialParams(MaterialParams params);
 private:
