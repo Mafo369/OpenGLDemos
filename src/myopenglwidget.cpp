@@ -19,6 +19,9 @@
 #include "demos/hello_spheres/hellospheres.h"
 #include "demos/hello_bloom/hellobloom.h"
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <gtx/string_cast.hpp>
+
 MyOpenGLWidget::MyOpenGLWidget(QWidget *parent) :QOpenGLWidget(parent)/*, QOpenGLFunctions_4_1_Core()*/, _openglDemo(nullptr), _lastime(0) {
     // add all demo constructors here
     _democonstructors.push_back( [](int width, int height, ImVec4 clearColor)->OpenGLDemo*{
@@ -110,6 +113,7 @@ void MyOpenGLWidget::paintGL() {
             }
         }
         if ( auto demo = dynamic_cast<BloomDemo*>( _openglDemo.get() ) ) {
+            //ImGui::Text(glm::to_string(demo->_camera->position()).c_str());
             ImGui::Text("Light Direction:");
             if(ImGui::SliderFloat3("light dir", glm::value_ptr(demo->lightDir), -10.f, 10.0)){
                 _openglDemo->compute();

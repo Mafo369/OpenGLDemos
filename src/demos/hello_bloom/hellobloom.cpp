@@ -135,8 +135,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     MaterialParams matParams;
     matParams.texDiffuse = 2;
     matParams.texSpecular = 3;
-    matParams.metallic = 0.6;
-    matParams.roughness = 0.6;
+    matParams.metallic = 0.939;
+    matParams.roughness = 0.276;
     m_material = std::make_shared<Material>(program, matParams);
     m_materialSpecular = std::make_shared<Material>(programSpecular, matParams);
     m_materialMicrofacet = std::make_shared<Material>(programMicrofacet, matParams);
@@ -150,7 +150,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_first = false;
 
     /*** Create Camera ***/
-    _cameraselector.push_back( []()->Camera*{return new EulerCamera(glm::vec3(0.f, 2.f, 7.f));} );
+    _cameraselector.push_back( []()->Camera*{return new EulerCamera(glm::vec3(-10.09f, 2.47f, 7.6f), {0,1.f,0.f}, -50.f, 0.f);} );
     _cameraselector.push_back( []()->Camera*{return new TrackballCamera(glm::vec3(0.f, 0.f, 1.f));} );
     _camera.reset(_cameraselector[_activecamera]());
     _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
@@ -158,9 +158,11 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     _projection = glm::perspective(glm::radians(_camera->zoom()), float(_width) / _height, _camera->getNearPlane(), _camera->getFarPlane());
 
     /*** Add lights to renderer ***/
-    m_renderer->addPointLight(glm::vec3(0.f, 13.f, 0.f), glm::vec3(1.0f));
-    m_renderer->addPointLight(glm::vec3(1.f, 13.f, 0.f), glm::vec3(1.0f));
-    m_renderer->addPointLight(glm::vec3(-1.f, 13.f, 0.0f), glm::vec3(1.0f));
+    m_renderer->addPointLight(glm::vec3(3.f, 6.f, 0.f), glm::vec3(5));
+    m_renderer->addPointLight(glm::vec3(0.f, 6.f, 0.f), glm::vec3(15.0f, 0, 0));
+    m_renderer->addPointLight(glm::vec3(-3.f, 6.f, 0.0f), glm::vec3(0.0f, 15.0f, 0.f));
+    m_renderer->addPointLight(glm::vec3(-6.f, 6.f, 0.0f), glm::vec3(0.0f, 0.0f, 25.f));
+    m_renderer->addPointLight(glm::vec3(0.f, 1.f, 0.0f), glm::vec3(5.f));
 
     m_renderer->setDirLight(lightDir, glm::vec3(1.f));
 
@@ -251,7 +253,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     addObjectsFromFile("/home/mafo/dev/Raytracer/assets/Suzanne.obj", verticesObj, indicesObj, m_color);
     auto obj = new Mesh(verticesObj, indicesObj, GL_TRIANGLES);
     m_currentRo = new RenderObject(obj, m_materialBasic);
-    auto monkeyTransform = glm::scale(glm::mat4(1.f), glm::vec3(0.48f));
+    auto monkeyTransform = glm::translate(glm::mat4(1.f), glm::vec3(0, 3, -2)) * glm::scale(glm::mat4(1.f), glm::vec3(0.68f));
     m_currentRo->setTransform(monkeyTransform);
     m_renderer->addRenderObject(m_currentRo);
 
@@ -275,13 +277,19 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     sphereRo->setTransform(sphereT);
     m_renderer->addRenderObject(sphereRo);
 
+    m_particle = new VerletParticle(sphereMesh, m_materialMicrofacet, glm::vec3(-8,10,-2), false);
+    m_particle->addConstraint(Aabb(glm::vec3(-50, -0.2, -50), glm::vec3(50, 40, 50)));
+    auto gravity = glm::vec3(0.0, -0.05, 0.0);
+    m_particle->addBehavior(gravity);
+    m_renderer->addRenderObject(m_particle);
+
     std::vector<std::vector<glm::vec3>> controlPoints = {
       {{-0.5f, -0.5f, 0.0f}, {0.f, 0.f, 0.0f}, {0.5f, 0.f, 0.0f}, {1.f, -0.5f, 0.0f}},
       {{-0.5f, -0.5f, 0.5f}, {0.f, 0.f, 0.5f}, {0.5f, 0.5f, 0.5f}, {1.f, -0.5f, 0.5f}},
       {{-0.5f,  -0.5f, 1.0f}, {0.f, 0.5f, 1.0f}, {0.83f, 1.3f, 1.0f}, {1.f, -0.3f, 1.0f}},
       {{-0.5f,  0.f, 1.5f}, {0.f, 0.f, 1.5f}, {0.5f, -1.0f, 1.5f}, {1.f, 0.3f, 1.5f}}
     };
-    Mesh* mesh = new BezierSurface(controlPoints, 100, 100, glm::vec4(1.0f, 0.5f, 0.2f, 1.f));
+    Mesh* mesh = new BezierSurface(controlPoints, 100, 100, glm::vec4(1.0f, 0.2f, 0.2f, 1.f));
     RenderObject* ro = new RenderObject(mesh, m_materialMicrofacet);
     auto bezierSurfaceT = glm::scale(glm::mat4(1.f), glm::vec3(3)) * glm::translate(glm::mat4(1.f), glm::vec3(-2, 0.5, -5));
     ro->setTransform(bezierSurfaceT);
@@ -390,6 +398,7 @@ void BloomDemo::draw() {
     /*** Update scene ***/
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
+    m_particle->update();
     m_renderer->draw();	
 
     glDrawBuffer(GL_COLOR_ATTACHMENT1);
@@ -452,7 +461,7 @@ void BloomDemo::draw() {
     }
 
     // Disable additive blending
-    //glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // Restore if this was default
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // Restore if this was default
     glDisable(GL_BLEND);
 
     // second pass

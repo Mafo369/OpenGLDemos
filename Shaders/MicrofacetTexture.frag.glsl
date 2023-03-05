@@ -12,20 +12,15 @@ uniform vec3 eyePosition;
 layout (location = 0) uniform sampler2DArray shadowMap;
 layout (location = 1) uniform samplerCube envMap;
 
-out vec4 color;
-
-struct Attenuation
-{
-  float constant;
-  float linear;
-  float quadratic;
-};
+out vec4 FragColor;
 
 struct Light
 {
   vec3 position;
   vec3 color; // Colour
-  Attenuation attenuation;
+  float constant;
+  float linear;
+  float quadratic;
 };
 
 struct Material{
@@ -35,7 +30,7 @@ struct Material{
   float roughness;
 };
 
-uniform Light light[3];
+uniform Light light[6];
 
 uniform Material material;
 
@@ -57,44 +52,67 @@ float smith(float NdotL, float HdotL, float NdotV, float HdotV, float alpha2){
 
 void main(){
   
-  const vec3 black = vec3(0);
-  vec3 iorV = vec3(0.04);
+  //const vec3 black = vec3(0);
+  //vec3 iorV = vec3(0.04);
 
-  vec4 texColor = texture(material.texDiffuse, out_texCoords);
-  vec4 texColorSpecular = texture(material.texSpecular, out_texCoords);
-  vec3 baseColor = texColor.rgb;
-  float metallic = float(texColorSpecular);
-  float roughness = float(texColorSpecular);
+  //vec4 texColor = texture(material.texDiffuse, out_texCoords);
+  //vec4 texColorSpecular = texture(material.texSpecular, out_texCoords);
+  //vec3 baseColor = texColor.rgb;
+  //float metallic = float(texColorSpecular);
+  //float roughness = float(texColorSpecular);
 
-  vec3 f0 = mix(iorV, baseColor.rgb, metallic);
-  vec3 c_diff = mix(baseColor.rgb, black, metallic);
-  float alpha = roughness * roughness;
-  float alpha2 = alpha * alpha;
+  //vec3 f0 = mix(iorV, baseColor.rgb, metallic);
+  //vec3 c_diff = mix(baseColor.rgb, black, metallic);
+  //float alpha = roughness * roughness;
+  //float alpha2 = alpha * alpha;
 
-  vec3 n = gl_FrontFacing ? out_normal : -out_normal;
-  n = normalize(n);
+  //vec3 n = gl_FrontFacing ? out_normal : -out_normal;
+  //n = normalize(n);
 
-  vec3 v = normalize(eyePosition - out_position.xyz);
-  vec3 material = vec3(0.0);
-  for(int i =0; i < 3; i++){
-    vec3 l = normalize(light[i].position - out_position.xyz);
-    vec3 h = normalize(l + v);
-    float VdotH = dot(v, h);
-    float NdotH = dot(n, h);
-    float NdotL = dot(n, l);
-    float HdotL = dot(h, l);
-    float NdotV = dot(n, v);
+  //vec3 v = normalize(eyePosition - out_position.xyz);
+  //vec3 material = vec3(0.0);
+  //for(int i =0; i < 3; i++){
+  //  vec3 l = normalize(light[i].position - out_position.xyz);
+  //  vec3 h = normalize(l + v);
+  //  float VdotH = dot(v, h);
+  //  float NdotH = dot(n, h);
+  //  float NdotL = dot(n, l);
+  //  float HdotL = dot(h, l);
+  //  float NdotV = dot(n, v);
 
-    vec3 F = f0 + (1-f0) * pow(1 - abs(VdotH),5);
+  //  vec3 F = f0 + (1-f0) * pow(1 - abs(VdotH),5);
 
-    vec3 f_diffuse = (1 - F) * (1 / PI) * c_diff;
-    float D = ggx(NdotH, alpha2);
-    float G = smith(NdotL, HdotL, NdotV, VdotH, alpha2);
-    vec3 f_specular = F * D * G / (4 * abs(NdotV) * abs(NdotL));
+  //  vec3 f_diffuse = (1 - F) * (1 / PI) * c_diff;
+  //  float D = ggx(NdotH, alpha2);
+  //  float G = smith(NdotL, HdotL, NdotV, VdotH, alpha2);
+  //  vec3 f_specular = F * D * G / (4 * abs(NdotV) * abs(NdotL));
 
-    material += (f_diffuse + f_specular);
-  }
+  //  material += (f_diffuse + f_specular);
+  //}
 
 
-  color = vec4(material, 1.0);
+  //color = vec4(material, 1.0);
+
+
+    vec3 color = texture(material.texDiffuse, out_texCoords).rgb;
+    vec3 normal = normalize(out_normal);
+    // ambient
+    vec3 ambient = 0.0 * color;
+    // lighting
+    vec3 lighting = vec3(0.0);
+    vec3 viewDir = normalize(eyePosition - out_position.xyz);
+    for(int i = 0; i < 6; i++)
+    {
+        // diffuse
+        vec3 lightDir = normalize(light[i].position - out_position.xyz);
+        float diff = max(dot(lightDir, normal), 0.0);
+        vec3 result = light[i].color * diff * color;      
+        // attenuation (use quadratic as we have gamma correction)
+        float distance = length(out_position.xyz - light[i].position);
+        result *= 1.0 / (distance * distance);
+        lighting += result;
+                
+    }
+    vec3 result = ambient + lighting;
+    FragColor = vec4(result, 1.0);
 }

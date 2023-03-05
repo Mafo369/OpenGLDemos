@@ -6,6 +6,7 @@
 #include "../../Rendering/Texture.h"
 #include "../../Rendering/Framebuffer.h"
 #include "../camera.h"
+#include "VerletParticle.h"
 #include "fwd.hpp"
 
 #include <memory>
@@ -34,10 +35,12 @@ public:
     glm::vec4& getColor() override { return m_color; }
     void toggleCtrlPts() override { m_displayCtrlPts = !m_displayCtrlPts; }
 
-    float m_exposure = 0.958f;
-    float m_threshold = 9.813f;
+    float m_exposure = 1.f;
+    float m_threshold = 0.935f;
     glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 80.0f));
     std::shared_ptr<Material> m_materialMicrofacet;
+
+    std::unique_ptr<Camera> _camera;
 
 private:
     // Shader program for rendering
@@ -85,12 +88,13 @@ private:
     std::vector<CameraSelector> _cameraselector;
     unsigned int _activecamera;
 
-    std::unique_ptr<Camera> _camera;
 
     // matrices
     glm::mat4 _lightmodel;
     glm::mat4 _view;
     glm::mat4 _projection;
+
+    VerletParticle* m_particle;
 
     glm::vec4 m_color;
 
