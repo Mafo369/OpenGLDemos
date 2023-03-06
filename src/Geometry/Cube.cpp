@@ -5,47 +5,47 @@ Cube::Cube(glm::vec4 color) : Mesh() {
     m_color = color;
     m_vertices = {
         // back face
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, m_color}, // bottom-left
-      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, m_color}, // top-right
-      {    { 1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}, m_color}, // bottom-right         
-      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, m_color}, // top-right
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, m_color}, // bottom-left
-      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}, m_color}, // top-left
-          // front face                                       
-      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, m_color}, // bottom-left
-      {    { 1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}, m_color}, // bottom-right
-      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, m_color}, // top-right
-      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, m_color}, // top-right
-      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}, m_color}, // top-left
-      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, m_color}, // bottom-left
-          // left face                                      
-      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // top-right
-      {    {-1.0f,  1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, m_color}, // top-left
-      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // bottom-left
-      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // bottom-left
-      {    {-1.0f, -1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, m_color}, // bottom-right
-      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // top-right
-          // right face                                     
-      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // top-left
-      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // bottom-right
-      {     {1.0f,  1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, m_color}, // top-right         
-      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // bottom-right
-      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // top-left
-      {     {1.0f, -1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, m_color}, // bottom-left     
-          // bottom face                                   
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // top-right
-      {    { 1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}, m_color}, // top-left
-      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // bottom-left
-      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // bottom-left
-      {    {-1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}, m_color}, // bottom-right
-      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // top-right
-          // top face                                     
-      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // top-left
-      {    { 1.0f,  1.0f , 1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // bottom-right
-      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}, m_color}, // top-right     
-      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, m_color}, // bottom-right
-      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, m_color}, // top-left
-      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}, m_color}  // bottom-left        
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+      {    { 1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right         
+      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  0.0f, -1.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+          // front face                                                                         
+      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+      {    { 1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right
+      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+      {    {-1.0f, -1.0f,  1.0f},  {0.0f,  0.0f,  1.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+          // left face                                                                          
+      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+      {    {-1.0f,  1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+      {    {-1.0f, -1.0f, -1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+      {    {-1.0f, -1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right
+      {    {-1.0f,  1.0f,  1.0f}, {-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+          // right face                                                                         
+      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right
+      {     {1.0f,  1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right         
+      {     {1.0f, -1.0f, -1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right
+      {     {1.0f,  1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+      {     {1.0f, -1.0f,  1.0f},  {1.0f,  0.0f,  0.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left     
+          // bottom face                                                                        
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+      {    { 1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+      {    { 1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-left
+      {    {-1.0f, -1.0f,  1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right
+      {    {-1.0f, -1.0f, -1.0f},  {0.0f, -1.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right
+          // top face                                                                           
+      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+      {    { 1.0f,  1.0f , 1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right
+      {    { 1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-right     
+      {    { 1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {1.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}, // bottom-right
+      {    {-1.0f,  1.0f, -1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 1.0f}, m_color, {0,0,0}, {0,0,0}}, // top-left
+      {    {-1.0f,  1.0f,  1.0f},  {0.0f,  1.0f,  0.0f}, {0.0f, 0.0f}, m_color, {0,0,0}, {0,0,0}}  // bottom-left        
     };  
     for(int i = 0; i < 6*6; i++){
       m_indices.push_back(i);

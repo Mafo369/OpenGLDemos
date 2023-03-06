@@ -3,10 +3,10 @@
 SimpleTriangle::SimpleTriangle(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor) {
     // Initialise geometric data
     m_color = glm::vec4(1.0f, 0.5f, 0.2f, 1.f);
-    Vertex v0 = {normalize(glm::vec3(0.5f,  0.5f, 1.5f)), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    Vertex v1 = {normalize(glm::vec3(0.5f, -0.5f, 0.0f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    Vertex v2 = {normalize(glm::vec3(-0.5f, -0.5f, 0.0f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
-    Vertex v3 = {normalize(glm::vec3(-0.5f, 0.5f, 1.5f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color};
+    Vertex v0 = {normalize(glm::vec3(0.5f,  0.5f, 1.5f)), glm::vec3(0.577350269189626f, 0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color, {0,0,0}, {0,0,0}};
+    Vertex v1 = {normalize(glm::vec3(0.5f, -0.5f, 0.0f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color, {0,0,0}, {0,0,0}};
+    Vertex v2 = {normalize(glm::vec3(-0.5f, -0.5f, 0.0f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color, {0,0,0}, {0,0,0}};
+    Vertex v3 = {normalize(glm::vec3(-0.5f, 0.5f, 1.5f)), glm::vec3(0.577350269189626f, -0.577350269189626f, 0.577350269189626f), glm::vec2(0.f, 0.f), m_color, {0,0,0}, {0,0,0}};
     std::vector<Vertex> vertices = { v0, v1, v2, v3 };
     std::vector<unsigned int> indices = {
         0, 1, 3,   // First Triangle

@@ -5,11 +5,11 @@ project(OpenGLDemos)
 cmake_minimum_required(VERSION 2.8.9) # Minimal version compatible QT5
 CMAKE_POLICY(SET CMP0043 NEW) # This will silence the Cmake Warning "Policy CMP0043 is not set"
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED OFF)
 set(CMAKE_CXX_EXTENSIONS ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic")
 
 #set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/bin)
 
@@ -77,3 +77,16 @@ set(EXT_LIBS Qt5::OpenGL ${OPENGL_LIBRARIES})
 add_subdirectory(libs/qtimgui)
 
 target_link_libraries(OpenGLDemos ${EXT_LIBS} qt_imgui_widgets implot  )
+
+include(FetchContent)
+set(FETCHCONTENT_BASE_DIR ${PROJECT_SOURCE_DIR}/libs CACHE PATH "Missing description." FORCE)
+FetchContent_Declare(assimp
+GIT_REPOSITORY https://github.com/assimp/assimp.git
+GIT_TAG 80799bdbf90ce626475635815ee18537718a05b1) #v4.1.0
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INJECT_DEBUG_POSTFIX OFF CACHE BOOL "" FORCE)
+set(ASSIMP_INSTALL OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(assimp)
+target_include_directories(OpenGLDemos PRIVATE libs/assimp-src/include libs/assimp-build/include)
+target_link_libraries(OpenGLDemos assimp)

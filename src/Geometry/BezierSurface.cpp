@@ -39,7 +39,7 @@ void BezierSurface::computeVertices(unsigned int lignes, glm::vec4 color){
                 uCurve.push_back(bezierValue(m_controlPoints[i], u, m_coeffsCols)); 
             }
             glm::vec3 puv = bezierValue(uCurve, v, m_coeffsLignes);
-            Vertex vertex = { puv, normal, glm::vec2(u, v), color };
+            Vertex vertex = { puv, normal, glm::vec2(u, v), color, {0,0,0}, {0,0,0} };
             m_vertices.push_back(vertex);
             std::vector<unsigned int> vn;
             m_vertexNormals.push_back(vn);

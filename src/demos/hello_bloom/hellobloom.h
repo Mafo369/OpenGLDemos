@@ -39,6 +39,7 @@ public:
     float m_threshold = 0.935f;
     glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 80.0f));
     std::shared_ptr<Material> m_materialMicrofacet;
+    std::shared_ptr<Material> m_materialTexture;
 
     std::unique_ptr<Camera> _camera;
 
@@ -51,7 +52,6 @@ private:
     std::shared_ptr<Material> m_materialLambert;
     std::shared_ptr<Material> m_materialNormal;
     std::shared_ptr<Material> m_materialParametric;
-    std::shared_ptr<Material> m_materialTexture;
     std::shared_ptr<Material> m_materialQuad;
     std::shared_ptr<Material> m_materialTh;
 

@@ -458,8 +458,8 @@ void Renderer::setMaterialParams(){
             if(material->hasTexture()){
                 auto texture = material->getTexture();
                 auto textureSpecular = material->getTextureSpecular();
-                texture->bind(2);
-                textureSpecular->bind(3);
+                texture->bind(materialParams.texDiffuse);
+                textureSpecular->bind(materialParams.texSpecular);
                 material->getShader()->setMaterialParams(materialParams);
             }
             else

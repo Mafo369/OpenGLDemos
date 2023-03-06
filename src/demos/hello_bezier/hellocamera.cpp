@@ -115,7 +115,7 @@ void SimpleCamera::compute() {
         std::vector<Vertex> vertices1;
         for(auto& points : m_controlPoints){
             for(auto& point : points){
-                Vertex v = {point, glm::vec3(0.f), glm::vec2(0.f), m_color};
+                Vertex v = {point, glm::vec3(0.f), glm::vec2(0.f), m_color, {0,0,0}, {0,0,0}};
                 vertices1.push_back(v);
             }
         } 
@@ -154,12 +154,12 @@ void SimpleCamera::compute() {
     if(m_displayCtrlPts)
         m_renderer->addRenderObject(roCPM);
     glm::vec4 planeColor = {0.5,0.5,0.5,1};
-    Vertex v0P = {glm::vec3(-5., -2.f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    Vertex v1P = {glm::vec3(-5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor};
-    Vertex v2P = {glm::vec3(5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    Vertex v3P = {glm::vec3(-5., -2.f, 5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor};
-    Vertex v4P = {glm::vec3(5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor};
-    Vertex v5P = {glm::vec3(5., -2.f, 5.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor};
+    Vertex v0P = {glm::vec3(-5., -2.f,  5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor, {0,0,0}, {0,0,0}};
+    Vertex v1P = {glm::vec3(-5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(0.f, 0.f), planeColor, {0,0,0}, {0,0,0}};
+    Vertex v2P = {glm::vec3(5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor, {0,0,0}, {0,0,0}};
+    Vertex v3P = {glm::vec3(-5., -2.f, 5.), glm::vec3(0,1,0), glm::vec2(0.f, 1.f), planeColor, {0,0,0}, {0,0,0}};
+    Vertex v4P = {glm::vec3(5., -2.f, -5.), glm::vec3(0,1,0), glm::vec2(1.f, 0.f), planeColor, {0,0,0}, {0,0,0}};
+    Vertex v5P = {glm::vec3(5., -2.f, 5.), glm::vec3(0,1,0), glm::vec2(1.f, 1.f), planeColor, {0,0,0}, {0,0,0}};
     std::vector<Vertex> verticesPlane = { v0P, v1P, v2P, v3P, v4P, v5P };
     std::vector<unsigned int> indicesPlane = {
         0, 1, 2,   // First Triangle

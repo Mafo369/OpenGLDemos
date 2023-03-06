@@ -64,6 +64,10 @@ void main(){
   float ior = 0.04;
   vec3 iorV = vec3(ior);
   vec3 baseColor = out_color.rgb;
+
+  float gamma = 2.2;
+  baseColor = pow(baseColor, vec3(gamma));
+
   float metallic = material.metallic;
   float roughness = material.roughness;
   vec3 n = gl_FrontFacing ? out_normal : -out_normal;

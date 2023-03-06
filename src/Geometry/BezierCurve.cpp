@@ -26,7 +26,7 @@ void BezierCurve::computeVertices(glm::vec4 color){
         m_indices.push_back(indice);
         indice++;
         m_indices.push_back(indice);
-        Vertex v = { pu, normal, glm::vec2(0.f, 0.f), color };
+        Vertex v = { pu, normal, glm::vec2(0.f, 0.f), color, {0,0,0}, {0,0,0} };
         m_vertices.push_back(v);
     }
     m_indices.pop_back();
