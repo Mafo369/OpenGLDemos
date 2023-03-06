@@ -11,6 +11,10 @@
 #include "Framebuffer.h"
 #include "../demos/camera.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 typedef struct s_BloomMip
 {
     glm::vec2 size;
@@ -55,7 +59,16 @@ public:
     std::vector<float>& getShadowCascadeLevels() { return m_shadowCascadeLevels; }
     unsigned int getLightDepthMaps() { return m_lightDepthMaps; }
 
+    void loadModel(std::string const &path, Shader* shader, glm::vec4 color, glm::mat4 transform);
+
 private:
+     
+    void processNode(aiNode *node, const aiScene *scene, Shader* shader, glm::vec4 color, glm::mat4 transform);
+
+    Mesh* processMesh(aiMesh *mesh, const aiScene *scene, glm::vec4 color, std::vector<Texture*>& textures);
+
+    std::vector<Texture*> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
+
     std::vector<RenderObject*> m_roList;
     std::vector<RenderObject*> m_roLights;
 
@@ -96,6 +109,12 @@ private:
     std::vector<glm::mat4> m_lightMatrices;
 
     glm::mat4 m_view, m_projection;
+
+    // model data 
+    std::vector<Texture*> textures_loaded;	// stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
+    std::vector<Mesh>    meshes;
+    std::string directory;
+    bool gammaCorrection;
 };
 
 std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
