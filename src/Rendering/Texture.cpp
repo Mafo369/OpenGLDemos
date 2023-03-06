@@ -9,7 +9,11 @@
 Texture::Texture(const std::string& path): m_filePath(path), 
     m_localBuffer(nullptr), m_width(0), m_height(0), m_bpp(0) {
     stbi_set_flip_vertically_on_load(1);
-    m_localBuffer = stbi_load(path.c_str(), &m_width, &m_height, &m_bpp, 4);
+    m_localBuffer = stbi_load(path.c_str(), &m_width, &m_height, &m_bpp, 0);
+    if(!m_localBuffer) 
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+    }
 
     glAssert(glGenTextures(1, &m_rendererId));
 

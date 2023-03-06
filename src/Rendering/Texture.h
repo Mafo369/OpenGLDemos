@@ -15,9 +15,8 @@ public:
     inline int getHeight() const { return m_height; }
 
     unsigned int m_rendererId;
-    std::string m_filePath;
+    std::string m_filePath, type;
     unsigned char* m_localBuffer;
     int m_width, m_height, m_bpp;
-    std::string m_path, type;
 private:
 };
