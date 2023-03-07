@@ -213,9 +213,10 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     auto monkeyTransform = glm::translate(glm::mat4(1.f), glm::vec3(0, 3, -2)) * glm::scale(glm::mat4(1.f), glm::vec3(0.68f));
     m_renderer->loadModel("/home/mafo/dev/Raytracer/assets/Suzanne.obj", programBasic, m_color, monkeyTransform);
 
-    auto hoverTransform = glm::translate(glm::mat4(1.f), glm::vec3(6, 0, -14)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(0.5f));
-    hoverTransform = hoverTransform * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,1,0));
-    m_renderer->loadModel("Assets/hover-bike/hover_bike/scene.gltf", programTexture, {0,0,0,1}, hoverTransform);
+    //auto hoverTransform = glm::translate(glm::mat4(1.f), glm::vec3(6, 0, -14)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(0.05f));
+    //hoverTransform = hoverTransform * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,1,0));
+    auto hoverTransform = glm::translate(glm::mat4(1.f), glm::vec3(6, 0, -14)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(1,0,0));
+    m_renderer->loadModel("/home/mafo/etc/glTF-Sample-Models/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf", programTexture, {0,0,0,1}, hoverTransform);
 
     m_mesh = new Plane({0,0,0,1});
 

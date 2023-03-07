@@ -61,11 +61,11 @@ void main(){
   texColor = vec4(diffuseColor, 1.0);
   vec4 texColorSpecular = texture(material.texSpecular, out_texCoords);
   vec3 baseColor = texColor.rgb;
-  float metallic = float(texColorSpecular);
-  float roughness = float(texColorSpecular);
+  float roughness = float(texColorSpecular.g);
+  float metallic = float(texColorSpecular.b);
 
-  //float metallic = 0.9;
-  //float roughness = 0.2;
+  //metallic = 0.9;
+  //roughness = 0.2;
 
   vec3 f0 = mix(iorV, baseColor.rgb, metallic);
   vec3 c_diff = mix(baseColor.rgb, black, metallic);

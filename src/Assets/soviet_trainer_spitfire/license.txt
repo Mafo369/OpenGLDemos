@@ -1,0 +1,11 @@
+Model Information:
+* title:	Soviet trainer spitfire
+* source:	https://sketchfab.com/3d-models/soviet-trainer-spitfire-7e527594e0894be588034848804260df
+* author:	Batmanya (https://sketchfab.com/Batmanya)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Soviet trainer spitfire" (https://sketchfab.com/3d-models/soviet-trainer-spitfire-7e527594e0894be588034848804260df) by Batmanya (https://sketchfab.com/Batmanya) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
