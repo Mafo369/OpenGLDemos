@@ -58,8 +58,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Parametric.frag.glsl");
     Shader* programTexture = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
-    Shader* programTexture1 = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/MicrofacetTexture.frag.glsl");
     Shader* programBasic = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Basic.frag.glsl");
     Shader* programSpecular = 
@@ -109,7 +107,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_materialLambert = std::make_shared<Material>(programLambert);
     m_materialNormal = std::make_shared<Material>(programNormal);
     m_materialParametric = std::make_shared<Material>(programParametric);
-    m_materialTexture = std::make_shared<Material>(programTexture1, matParams, texture, textureSpecular);
+    m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular);
     
     m_first = false;
 
@@ -354,9 +352,6 @@ void BloomDemo::draw() {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glViewport(0, 0, _width, _height);
 
-    /*** Update Material ***/
-    m_renderer->setMaterialParams();
-   
     /*** Update scene ***/
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());

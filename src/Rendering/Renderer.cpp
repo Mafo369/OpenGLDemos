@@ -395,7 +395,22 @@ void Renderer::draw(Mesh* mesh, Shader* shader){
 void Renderer::draw() {
     for(auto& ro : m_roList) {
         Mesh* mesh = ro->getMesh();
-        ro->getMaterial()->getShader()->setMVP(ro->getTransform(), m_view, m_projection);
+        auto material = ro->getMaterial();
+        if(material->hasParams()){
+            auto materialParams = material->getParams();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, getLightDepthMaps());
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, getCubeMap());
+            if(material->hasTexture()){
+                auto texture = material->getTexture();
+                auto textureSpecular = material->getTextureSpecular();
+                texture->bind(materialParams.texDiffuse);
+                textureSpecular->bind(materialParams.texSpecular);
+            }
+            material->getShader()->setMaterialParams(materialParams);
+        }
+        material->getShader()->setMVP(ro->getTransform(), m_view, m_projection);
         draw(mesh->m_vao, mesh->m_ebo, ro->getMaterial()->getShader());
     }
     for(unsigned int i = 0; i < m_roLights.size(); i++) {
@@ -458,12 +473,14 @@ void Renderer::setMaterialParams(){
         auto material = ro->getMaterial();
         if(material->hasParams()){
             auto materialParams = material->getParams();
+            material->getShader()->bind();
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D_ARRAY, getLightDepthMaps());
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_CUBE_MAP, getCubeMap());
             if(material->hasTexture()){
                 auto texture = material->getTexture();
+                std::cout << texture->m_filePath << std::endl;
                 auto textureSpecular = material->getTextureSpecular();
                 texture->bind(materialParams.texDiffuse);
                 textureSpecular->bind(materialParams.texSpecular);
@@ -471,6 +488,7 @@ void Renderer::setMaterialParams(){
             }
             else
                 material->getShader()->setMaterialParams(materialParams);
+            material->getShader()->unbind();
         }
 
     }
