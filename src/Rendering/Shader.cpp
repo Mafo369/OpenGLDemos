@@ -87,6 +87,9 @@ void Shader::setMaterialParams(MaterialParams params){
     bind();
     setUniform1i("material.texDiffuse", params.texDiffuse);
     setUniform1i("material.texSpecular", params.texSpecular);
+    setUniform1i("material.texNormal", params.texNormal);
+    setUniform1i("material.texEmission", params.texEmission);
+    setUniform1i("material.texAO", params.texAO);
     setUniform1f("material.metallic", params.metallic);
     setUniform1f("material.roughness", params.roughness);
     unbind();

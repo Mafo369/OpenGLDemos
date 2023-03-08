@@ -70,8 +70,8 @@ void main(){
 
   float metallic = material.metallic;
   float roughness = material.roughness;
-  vec3 n = gl_FrontFacing ? out_normal : -out_normal;
-  n = normalize(n);
+  //vec3 n = gl_FrontFacing ? out_normal : -out_normal;
+  vec3 n = out_normal;
 
   vec3 v = normalize(eyePosition - out_position.xyz);
   vec3 material = vec3(0.0);

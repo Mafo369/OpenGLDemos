@@ -407,6 +407,9 @@ void Renderer::draw() {
                 auto textureSpecular = material->getTextureSpecular();
                 texture->bind(materialParams.texDiffuse);
                 textureSpecular->bind(materialParams.texSpecular);
+                material->m_textureNormal->bind(materialParams.texNormal);
+                material->m_textureAO->bind(materialParams.texAO);
+                material->m_textureEmission->bind(materialParams.texEmission);
             }
             material->getShader()->setMaterialParams(materialParams);
         }
@@ -484,6 +487,8 @@ void Renderer::setMaterialParams(){
                 auto textureSpecular = material->getTextureSpecular();
                 texture->bind(materialParams.texDiffuse);
                 textureSpecular->bind(materialParams.texSpecular);
+                material->m_textureNormal->bind(materialParams.texNormal);
+                material->m_textureAO->bind(materialParams.texAO);
                 material->getShader()->setMaterialParams(materialParams);
             }
             else
@@ -507,6 +512,7 @@ void Renderer::setLight(PointLight* light, unsigned int id){
     for(auto& ro: m_roList){
         ro->getMaterial()->getShader()->setPointLight(light, id);
         ro->getMaterial()->getShader()->setDirLight(m_dirLight.direction, m_dirLight.color);
+        //ro->getMaterial()->getShader()->setUniform1i("nLights", (int)m_roList.size());
     }
 }
 
@@ -560,17 +566,36 @@ void Renderer::processNode(aiNode *node, const aiScene *scene, Shader* shader, g
         MaterialParams matParams;
         matParams.texDiffuse = 2;
         matParams.texSpecular = 3;
+        matParams.texNormal = 4;
+        matParams.texAO = 5;
+        matParams.texEmission = 6;
         matParams.metallic = 0.9;
         matParams.roughness = 0.9;
         std::shared_ptr<Material> material;
-        int idx = -1;
-        for(unsigned int j = 0; j < textures_loaded.size(); j++) {
-          if(textures_loaded[i]->m_filePath.compare("texture_diffuse")){
-              idx = i;
+        int idx = 0;
+        for(unsigned int j = 0; j < textures.size(); j++) {
+          if(textures[i]->m_filePath.compare("texture_diffuse")){
+              idx++;
+          }
+          else if(textures[i]->m_filePath.compare("texture_metalness")){
+              idx++;
+          }
+          else if(textures[i]->m_filePath.compare("texture_normal")){
+              idx++;
+          }
+          else if(textures[i]->m_filePath.compare("texture_ao")){
+              idx++;
+          }
+          else if(textures[i]->m_filePath.compare("texture_emission")){
+              idx++;
           }
         }
-        if(idx != -1 && textures.size() > 2){
-          material = std::make_shared<Material>(shader, matParams, textures[0], textures[3]);
+        if(idx == 5){
+          material = std::make_shared<Material>(shader, matParams, textures[0], textures[1], textures[2], textures[3], textures[4]);
+        }
+        else if(idx == 4)
+        {
+          material = std::make_shared<Material>(shader, matParams, textures[0], textures[1], textures[2], new Texture(glm::vec3(0)), new Texture(glm::vec3(0)));
         }
         else
         {
@@ -673,14 +698,26 @@ Mesh* Renderer::processMesh(aiMesh *mesh, const aiScene *scene, glm::vec4 color,
     std::vector<Texture*> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, "texture_diffuse");
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     // 2. specular maps
-    std::vector<Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, "texture_specular");
+    std::vector<Texture*> specularMaps = loadMaterialTextures(material, aiTextureType_METALNESS, "texture_metalness");
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // 3. normal maps
     std::vector<Texture*> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, "texture_normal");
     textures.insert(textures.end(), normalMaps.begin(), normalMaps.end());
     // 4. height maps
-    std::vector<Texture*> heightMaps = loadMaterialTextures(material, aiTextureType_UNKNOWN, "texture_height");
+    std::vector<Texture*> heightMaps = loadMaterialTextures(material, aiTextureType_LIGHTMAP, "texture_ao");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
+    // 5. emission maps
+    std::vector<Texture*> emissionMaps = loadMaterialTextures(material, aiTextureType_EMISSIVE, "texture_emission");
+    textures.insert(textures.end(), emissionMaps.begin(), emissionMaps.end());
+
+    //std::cout << "ALL TEXS" << std::endl;
+    //for(unsigned int i = 0; i < 30; i++){
+    //    std::cout << i << std::endl;
+    //    std::vector<Texture*> heightMaps = loadMaterialTextures(material, static_cast<aiTextureType>(i), "texture_ao");
+    //    for(auto& t : heightMaps){
+    //      std::cout << t->m_filePath << std::endl;
+    //    }
+    //}
     
     // return a mesh object created from the extracted mesh data
     return new Mesh(vertices, indices, GL_TRIANGLES);

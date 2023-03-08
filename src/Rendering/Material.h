@@ -10,6 +10,9 @@ class Shader;
 typedef struct s_MaterialParams{
     int texDiffuse;
     int texSpecular;
+    int texNormal;
+    int texAO;
+    int texEmission;
     float metallic;
     float roughness;
 }MaterialParams;
@@ -20,6 +23,8 @@ public:
     Material(Shader* shader, MaterialParams materialParams);
     Material(Shader* shader, MaterialParams materialParams, Texture* texture,
              Texture* textureSpecular);
+    Material(Shader* shader, MaterialParams materialParams, Texture* texture,
+             Texture* textureSpecular, Texture* textureNormal, Texture* textureAO, Texture* textureEmission);
     ~Material();
 
     Shader* getShader() { return m_shader; }
@@ -30,11 +35,15 @@ public:
     bool hasTexture() { return m_hasTexture; }
     float* getMetallic() { return &m_materialParams.metallic; }
     float* getRoughness() { return &m_materialParams.roughness; }
+
+    Texture* m_texture;
+    Texture* m_textureSpecular;
+    Texture* m_textureNormal;
+    Texture* m_textureAO;
+    Texture* m_textureEmission;
 private:
     Shader* m_shader;
     MaterialParams m_materialParams;
-    Texture* m_texture;
-    Texture* m_textureSpecular;
     bool m_hasParams = false;
     bool m_hasTexture = false;
 };

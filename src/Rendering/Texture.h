@@ -1,11 +1,13 @@
 #pragma once
 
 #include <string>
+#include <glm/glm.hpp>
 
 class Texture {
 public:
     Texture() {};
     Texture(const std::string& path);
+    Texture(const glm::vec3& color);
     ~Texture();
 
     void bind(unsigned int slot = 0) const;

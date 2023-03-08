@@ -42,6 +42,9 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     // Textures
     Texture* texture = new Texture("Assets/container2.png");
     Texture* textureSpecular = new Texture("Assets/container2_specular.png");
+    Texture* texNormal = new Texture(glm::vec3(0));
+    Texture* texAO = new Texture(glm::vec3(0));
+    Texture* texE = new Texture(glm::vec3(0));
     
     // Shaders
     Shader* program = 
@@ -97,6 +100,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     MaterialParams matParams;
     matParams.texDiffuse = 2;
     matParams.texSpecular = 3;
+    matParams.texNormal = 4;
+    matParams.texAO = 5;
     matParams.metallic = 0.939;
     matParams.roughness = 0.276;
     m_material = std::make_shared<Material>(program, matParams);
@@ -107,7 +112,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_materialLambert = std::make_shared<Material>(programLambert);
     m_materialNormal = std::make_shared<Material>(programNormal);
     m_materialParametric = std::make_shared<Material>(programParametric);
-    m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular);
+    m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular, texNormal, texAO, texE);
     
     m_first = false;
 
@@ -126,6 +131,9 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_renderer->addPointLight(glm::vec3(-6.f, 6.f, 0.0f), glm::vec3(0.0f, 0.0f, 25.f));
     m_renderer->addPointLight(glm::vec3(0.f, 1.f, 0.0f), glm::vec3(5.f));
 
+    programTexture->bind();
+    programTexture->setUniform1i("nLights", 5);
+    programTexture->unbind();
     m_renderer->setDirLight(lightDir, glm::vec3(1.f));
 
     m_fbo = new Framebuffer();
@@ -210,19 +218,21 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     m_mipfbo->unbind();
 
-    auto monkeyTransform = glm::translate(glm::mat4(1.f), glm::vec3(0, 3, -2)) * glm::scale(glm::mat4(1.f), glm::vec3(0.68f));
+    auto monkeyTransform = glm::translate(glm::mat4(1.f), glm::vec3(0, 3, -4)) * glm::scale(glm::mat4(1.f), glm::vec3(0.68f));
     m_renderer->loadModel("/home/mafo/dev/Raytracer/assets/Suzanne.obj", programBasic, m_color, monkeyTransform);
 
-    //auto hoverTransform = glm::translate(glm::mat4(1.f), glm::vec3(6, 0, -14)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(0.05f));
-    //hoverTransform = hoverTransform * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,1,0));
-    auto hoverTransform = glm::translate(glm::mat4(1.f), glm::vec3(6, 0, -14)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(1,0,0));
-    m_renderer->loadModel("/home/mafo/etc/glTF-Sample-Models/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf", programTexture, {0,0,0,1}, hoverTransform);
+    auto helmetTransform = glm::translate(glm::mat4(1.f), glm::vec3(0, 0, -3)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(1,0,0));
+    m_renderer->loadModel("/home/mafo/etc/glTF-Sample-Models/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf", programTexture, {0,0,0,1}, helmetTransform);
+
+    auto hoverTransform = glm::translate(glm::mat4(1.f), glm::vec3(6, 0, -14)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(0.05f));
+    hoverTransform = hoverTransform * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,1,0));
+    m_renderer->loadModel("Assets/soviet_trainer_spitfire/scene.gltf", programTexture, {0,0,0,1}, hoverTransform);
 
     m_mesh = new Plane({0,0,0,1});
 
     Mesh* cubeMesh = new Cube({0.1,0.1,0.8,1});
     auto cubeRo = new RenderObject(cubeMesh, m_materialTexture);
-    auto cubeT =  glm::scale(glm::mat4(1.f), glm::vec3(0.8f)) * glm::translate(glm::mat4(1.f), glm::vec3(3, 2, -1)) * glm::rotate(glm::mat4(1.f), 90.f, glm::vec3(1,1,0)) ;
+    auto cubeT =  glm::scale(glm::mat4(1.f), glm::vec3(0.8f)) * glm::translate(glm::mat4(1.f), glm::vec3(5, 2, -1)) * glm::rotate(glm::mat4(1.f), 90.f, glm::vec3(1,1,0)) ;
     cubeRo->setTransform(cubeT);
     m_renderer->addRenderObject(cubeRo);
 
@@ -234,7 +244,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
 
     auto sphereMesh = new Sphere({0.1, 0.7, 0.1, 1.f});
     auto sphereRo = new RenderObject(sphereMesh, m_materialSpecular);
-    auto sphereT = glm::translate(glm::mat4(1.f), glm::vec3(-3, 0, -3));
+    auto sphereT = glm::translate(glm::mat4(1.f), glm::vec3(-4, 0, -3));
     sphereRo->setTransform(sphereT);
     m_renderer->addRenderObject(sphereRo);
 

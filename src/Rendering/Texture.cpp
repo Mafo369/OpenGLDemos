@@ -40,6 +40,33 @@ Texture::Texture(const std::string& path): m_filePath(path),
         stbi_image_free(m_localBuffer);
 }
 
+Texture::Texture(const glm::vec3& color): m_filePath("uniformColor"), 
+    m_localBuffer(nullptr), m_width(0), m_height(0), m_bpp(0) {
+    unsigned char a = 0x00;
+    unsigned char bytes[3] = {a, a, a};
+    m_localBuffer = bytes;
+
+    m_width = 1;
+    m_height = 1;
+
+    glAssert(glGenTextures(1, &m_rendererId));
+
+    m_bpp = 3;
+    GLenum format;
+    format = GL_RGB;
+
+    glAssert(glBindTexture(GL_TEXTURE_2D, m_rendererId));
+    
+    glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+    glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+
+    glAssert(glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, m_localBuffer));
+    glAssert(glGenerateMipmap(GL_TEXTURE_2D));
+    glAssert(glBindTexture(GL_TEXTURE_2D, 0));
+}
+
 Texture::~Texture(){
     glAssert(glDeleteTextures(1, &m_rendererId));
 }
