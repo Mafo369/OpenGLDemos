@@ -11,6 +11,7 @@
 #include "../Rendering/Texture.h"
 
 class Renderer;
+class Bone;
 
 struct Vertex{
     glm::vec3 m_position;
@@ -27,6 +28,7 @@ class Mesh{
     friend Renderer;
 public:
     std::vector<Vertex> m_vertices;
+    std::vector<Vertex> m_verticesInit;
     std::vector<unsigned int> m_indices;
 
     Mesh() {}
@@ -36,6 +38,9 @@ public:
     void setVertices(std::vector<Vertex> vertices) { m_vertices = vertices; }
     void setIndices(std::vector<unsigned int> indices) { m_indices = indices; }
     void setColor(const glm::vec4& color);
+
+    std::vector<Bone*> m_boneList;
+    std::vector<std::vector<std::pair<int,float>>> m_boneWeight;
 private:
     VertexArray* m_vao;
     VertexBuffer* m_vbo;

@@ -9,6 +9,8 @@
 #include "Geometry/Sphere.h"
 #include "Geometry/Plane.h"
 #include "Geometry/Mesh.h"
+#include "Geometry/Cylinder.h"
+#include "Rendering/Bone.h"
 #include "../../Rendering/RenderObject.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
@@ -37,8 +39,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     /*** Initialise renderer ***/
     m_renderer = new Renderer();
 
-    /*** Create render objects ***/
-
     // Textures
     Texture* texture = new Texture("Assets/container2.png");
     Texture* textureSpecular = new Texture("Assets/container2_specular.png");
@@ -65,6 +65,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Basic.frag.glsl");
     Shader* programSpecular = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Specular.frag.glsl");
+    Shader* programWeight = 
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/Weight.frag.glsl");
 
     m_renderer->setEnvMap("/home/mafo/dev/Raytracer/assets/Alexs_Apt_2k.hdr");
 
@@ -113,6 +115,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_materialNormal = std::make_shared<Material>(programNormal);
     m_materialParametric = std::make_shared<Material>(programParametric);
     m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular, texNormal, texAO, texE);
+    m_materialWeight = std::make_shared<Material>(programWeight);
     
     m_first = false;
 
@@ -266,6 +269,27 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     ro->setTransform(bezierSurfaceT);
     m_renderer->addRenderObject(ro);
 
+    m_arm = new Cylinder({1,0,0,1}, 1, 1.0, 8.0, 64);
+    for(auto& v : m_arm->m_vertices){
+        m_arm->m_verticesInit.push_back(v);
+    }
+
+    m_cylinder = new Cylinder({1,0,0,1}, 1, 1.0, 8.0, 64);
+    m_armRo = new RenderObject(m_arm, m_materialWeight);
+    auto cylinderT = glm::translate(glm::mat4(1.f), glm::vec3(-11, 3.5, -8)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,0,1));
+    m_armRo->setTransform(cylinderT);
+    m_renderer->addRenderObject(m_armRo);
+
+    auto bone = new Bone({4,1.5,0}, {0,1.5,0}, m_materialBasic);
+    bone->setPosition(glm::vec3(0));
+    m_arm->m_boneList.push_back(bone);
+    auto bone2 = new Bone({0,1.5,0}, {-4,1.5,0}, m_materialBasic);
+    bone->m_childs.push_back(bone2);
+    bone2->setPosition(glm::vec3(0,4,0));
+    m_arm->m_boneList.push_back(bone2);
+    m_arm->m_boneWeight.resize(m_arm->m_vertices.size());
+    computeWeight();
+
     m_renderer->setupShadows(_camera->getNearPlane(), _camera->getFarPlane());
 
     m_material->getShader()->bind();
@@ -307,6 +331,56 @@ BloomDemo::~BloomDemo() {
     delete m_renderer;
 }
 
+void BloomDemo::computeWeight(){
+    float d =(float)(value_d)/200;
+    float min = 0.5-d;
+    float max = 0.5+d;
+    std::vector<Vertex> newVertices;
+    for(auto i=0; i< (int)m_cylinder->m_vertices.size(); i++){
+        glm::vec2 tex = m_cylinder->m_vertices[i].m_texCoords;
+        float a = tex.y;
+        if(a<min) a = 0;
+        else{
+            if(a>max) a = 1;
+            else{
+                a = (a - min) / (max - min);
+            }
+        }
+        m_arm->m_boneWeight[i].clear();
+        m_arm->m_boneWeight[i].push_back(std::pair<int,float>(0,1-a));
+        m_arm->m_boneWeight[i].push_back(std::pair<int,float>(1,a));
+
+        m_arm->m_vertices[i].m_texCoords = glm::vec3(1-a,a,0);
+        newVertices.push_back(m_arm->m_vertices[i]);
+    }
+    Mesh* newMesh = new Mesh(newVertices, m_arm->m_indices, GL_TRIANGLES);
+    m_armRo->setMesh(newMesh);
+}
+
+void BloomDemo::computeRotation() {
+    m_arm->m_boneList[1]->rotateRestPose(-rot+180,glm::vec3(0.,0.,1.));
+    m_arm->m_boneList[1]->rotate(-rot3+180,glm::vec3(0.,1.,0.));
+    m_arm->m_boneList[0]->rotateRestPose(-rot2+180,glm::vec3(0.,0.,1.));
+}
+
+void BloomDemo::computeMesh() {
+    std::vector<Vertex> newVertices;
+    computeRotation();
+    for(auto i=0; i<(int)m_arm->m_vertices.size(); i++){
+        glm::mat4 blend(0);
+        for(uint j=0; j<m_arm->m_boneWeight[i].size(); j++){
+            std::pair<int,float> pair = m_arm->m_boneWeight[i][j];
+            Bone* bone = m_arm->m_boneList[pair.first];
+            blend += pair.second * bone->getBlendPose();
+        }
+        glm::vec4 initV = glm::vec4(m_arm->m_verticesInit[i].m_position,1);
+        m_arm->m_vertices[i].m_position = blend * initV;
+        newVertices.push_back(m_arm->m_vertices[i]);
+    }
+    Mesh* newMesh = new Mesh(newVertices, m_arm->m_indices, GL_TRIANGLES);
+    m_armRo->setMesh(newMesh);
+}
+
 void BloomDemo::compute() {
     m_programQuad->bind();
     m_programQuad->setUniform1f("exposure", m_exposure);
@@ -318,6 +392,7 @@ void BloomDemo::compute() {
 
     //m_currentRo->getMesh()->setColor(m_color);
     m_renderer->setDirLight(lightDir, glm::vec3(1));
+
 }
 
 void BloomDemo::resize(int width, int height){

@@ -131,6 +131,13 @@ void MyOpenGLWidget::paintGL() {
             if(ImGui::SliderFloat("threshold", &demo->m_threshold, 0, 100)){
               _openglDemo->compute();
             }
+            if(ImGui::SliderFloat("rot", &demo->rot, 0, 360)){
+              demo->computeMesh();
+            }
+            if(ImGui::SliderInt("value d", &demo->value_d, 0, 100)){
+              demo->computeWeight();
+              demo->computeMesh();
+            }
         }
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Keybinds:");
         ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "  Shaders:");
