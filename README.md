@@ -2,7 +2,7 @@
 
 ## IMPORTANT NOTE !!!
 
-**FILE HAS TO BE EXECUTED FROM bin/ DUE TO RESSOURCES ACCESS LIKE Shaders/ AND Assets/**
+**FILE HAS TO BE EXECUTED FROM build/ DUE TO RESSOURCES ACCESS**
 
 ## Getting Started
 
@@ -13,22 +13,21 @@ git clone --recursive https://github.com/Mafo369/OpenGLDemos.git
 ```bash
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ../
 make
-cd ../bin
-./helloopenGL
+./OpenGLDemos
 ```
 
 ## Keybinds:
 
 Shaders:
 
-- **c** : glTF 2.0 microfacets
-- **m** : modified microfacets
-- **t** : texture microfacets
-- **l** : simple lambert
-- **n** : normals
-- **u** : UV coords
+- glTF 2.0 microfacets
+- modified microfacets
+- texture microfacets
+- simple lambert
+- normals
+- UV coords
 
 Demos:
 
@@ -36,6 +35,7 @@ Demos:
 - **1** : Hello triangle
 - **2** : Bezier Surface
 - **3** : Hello Sphere
+- **4** : Hello Bloom 
 
 ## Results: Bezier Surface
 
