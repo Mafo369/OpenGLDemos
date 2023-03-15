@@ -340,16 +340,20 @@ BloomDemo::~BloomDemo() {
 
 // Compute weights for cylinder
 void BloomDemo::computeWeight(){
-    float d =(float)(value_d)/200;
+    float d =(float)(value_d)/200.f;
     float min = 0.5-d;
     float max = 0.5+d;
     std::vector<Vertex> newVertices;
-    for(auto i=0; i< (int)m_cylinder->m_vertices.size(); i++){
+    for(unsigned int i=0; i < m_cylinder->m_vertices.size(); i++){
         glm::vec2 tex = m_cylinder->m_vertices[i].m_texCoords;
         float a = tex.y;
-        if(a<min) a = 0;
+        if(a<min){
+            a = 0;
+        }
         else{
-            if(a>max) a = 1;
+            if(a>max){
+                a = 1;
+            }
             else{
                 a = (a - min) / (max - min);
             }
@@ -582,6 +586,25 @@ bool BloomDemo::keyboard(unsigned char k) {
             _activecamera = (_activecamera+1)%2;
             _camera.reset(_cameraselector[_activecamera]());
             _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
+            return true;
+        case 'r':
+            {
+            m_particle->setTransform(glm::mat4(1.f));
+            m_particle->m_position = m_particle->m_initPos;
+            m_particle->m_prev = m_particle->m_initPos;
+            //m_rot = 180.f;
+            //value_d = 50;
+            //computeMesh();
+            //std::vector<Vertex> newVertices;
+            //computeRotation();
+            //for(unsigned int i=0; i < m_arm->m_vertices.size(); i++){
+            //    glm::vec4 initV = glm::vec4(m_arm->m_verticesInit[i].m_position,1);
+            //    m_arm->m_vertices[i].m_position = initV;
+            //    newVertices.push_back(m_arm->m_vertices[i]);
+            //}
+            //Mesh* newMesh = new Mesh(newVertices, m_arm->m_indices, GL_TRIANGLES);
+            //m_armRo->setMesh(newMesh);
+            }
             return true;
         case 'm':
             m_animMode = !m_animMode;

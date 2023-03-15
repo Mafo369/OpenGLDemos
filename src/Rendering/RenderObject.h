@@ -15,7 +15,7 @@ public:
     Mesh* getMesh() { return m_mesh; }
     void setMesh(Mesh* m) { m_mesh = m; }
     std::shared_ptr<Material> getMaterial() { return m_material; }
-    void setTransform(glm::mat4& transform) { m_transform = transform; }
+    void setTransform(glm::mat4 transform) { m_transform = transform; }
     glm::mat4 getTransform() { return m_transform; }
 protected:
     int m_rendererId = -1;

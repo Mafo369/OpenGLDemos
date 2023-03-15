@@ -4,6 +4,7 @@
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, 
            unsigned int mode){
     setVertices(vertices);
+    m_verticesInit = vertices;
     setIndices(indices);
     setupMesh(mode);
 }
