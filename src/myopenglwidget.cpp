@@ -146,6 +146,7 @@ void MyOpenGLWidget::paintGL() {
         ImGui::Text("    'w' : wireframe");
         ImGui::Text("    'r' : reset verlet");
         ImGui::Text("    'm' : toggle animation mode");
+        ImGui::Text("    's' : toggle shadow debug mode");
         ImGui::Text("    'p' : perspective view (kinda buggy)");
         //ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "  Shaders:");
         //ImGui::Text("    'c' : glTF2.0 microfacets");
