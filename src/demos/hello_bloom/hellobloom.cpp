@@ -68,6 +68,8 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Specular.frag.glsl");
     Shader* programWeight = 
         new Shader("Shaders/anim.vert.glsl", "Shaders/Weight.frag.glsl");
+    m_programShadowDebug = 
+        new Shader("Shaders/Camera.vert.glsl", "Shaders/ShadowMapDebug.frag.glsl");
     m_programQuad = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Quad.frag.glsl");
     m_programTh = 
@@ -309,6 +311,15 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
       m_material->getShader()->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
     }  
 
+    m_programShadowDebug->bind();
+    m_programShadowDebug->setUniform1i("shadowMap", 0);
+    m_programShadowDebug->setUniform1i("envMap", 1);
+    m_programShadowDebug->setUniform1f("farPlane", _camera->getFarPlane());
+    m_programShadowDebug->setUniform1i("cascadeCount", shadowCascadeLevels.size());
+    for (size_t i = 0; i < shadowCascadeLevels.size(); ++i){
+      m_programShadowDebug->setUniform1f("cascadePlaneDistances[" + std::to_string(i) + "]", shadowCascadeLevels[i]);
+    }  
+
     m_materialSpecular->getShader()->bind();
     m_materialSpecular->getShader()->setUniform1i("shadowMap", 0);
     m_materialSpecular->getShader()->setUniform1i("envMap", 1);
@@ -477,7 +488,13 @@ void BloomDemo::draw() {
     m_materialWeight->getShader()->unbind();
 
     /*** Original render ***/
-    m_renderer->draw();	
+    if(!m_shadowDebug){
+      m_renderer->draw();	
+    }
+    else
+    {
+      m_renderer->draw(m_programShadowDebug);  
+    }
 
     glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
@@ -587,6 +604,8 @@ bool BloomDemo::keyboard(unsigned char k) {
             _camera.reset(_cameraselector[_activecamera]());
             _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
             return true;
+        case 's':
+              m_shadowDebug = !m_shadowDebug;
         case 'r':
             {
             m_particle->setTransform(glm::mat4(1.f));

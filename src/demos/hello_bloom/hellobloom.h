@@ -78,6 +78,7 @@ private:
     unsigned int m_attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 
     Shader* m_programQuad;
+    Shader* m_programShadowDebug;
     Shader* m_programTh;
     Shader* m_programDown;
     Shader* m_programUp;
@@ -112,6 +113,7 @@ private:
     glm::vec4 m_color;
 
     bool m_animMode = true; // true -> CPU ; false -> GPU
+    bool m_shadowDebug = false;
 };
 
 /*------------------------------------------------------------------------------------------------------------------------*/
