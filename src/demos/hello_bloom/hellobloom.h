@@ -43,9 +43,9 @@ public:
     float m_exposure = 1.f;
     float m_threshold = 0.935f;
     int value_d = 50;
-    float rot = 180;
-    float rot2 = 180;
-    float rot3 = 180;
+    float m_rot = 180;
+    float m_rot2 = 180;
+    float m_rot3 = 180;
 
     glm::vec3 lightDir = glm::normalize(glm::vec3(20.0f, 50, 80.0f));
     std::shared_ptr<Material> m_materialMicrofacet;

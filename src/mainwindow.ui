@@ -38,10 +38,10 @@
     <property name="title">
      <string>&amp;Demo</string>
     </property>
-    <addaction name="actionHello_clear"/>
     <addaction name="actionHello_triangle"/>
     <addaction name="actionHello_camera"/>
     <addaction name="actionHello_spheres"/>
+    <addaction name="actionHello_bloom"/>
    </widget>
    <addaction name="menu_Demo"/>
    <addaction name="menuInfo"/>
@@ -75,9 +75,9 @@
     <string>Hello spheres ...</string>
    </property>
   </action>
-  <action name="actionHello_clear">
+  <action name="actionHello_bloom">
    <property name="text">
-    <string>Hello clear ...</string>
+    <string>Hello bloom ...</string>
    </property>
   </action>
  </widget>

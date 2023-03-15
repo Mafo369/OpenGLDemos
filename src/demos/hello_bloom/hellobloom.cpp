@@ -11,7 +11,7 @@
 #include "Geometry/Mesh.h"
 #include "Geometry/Cylinder.h"
 #include "Rendering/Bone.h"
-#include "../../Rendering/RenderObject.h"
+#include "Rendering/RenderObject.h"
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <gtx/string_cast.hpp>
@@ -32,12 +32,13 @@
 #include <map>
 #include <vector>
 
-BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _activecamera(0), _camera(nullptr) {
+BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(width, height, clearColor), _camera(nullptr), _activecamera(0) {
     /*** Initialise geometric data ***/
     m_color = glm::vec4(45.1f, 0.3f, 0.3f, 1.f);
 
     /*** Initialise renderer ***/
     m_renderer = new Renderer();
+    m_renderer->setEnvMap("Assets/Alexs_Apt_2k.hdr");
 
     // Textures
     Texture* texture = new Texture("Assets/container2.png");
@@ -67,9 +68,6 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Specular.frag.glsl");
     Shader* programWeight = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Weight.frag.glsl");
-
-    m_renderer->setEnvMap("/home/mafo/dev/Raytracer/assets/Alexs_Apt_2k.hdr");
-
     m_programQuad = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Quad.frag.glsl");
     m_programTh = 
@@ -139,12 +137,15 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     programTexture->unbind();
     m_renderer->setDirLight(lightDir, glm::vec3(1.f));
 
+
+    /*** Setup Framebuffer for original render and threshold ***/
     m_fbo = new Framebuffer();
     m_fbo->bind();
     
     int hdrWidth = _width;
     int hdrHeight = _height;
 
+    // Original render texture
     glGenTextures(1, &m_fboTexture);
     glBindTexture(GL_TEXTURE_2D, m_fboTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, hdrWidth, hdrHeight, 0, GL_RGB, GL_FLOAT, NULL);
@@ -158,6 +159,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     // attach it to currently bound framebuffer object
     m_fbo->attachTexture2D(GL_COLOR_ATTACHMENT0, m_fboTexture);
 
+    // Thresholded texture of original used for Bloom
     glGenTextures(1, &m_fboThTexture);
     glBindTexture(GL_TEXTURE_2D, m_fboThTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, hdrWidth, hdrHeight, 0, GL_RGB, GL_FLOAT, NULL);
@@ -171,7 +173,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     // attach it to currently bound framebuffer object
     m_fbo->attachTexture2D(GL_COLOR_ATTACHMENT1, m_fboThTexture);
 
-    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+    // create a renderbuffer object for depth and stencil attachment
     unsigned int rbo;
     glGenRenderbuffers(1, &rbo);
     glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -182,6 +184,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     m_fbo->unbind();
 
+    /*** Setup Bloom Framebuffer for final Bloom image ***/
     m_mipfbo = new Framebuffer();
     m_mipfbo->bind();
 
@@ -192,6 +195,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
         std::cerr << "Window size conversion overflow - cannot build bloom FBO!\n";
     }
 
+    // Create different mips for Bloom texture
     for(unsigned int i = 0; i < 6; i++){
       BloomMip mip;
 
@@ -214,18 +218,19 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
       m_mipChain.emplace_back(mip);
     }
 
-    // attach it to currently bound framebuffer object
+    // attach first mip to currently bound framebuffer object
     m_mipfbo->attachTexture2D(GL_COLOR_ATTACHMENT0, m_mipChain[0].texture);
 
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     m_mipfbo->unbind();
 
+    /*** Add render objects of scene ***/
     auto monkeyTransform = glm::translate(glm::mat4(1.f), glm::vec3(0, 3, -4)) * glm::scale(glm::mat4(1.f), glm::vec3(0.68f));
-    m_renderer->loadModel("/home/mafo/dev/Raytracer/assets/Suzanne.obj", programBasic, m_color, monkeyTransform);
+    m_renderer->loadModel("Assets/Suzanne.obj", programBasic, m_color, monkeyTransform);
 
     auto helmetTransform = glm::translate(glm::mat4(1.f), glm::vec3(0, 0, -3)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(1,0,0));
-    m_renderer->loadModel("/home/mafo/etc/glTF-Sample-Models/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf", programTexture, {0,0,0,1}, helmetTransform);
+    m_renderer->loadModel("Assets/DamagedHelmet/glTF/DamagedHelmet.gltf", programTexture, {0,0,0,1}, helmetTransform);
 
     auto hoverTransform = glm::translate(glm::mat4(1.f), glm::vec3(6, 0, -14)) * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,0,1)) * glm::scale(glm::mat4(1.f), glm::vec3(0.05f));
     hoverTransform = hoverTransform * glm::rotate(glm::mat4(1.f), deg2rad(90), glm::vec3(0,1,0));
@@ -290,8 +295,10 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_arm->m_boneWeight.resize(m_arm->m_vertices.size());
     computeWeight();
 
+    /*** Setup shadows ***/
     m_renderer->setupShadows(_camera->getNearPlane(), _camera->getFarPlane());
 
+    // TODO: refactor into renderer
     m_material->getShader()->bind();
     m_material->getShader()->setUniform1i("shadowMap", 0);
     m_material->getShader()->setUniform1i("envMap", 1);
@@ -331,6 +338,7 @@ BloomDemo::~BloomDemo() {
     delete m_renderer;
 }
 
+// Compute weights for cylinder
 void BloomDemo::computeWeight(){
     float d =(float)(value_d)/200;
     float min = 0.5-d;
@@ -357,12 +365,14 @@ void BloomDemo::computeWeight(){
     m_armRo->setMesh(newMesh);
 }
 
+// Compute rotations for cylinder
 void BloomDemo::computeRotation() {
-    m_arm->m_boneList[1]->rotateRestPose(-rot+180,glm::vec3(0.,0.,1.));
-    m_arm->m_boneList[1]->rotate(-rot3+180,glm::vec3(0.,1.,0.));
-    m_arm->m_boneList[0]->rotateRestPose(-rot2+180,glm::vec3(0.,0.,1.));
+    m_arm->m_boneList[1]->rotateRestPose(-m_rot + 180.f, glm::vec3(0,0,1));
+    m_arm->m_boneList[1]->rotate(-m_rot3 + 180.f, glm::vec3(0,1,0));
+    m_arm->m_boneList[0]->rotateRestPose(-m_rot2 + 180, glm::vec3(0,0,1));
 }
 
+// Update mesh vertices with new weights
 void BloomDemo::computeMesh() {
     std::vector<Vertex> newVertices;
     computeRotation();
@@ -381,6 +391,7 @@ void BloomDemo::computeMesh() {
     m_armRo->setMesh(newMesh);
 }
 
+// Update scene with available parameters in GUI
 void BloomDemo::compute() {
     m_programQuad->bind();
     m_programQuad->setUniform1f("exposure", m_exposure);
@@ -442,10 +453,13 @@ void BloomDemo::draw() {
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
     m_particle->update();
+
+    /*** Original render ***/
     m_renderer->draw();	
 
     glDrawBuffer(GL_COLOR_ATTACHMENT1);
 
+    /*** Threshold original render ***/
     m_programTh->bind();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_fboTexture);
@@ -453,6 +467,7 @@ void BloomDemo::draw() {
     m_renderer->draw(m_mesh, m_programTh);
     m_programTh->unbind();
 
+    /*** Downscale texture ***/
     m_mipfbo->bind();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_DEPTH_TEST);
@@ -480,6 +495,7 @@ void BloomDemo::draw() {
         m_programDown->unbind();
     }
 
+    /*** Upscale texture ***/
     m_programUp->bind();
     m_programUp->setUniform1f("filterRadius", 0.005f);
     glEnable(GL_BLEND);
@@ -507,7 +523,7 @@ void BloomDemo::draw() {
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA); // Restore if this was default
     glDisable(GL_BLEND);
 
-    // second pass
+    /*** final render to quad and gamma correction ***/
     m_mipfbo->unbind();
     glViewport(0,0, _width, _height);
     glDisable(GL_DEPTH_TEST);
@@ -548,27 +564,6 @@ bool BloomDemo::keyboard(unsigned char k) {
             _activecamera = (_activecamera+1)%2;
             _camera.reset(_cameraselector[_activecamera]());
             _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
-            return true;
-        case 'c' :
-            m_renderer->setMaterial(m_material);
-            return true;
-        case 'm' :
-            m_renderer->setMaterial(m_materialModified);
-            return true;
-        case 'n' :
-            m_renderer->setMaterial(m_materialNormal);
-            return true;
-        case 'u' :
-            m_renderer->setMaterial(m_materialParametric);
-            return true;
-        case 'l' :
-            m_renderer->setMaterial(m_materialLambert);
-            return true;
-        case 't' :
-            m_renderer->setMaterial(m_materialTexture);
-            return true;
-        case 'b' :
-            m_renderer->setMaterial(m_materialBasic);
             return true;
         default:
             return false;

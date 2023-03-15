@@ -131,7 +131,7 @@ void MyOpenGLWidget::paintGL() {
             if(ImGui::SliderFloat("threshold", &demo->m_threshold, 0, 100)){
               _openglDemo->compute();
             }
-            if(ImGui::SliderFloat("rot", &demo->rot, 0, 360)){
+            if(ImGui::SliderFloat("rot", &demo->m_rot, 0, 360)){
               demo->computeMesh();
             }
             if(ImGui::SliderInt("value d", &demo->value_d, 0, 100)){
