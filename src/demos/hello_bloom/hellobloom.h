@@ -41,6 +41,7 @@ public:
     void computeMesh();
 
     float m_exposure = 1.f;
+    float m_bloomStrength = 0.04f;
     float m_threshold = 0.935f;
     int value_d = 50;
     float m_rot = 180;

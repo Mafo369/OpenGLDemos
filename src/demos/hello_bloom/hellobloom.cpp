@@ -412,6 +412,7 @@ void BloomDemo::computeMesh() {
 void BloomDemo::compute() {
     m_programQuad->bind();
     m_programQuad->setUniform1f("exposure", m_exposure);
+    m_programQuad->setUniform1f("bloomStrength", m_bloomStrength);
     m_programQuad->unbind();
 
     m_programTh->bind();

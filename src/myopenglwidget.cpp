@@ -118,19 +118,22 @@ void MyOpenGLWidget::paintGL() {
             if(ImGui::SliderFloat3("light dir", glm::value_ptr(demo->lightDir), -10.f, 10.0)){
                 _openglDemo->compute();
             }
-            ImGui::Text("Surface:");
-            auto& color = _openglDemo->getColor();
-            if(ImGui::DragFloat3("surface color", (float*)glm::value_ptr(color), 0.01, 0, 200)){
-                _openglDemo->compute();
-            }
+            ImGui::Text("Microfacet material params:");
             ImGui::SliderFloat("metallic", demo->m_materialMicrofacet->getMetallic(), 0.0, 1.0);
             ImGui::SliderFloat("roughness", demo->m_materialMicrofacet->getRoughness(), 0.0, 1.0);
+
+            ImGui::Text("HDR + bloom parms:");
             if(ImGui::SliderFloat("exposure", &demo->m_exposure, 0, 20)){
               _openglDemo->compute();
             }
             if(ImGui::SliderFloat("threshold", &demo->m_threshold, 0, 100)){
               _openglDemo->compute();
             }
+            if(ImGui::SliderFloat("bloom strength", &demo->m_bloomStrength, 0, 0.7)){
+              _openglDemo->compute();
+            }
+
+            ImGui::Text("Animation parms:");
             if(ImGui::SliderFloat("rot", &demo->m_rot, 0, 360)){
               demo->computeMesh();
             }
@@ -140,17 +143,23 @@ void MyOpenGLWidget::paintGL() {
             }
         }
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Keybinds:");
-        ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "  Shaders:");
-        ImGui::Text("    'c' : glTF2.0 microfacets");
-        ImGui::Text("    'm' : modified microfacets");
-        ImGui::Text("    't' : texture microfacets");
-        ImGui::Text("    'l' : simple lambert");
-        ImGui::Text("    'n' : normals");
-        ImGui::Text("    'u' : UV coords");
+        ImGui::Text("    'w' : wireframe");
+        ImGui::Text("    'r' : reset verlet");
+        ImGui::Text("    'm' : toggle animation mode");
+        ImGui::Text("    'p' : perspective view (kinda buggy)");
+        //ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "  Shaders:");
+        //ImGui::Text("    'c' : glTF2.0 microfacets");
+        //ImGui::Text("    'm' : modified microfacets");
+        //ImGui::Text("    't' : texture microfacets");
+        //ImGui::Text("    'l' : simple lambert");
+        //ImGui::Text("    'n' : normals");
+        //ImGui::Text("    'u' : UV coords");
         ImGui::TextColored(ImVec4(1.0f, 0.0f, 1.0f, 1.0f), "  Demos:");
         ImGui::Text("    '0' : Hello triangle");
         ImGui::Text("    '1' : Bezier Surface");
         ImGui::Text("    '2' : Hello sphere");
+        ImGui::Text("    '3' : Hello bloom");
+
     }
 
     std::int64_t starttime = QDateTime::currentMSecsSinceEpoch();
