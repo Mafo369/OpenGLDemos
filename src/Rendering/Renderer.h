@@ -93,7 +93,7 @@ private:
 
     std::vector<BloomMip> m_mipChain;
 
-    Shader* m_programDepth;
+    Shader* m_programDepth = nullptr;
     Framebuffer* m_lightFBO;
     unsigned int m_matricesUBO;
 

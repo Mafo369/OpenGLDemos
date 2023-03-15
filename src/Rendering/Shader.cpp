@@ -19,7 +19,10 @@ Shader::Shader(const std::string& vertexFilepath, const std::string& fragmentFil
         std::cout << "Error: Invalid vertex shader!" << vertexFilepath << std::endl;
     if(source.fragmentSource.empty())
         std::cout << "Error: Invalid fragment shader!" << fragmentFilepath << std::endl;
-    m_rendererId = createShader( source.vertexSource, source.fragmentSource, readShader(geometryFilepath).str() );
+    auto geomSource = readShader(geometryFilepath).str();
+    if(geomSource.empty())
+        std::cout << "Error: Invalid geometry shader!" << geometryFilepath << std::endl;
+    m_rendererId = createShader( source.vertexSource, source.fragmentSource, geomSource );
 }
 
 Shader::~Shader(){

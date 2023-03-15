@@ -191,14 +191,14 @@ void MyOpenGLWidget::mousePressEvent(QMouseEvent *event) {
 void MyOpenGLWidget::mouseMoveEvent(QMouseEvent *event) {
     if(!ImGui::GetIO().WantCaptureMouse){
         _openglDemo->mousemove(event->x(), event->y());
-        update();
+        //update();
     }
 }
 
 void MyOpenGLWidget::wheelEvent( QWheelEvent* event ) {
     if(!ImGui::GetIO().WantCaptureMouse){
         _openglDemo->mousewheel( event->angleDelta().y() * 0.01f + event->angleDelta().x() * 0.01f );
-        update();
+        //update();
     }
 }
 
@@ -224,7 +224,7 @@ void MyOpenGLWidget::keyPressEvent(QKeyEvent *event) {
         case Qt::Key_Down:
             if(!ImGui::GetIO().WantCaptureMouse){
                 _openglDemo->keyboardmove(event->key()-Qt::Key_Left, 1./100/*double(_lastime)/10.*/);
-                update();
+                //update();
             }
         break;
         // Wireframe key

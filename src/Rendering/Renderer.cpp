@@ -354,6 +354,11 @@ void Renderer::setupShadows(float cameraNearPlane, float cameraFarPlane) {
 }
 
 void Renderer::depthOnlyPass(Camera* camera, glm::vec3& lightDir, int width, int height) {
+    if(m_programDepth == nullptr){
+      return;
+    }
+
+    m_programDepth->bind();
     glEnable(GL_DEPTH_TEST);
     // 0. UBO setup
     const auto lightMatrices = getLightSpaceMatrices(camera, m_shadowCascadeLevels, m_cameraNearPlane, m_cameraFarPlane, width, height, lightDir);
@@ -364,13 +369,11 @@ void Renderer::depthOnlyPass(Camera* camera, glm::vec3& lightDir, int width, int
     }
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    m_programDepth->bind();
-
     m_lightFBO->bind();
     glViewport(0, 0, depthMapResolution, depthMapResolution);
     glClear(GL_DEPTH_BUFFER_BIT);
     glCullFace(GL_FRONT);  // peter panning
-    setCameraPosition(camera->position());
+    m_programDepth->setCameraPosition(camera->position());
     draw(m_programDepth);
     glCullFace(GL_BACK);
     m_lightFBO->unbind();
