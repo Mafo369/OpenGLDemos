@@ -42,32 +42,32 @@ Demos:
 
 Microfacets
 
-![alt text](results/microfacets.png)
+![alt text](oldResults/microfacets.png)
 
 Microfacets modified
 
-![alt text](results/microfacetsmodified.png)
+![alt text](oldResults/microfacetsmodified.png)
 
 Microfacets + texture
 
-![alt text](results/microfacetstexture.png)
+![alt text](oldResults/microfacetstexture.png)
 
 Microfacets modified
 
-![alt text](results/microfacetsmodified1.png)
+![alt text](oldResults/microfacetsmodified1.png)
 
 Lambert
 
-![alt text](results/lambert.png)
+![alt text](oldResults/lambert.png)
 
 Normals
 
-![alt text](results/normals.png)
+![alt text](oldResults/normals.png)
 
 Parametric
 
-![alt text](results/parametric.png)
+![alt text](oldResults/parametric.png)
 
 Gui
 
-![alt text](results/gui.png)
+![alt text](oldResults/gui.png)
