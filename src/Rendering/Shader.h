@@ -30,6 +30,7 @@ public:
     void unbind() const;
 
     // utility uniform functions
+    void setMat4(const std::string& name, const glm::mat4& v);
     void setUniform4f(const std::string& name, const glm::vec4& v);
     void setUniform3f(const std::string& name, const glm::vec3& v);
     void setUniform1f(const std::string& name, float value);

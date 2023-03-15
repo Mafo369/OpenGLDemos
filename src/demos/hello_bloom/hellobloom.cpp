@@ -67,7 +67,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     Shader* programSpecular = 
         new Shader("Shaders/Camera.vert.glsl", "Shaders/Specular.frag.glsl");
     Shader* programWeight = 
-        new Shader("Shaders/Camera.vert.glsl", "Shaders/Weight.frag.glsl");
+        new Shader("Shaders/anim.vert.glsl", "Shaders/Weight.frag.glsl");
     m_programQuad = 
         new Shader("Shaders/Sample.vert.glsl", "Shaders/Quad.frag.glsl");
     m_programTh = 
@@ -113,7 +113,7 @@ BloomDemo::BloomDemo(int width, int height, ImVec4 clearColor) : OpenGLDemo(widt
     m_materialNormal = std::make_shared<Material>(programNormal);
     m_materialParametric = std::make_shared<Material>(programParametric);
     m_materialTexture = std::make_shared<Material>(programTexture, matParams, texture, textureSpecular, texNormal, texAO, texE);
-    m_materialWeight = std::make_shared<Material>(programWeight);
+    m_materialWeight = std::make_shared<Material>(programWeight, matParams);
     
     m_first = false;
 
@@ -376,9 +376,11 @@ void BloomDemo::computeRotation() {
 void BloomDemo::computeMesh() {
     std::vector<Vertex> newVertices;
     computeRotation();
-    for(auto i=0; i<(int)m_arm->m_vertices.size(); i++){
+    if(!m_animMode)
+      return;
+    for(unsigned int i=0; i < m_arm->m_vertices.size(); i++){
         glm::mat4 blend(0);
-        for(uint j=0; j<m_arm->m_boneWeight[i].size(); j++){
+        for(unsigned int j=0; j < m_arm->m_boneWeight[i].size(); j++){
             std::pair<int,float> pair = m_arm->m_boneWeight[i][j];
             Bone* bone = m_arm->m_boneList[pair.first];
             blend += pair.second * bone->getBlendPose();
@@ -453,6 +455,22 @@ void BloomDemo::draw() {
     m_renderer->setVP(_view, _projection);
     m_renderer->setCameraPosition(_camera->position());
     m_particle->update();
+
+    auto pose = glm::mat4(1.f);
+    m_materialWeight->getShader()->bind();
+    if(m_animMode){
+      m_materialWeight->getShader()->setMat4("bone1", pose);
+      m_materialWeight->getShader()->setMat4("bone2", pose);
+    }
+    else {
+      if(m_arm->m_boneList.size() >= 1){
+        m_materialWeight->getShader()->setMat4("bone1", m_arm->m_boneList[0]->getBlendPose());
+      }
+      if(m_arm->m_boneList.size() >= 2){
+        m_materialWeight->getShader()->setMat4("bone2", m_arm->m_boneList[1]->getBlendPose());
+      }
+    }
+    m_materialWeight->getShader()->unbind();
 
     /*** Original render ***/
     m_renderer->draw();	
@@ -564,6 +582,16 @@ bool BloomDemo::keyboard(unsigned char k) {
             _activecamera = (_activecamera+1)%2;
             _camera.reset(_cameraselector[_activecamera]());
             _camera->setviewport(glm::vec4(0.f, 0.f, _width, _height));
+            return true;
+        case 'm':
+            m_animMode = !m_animMode;
+            if(m_animMode){
+              std::cout << "CPU side animation" << std::endl;
+            }
+            else
+            {
+              std::cout << "GPU side animation" << std::endl;
+            }
             return true;
         default:
             return false;
