@@ -3,6 +3,7 @@
 ## IMPORTANT NOTE !!!
 
 **FILE HAS TO BE EXECUTED FROM build/ DUE TO RESSOURCES ACCESS**
+**Resizing is kind of broken for the moment**
 
 ## Getting Started
 
