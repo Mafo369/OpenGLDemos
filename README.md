@@ -1,9 +1,15 @@
 # OpenGLDemos
 
-## IMPORTANT NOTE !!!
+OpenGL implementation of core 3D graphics concepts.
 
-**FILE HAS TO BE EXECUTED FROM build/ DUE TO RESSOURCES ACCESS**
-**Resizing is kind of broken for the moment**
+Features:
+- HDR rendering: [Call-of-Duty:Advanced Warface Bloom implementation](https://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare/) + basic tonemapping
+- glTF 2.0 model loading and rendering
+- Environment mapping
+- Cascaded shadow mapping
+- Microfacet material model
+- Skinning animation (CPU and GPU based)
+- Bezier surfaces
 
 ## Getting Started
 
@@ -19,26 +25,26 @@ make
 ./OpenGLDemos
 ```
 
-## Keybinds:
-
-Shaders:
-
-- glTF 2.0 microfacets
-- modified microfacets
-- texture microfacets
-- simple lambert
-- normals
-- UV coords
-
-Demos:
-
-- **0** : clear
-- **1** : Hello triangle
-- **2** : Bezier Surface
-- **3** : Hello Sphere
-- **4** : Hello Bloom 
-
 ## Results: Bezier Surface
+
+
+Damaged Helmet
+
+![alt text](results/helmet.png)
+
+Bloom
+
+![alt text](results/bloom.png)
+
+Cascaded shadow mapping
+
+![alt text](results/csm.png)
+
+Skinning animation
+
+![alt text](results/arm0.png)
+![alt text](results/arm1.png)
+![alt text](results/arm2.png)
 
 Microfacets
 
@@ -60,14 +66,3 @@ Lambert
 
 ![alt text](oldResults/lambert.png)
 
-Normals
-
-![alt text](oldResults/normals.png)
-
-Parametric
-
-![alt text](oldResults/parametric.png)
-
-Gui
-
-![alt text](oldResults/gui.png)
